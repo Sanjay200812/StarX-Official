@@ -50,12 +50,8 @@ export const ScrollRevealHeading = ({
   const rxDegrees = isMobile ? 3.5 : 8;
 
   const opacity = useTransform(scrollYProgress, [0, 0.75], [0, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], [70, 0]);
-  const z = useTransform(scrollYProgress, [0, 1], [zDistance, 0]);
-  const rotateX = useTransform(scrollYProgress, [0, 1], [rxDegrees, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [0.95, 1]);
-  const blurNum = useTransform(scrollYProgress, [0, 0.85], [5, 0]);
-  const filter = useTransform(blurNum, (v) => (v > 0.2 ? `blur(${v}px)` : 'none'));
+  const y = useTransform(scrollYProgress, [0, 1], [28, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.985, 1]);
 
   const MotionComponent = motion[as] || motion.h2;
 
@@ -63,8 +59,6 @@ export const ScrollRevealHeading = ({
     <div
       ref={containerRef}
       style={{
-        perspective: `${perspective}px`,
-        transformStyle: 'preserve-3d',
         display: 'inline-block',
         width: '100%',
         position: 'relative'
@@ -76,12 +70,8 @@ export const ScrollRevealHeading = ({
           ...style,
           opacity,
           y,
-          z,
-          rotateX,
           scale,
-          filter,
-          transformPerspective: perspective,
-          willChange: 'transform, opacity, filter'
+          willChange: 'transform, opacity'
         }}
       >
         {children}

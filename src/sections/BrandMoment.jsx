@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { siteData } from '../data/siteData';
+import BrandLogo from '../components/BrandLogo';
 
 /**
  * BrandMoment Section (Section 9)
@@ -71,11 +72,9 @@ export const BrandMoment = () => {
       >
         {/* Slowly Enlarging STARX Logo Mark */}
         <motion.div style={{ scale: logoScale, marginBottom: '2rem' }}>
-          <img
-            src="/assets/brand/starx-symbol.svg"
-            alt="StarX"
-            style={{ width: '80px', height: '80px', margin: '0 auto 1.5rem auto' }}
-          />
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <BrandLogo size="xl" />
+          </div>
 
           <h2
             style={{

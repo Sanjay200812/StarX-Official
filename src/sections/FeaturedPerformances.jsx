@@ -30,18 +30,18 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
   return (
     <section
       id="performances"
+      className="section-standard"
       style={{
-        backgroundColor: '#050505',
-        padding: '12rem 2rem 10rem 2rem',
+        backgroundColor: 'transparent',
         overflow: 'hidden'
       }}
     >
-      <div className="container" style={{ maxWidth: '1280px' }}>
+      <div className="container">
         {/* Section Header with Depth Reveal */}
         <div
           style={{
             textAlign: 'center',
-            marginBottom: '5.5rem'
+            marginBottom: '3.5rem'
           }}
         >
           <div
@@ -52,7 +52,7 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#C1121F',
+              color: '#B3131B',
               textTransform: 'uppercase',
               marginBottom: '0.75rem'
             }}
@@ -62,7 +62,7 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#C1121F'
+                backgroundColor: '#B3131B'
               }}
             />
             LIVE CONCERTS
@@ -70,21 +70,21 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
 
           <ScrollRevealHeading
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: 'clamp(2.8rem, 5.5vw, 4.8rem)',
+              fontFamily: "var(--font-heading)",
+              fontSize: 'clamp(34px, 3.8vw, 50px)',
               fontWeight: 750,
-              letterSpacing: '-0.04em',
+              letterSpacing: '-0.03em',
               color: '#F5F5F7',
-              margin: '0 0 0.85rem 0'
+              margin: '0 0 0.65rem 0'
             }}
           >
-            LIVE PERFORMANCES.
+            LIVE PERFORMANCES
           </ScrollRevealHeading>
 
           <ScrollRevealParagraph
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: '1.2rem',
+              fontFamily: "var(--font-body)",
+              fontSize: 'clamp(15px, 1.1vw, 17px)',
               color: '#A1A1A6',
               letterSpacing: '-0.015em',
               margin: 0
@@ -96,7 +96,7 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
 
         {/* 1. Large Main Featured Performance (16:9 Canvas) */}
         {mainPerf && (
-          <div ref={featuredRef} style={{ position: 'relative', marginBottom: '5rem' }}>
+          <div ref={featuredRef} style={{ position: 'relative', maxWidth: '950px', margin: '0 auto 3rem auto' }}>
             <motion.div
               onClick={() => {
                 if (mainPerf.videoUrl) {
@@ -193,11 +193,11 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
                   <div>
                     <span
                       style={{
-                        fontFamily: "'Geist', 'Inter', sans-serif",
+                        fontFamily: "var(--font-body)",
                         fontSize: '0.75rem',
                         fontWeight: 700,
                         letterSpacing: '0.08em',
-                        color: '#C1121F',
+                        color: '#B3131B',
                         textTransform: 'uppercase'
                       }}
                     >
@@ -205,7 +205,7 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
                     </span>
                     <h3
                       style={{
-                        fontFamily: "'Geist', 'Inter', sans-serif",
+                        fontFamily: "var(--font-heading)",
                         fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)',
                         fontWeight: 750,
                         letterSpacing: '-0.03em',
@@ -227,7 +227,8 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
                       padding: '0 24px',
                       fontSize: '13.5px',
                       opacity: mainPerf.videoUrl ? 1 : 0.8,
-                      cursor: mainPerf.videoUrl ? 'pointer' : 'default'
+                      cursor: mainPerf.videoUrl ? 'pointer' : 'default',
+                      textTransform: 'none'
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -237,7 +238,7 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
                     }}
                   >
                     <Play size={15} fill={mainPerf.videoUrl ? '#050505' : '#F5F5F7'} />
-                    {mainPerf.videoUrl ? 'Watch Video' : 'VIDEO COMING SOON'}
+                    {mainPerf.videoUrl ? 'Watch video' : 'Video coming soon'}
                   </button>
                 </div>
               </div>
@@ -318,7 +319,7 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
                     }}
                   >
                     <Play size={13} fill="#F5F5F7" />
-                    <span>{perf.videoUrl ? 'Play' : 'COMING SOON'}</span>
+                    <span>{perf.videoUrl ? 'Play' : 'Coming soon'}</span>
                   </div>
                 </div>
               </div>
@@ -326,11 +327,11 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
               <div style={{ padding: '1.75rem' }}>
                 <span
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-body)",
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     letterSpacing: '0.08em',
-                    color: '#C1121F',
+                    color: '#B3131B',
                     textTransform: 'uppercase',
                     display: 'block',
                     marginBottom: '0.35rem'
@@ -340,7 +341,7 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
                 </span>
                 <h4
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-heading)",
                     fontSize: '1.25rem',
                     fontWeight: 700,
                     letterSpacing: '-0.025em',

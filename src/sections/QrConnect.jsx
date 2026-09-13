@@ -16,17 +16,17 @@ export const QrConnect = () => {
   return (
     <section
       id="connect"
+      className="section-standard"
       style={{
-        backgroundColor: '#050505',
-        padding: '12rem 2rem 10rem 2rem',
+        backgroundColor: 'transparent',
         overflow: 'hidden'
       }}
     >
-      <div className="container" style={{ maxWidth: '1160px' }}>
+      <div className="container">
         {/* Section Header */}
         <div
           style={{
-            marginBottom: '5.5rem'
+            marginBottom: '3rem'
           }}
         >
           <div
@@ -37,7 +37,7 @@ export const QrConnect = () => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#C1121F',
+              color: '#B3131B',
               textTransform: 'uppercase',
               marginBottom: '0.75rem'
             }}
@@ -47,7 +47,7 @@ export const QrConnect = () => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#C1121F'
+                backgroundColor: '#B3131B'
               }}
             />
             OFFICIAL CHANNELS
@@ -55,21 +55,21 @@ export const QrConnect = () => {
 
           <ScrollRevealHeading
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: 'clamp(2.8rem, 5.5vw, 4.8rem)',
+              fontFamily: "var(--font-heading)",
+              fontSize: 'clamp(34px, 3.8vw, 50px)',
               fontWeight: 750,
-              letterSpacing: '-0.04em',
+              letterSpacing: '-0.03em',
               color: '#F5F5F7',
-              margin: '0 0 0.85rem 0'
+              margin: '0 0 0.65rem 0'
             }}
           >
-            CONNECT WITH STARX.
+            CONNECT WITH STARX
           </ScrollRevealHeading>
 
           <ScrollRevealParagraph
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: '1.2rem',
+              fontFamily: "var(--font-body)",
+              fontSize: 'clamp(15px, 1.1vw, 17px)',
               color: '#A1A1A6',
               letterSpacing: '-0.015em',
               margin: 0
@@ -133,7 +133,7 @@ export const QrConnect = () => {
             <span
               style={{
                 display: 'block',
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-body)",
                 fontSize: '0.8rem',
                 letterSpacing: '0.06em',
                 color: '#737378',
@@ -146,8 +146,8 @@ export const QrConnect = () => {
             </span>
           </div>
 
-          {/* Right: Clean Large Social Links (Section 35) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Right: Minimalist List Links */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {/* Instagram */}
             <a
               href={social.instagram.url}
@@ -162,13 +162,13 @@ export const QrConnect = () => {
                 textDecoration: 'none',
                 transition: 'color 0.25s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#C1121F')}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
             >
               <div>
                 <span
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-body)",
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     letterSpacing: '0.08em',
@@ -180,7 +180,7 @@ export const QrConnect = () => {
                 </span>
                 <div
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-heading)",
                     fontSize: '1.75rem',
                     fontWeight: 700,
                     letterSpacing: '-0.025em',
@@ -188,7 +188,7 @@ export const QrConnect = () => {
                     marginTop: '0.2rem'
                   }}
                 >
-                  {social.instagram.label}
+                  {social.instagram.handle || '@starxliveband'}
                 </div>
               </div>
               <ArrowUpRight size={22} color="#737378" />
@@ -208,13 +208,13 @@ export const QrConnect = () => {
                 textDecoration: 'none',
                 transition: 'color 0.25s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#C1121F')}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
             >
               <div>
                 <span
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-body)",
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     letterSpacing: '0.08em',
@@ -226,7 +226,7 @@ export const QrConnect = () => {
                 </span>
                 <div
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-heading)",
                     fontSize: '1.75rem',
                     fontWeight: 700,
                     letterSpacing: '-0.025em',
@@ -234,7 +234,7 @@ export const QrConnect = () => {
                     marginTop: '0.2rem'
                   }}
                 >
-                  {social.facebook.label}
+                  {social.facebook.handle || '@starxliveband'}
                 </div>
               </div>
               <ArrowUpRight size={22} color="#737378" />
@@ -254,13 +254,13 @@ export const QrConnect = () => {
                 textDecoration: 'none',
                 transition: 'color 0.25s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#C1121F')}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
             >
               <div>
                 <span
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-body)",
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     letterSpacing: '0.08em',
@@ -272,7 +272,7 @@ export const QrConnect = () => {
                 </span>
                 <div
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-heading)",
                     fontSize: '1.75rem',
                     fontWeight: 700,
                     letterSpacing: '-0.025em',
@@ -280,7 +280,7 @@ export const QrConnect = () => {
                     marginTop: '0.2rem'
                   }}
                 >
-                  {social.youtube.label}
+                  {social.youtube.handle || '@starxliveband'}
                 </div>
               </div>
               <ArrowUpRight size={22} color="#737378" />

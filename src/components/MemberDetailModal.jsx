@@ -1,261 +1,359 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Instagram } from 'lucide-react';
+import { X, Instagram, ArrowRight } from 'lucide-react';
 import BrandedImage from './BrandedImage';
 
 /**
- * MemberDetailModal Component
- * Glassy premium modal dialog (Section 27 & 28):
- * Overlay: rgba(0, 0, 0, 0.72) with blur(10px).
- * Modal: rgba(18, 18, 20, 0.88) with blur(28px), border-radius 30px.
- * Smooth 0.7s entrance: opacity 0 -> 1, translateY 24px -> 0, scale 0.96 -> 1.
+ * MemberDetailModal Component (Specs 20–24)
+ * Smoked black glass modal dialog:
+ * - Overlay: rgba(0, 0, 0, 0.78) with backdrop-filter: blur(10px)
+ * - Modal: rgba(15, 15, 17, 0.94) with blur(24px), border-radius 24px, 1px solid rgba(255, 255, 255, 0.08)
+ * - Smooth entrance: opacity 0 -> 1, translateY 18px -> 0, scale 0.97 -> 1 (650ms, cubic-bezier(0.22, 1, 0.36, 1))
+ * - Left: member image (4:5 ratio)
+ * - Right: name, role, 4-5 line bio, Instagram link
+ * - Mobile: image on top, text underneath
+ * - Preserve exact scroll position when opening and closing
  */
 export const MemberDetailModal = ({ isOpen, onClose, member }) => {
+  const scrollPosRef = useRef(0);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
     };
 
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      scrollPosRef.current = window.scrollY;
       window.addEventListener('keydown', handleKeyDown);
-    } else {
-      document.body.style.overflow = '';
     }
 
     return () => {
-      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
+      // Ensure scroll position is strictly preserved
+      if (scrollPosRef.current) {
+        window.scrollTo(0, scrollPosRef.current);
+      }
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen || !member) return null;
-
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.35 }}
-        onClick={onClose}
-        style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.72)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          zIndex: 99998,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '1.5rem'
-        }}
-      >
+      {isOpen && member && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.96, y: 24 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: 24 }}
-          transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
-          onClick={(e) => e.stopPropagation()}
+          key="member-detail-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.35 }}
+          onClick={onClose}
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
           style={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: '860px',
-            backgroundColor: 'rgba(18, 18, 20, 0.88)',
-            backdropFilter: 'blur(28px) saturate(115%)',
-            WebkitBackdropFilter: 'blur(28px) saturate(115%)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '28px',
-            boxShadow: '0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
-            overflow: 'hidden'
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.76)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            zIndex: 99998,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1.25rem'
           }}
         >
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            aria-label="Close dialog"
+          <motion.div
+            initial={{ opacity: 0, scale: 0.985, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.985, y: 12 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            onClick={(e) => e.stopPropagation()}
             style={{
-              position: 'absolute',
-              top: '1.25rem',
-              right: '1.25rem',
-              width: '38px',
-              height: '38px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              position: 'relative',
+              width: '100%',
+              maxWidth: '820px',
+              backgroundColor: 'rgba(15, 15, 17, 0.96)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#F5F5F7',
-              cursor: 'pointer',
-              zIndex: 10,
-              transition: 'all 0.25s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
+              borderRadius: '24px',
+              boxShadow: '0 30px 80px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+              overflow: 'hidden',
+              maxHeight: '90vh'
             }}
           >
-            <X size={18} />
-          </button>
-
-          {/* Dialog Split Content */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr',
-              alignItems: 'stretch'
-            }}
-            className="member-modal-grid"
-          >
-            {/* Left: Artist Photo Canvas */}
-            <div
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              aria-label="Close details"
               style={{
-                position: 'relative',
-                width: '100%',
-                backgroundColor: '#0D0D0F',
-                minHeight: '340px'
-              }}
-            >
-              <BrandedImage
-                src={member.image}
-                alt={`${member.name} - ${member.role}`}
-                aspectRatio="3/4"
-                fallbackTitle={member.name}
-                fallbackSubtitle={member.role}
-                variant="member"
-              />
-            </div>
-
-            {/* Right: Artist Details */}
-            <div
-              style={{
-                padding: '3rem 2.5rem',
+                position: 'absolute',
+                top: '1.15rem',
+                right: '1.15rem',
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
                 display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between'
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#F5F5F7',
+                cursor: 'pointer',
+                zIndex: 10,
+                transition: 'all 0.25s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.12)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)';
               }}
             >
-              <div>
-                <span
-                  style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    color: '#C1121F',
-                    textTransform: 'uppercase',
-                    display: 'block',
-                    marginBottom: '0.4rem'
-                  }}
-                >
-                  {member.role}
-                </span>
+              <X size={18} />
+            </button>
 
-                <h3
-                  style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
-                    fontSize: '2.3rem',
-                    fontWeight: 750,
-                    letterSpacing: '-0.035em',
-                    color: '#F5F5F7',
-                    margin: '0 0 1.5rem 0',
-                    lineHeight: 1.15
-                  }}
-                >
-                  {member.name}
-                </h3>
-
-                <span
-                  style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.08em',
-                    color: '#737378',
-                    textTransform: 'uppercase',
-                    display: 'block',
-                    marginBottom: '0.6rem'
-                  }}
-                >
-                  ABOUT
-                </span>
-
-                {/* 4-5 line biography */}
-                <p
-                  style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
-                    fontSize: '0.98rem',
-                    color: '#A1A1A6',
-                    lineHeight: 1.68,
-                    margin: 0
-                  }}
-                >
-                  {member.bio}
-                </p>
-              </div>
-
-              {/* Bottom Row: Instagram Link if available */}
+            {/* Split Content (Desktop: Left Image / Right Text; Mobile: Stacked) */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr',
+                alignItems: 'stretch',
+                overflowY: 'auto',
+                maxHeight: '90vh'
+              }}
+              className="member-modal-grid"
+            >
+              {/* Left: Artist / Crew Photo Canvas */}
               <div
                 style={{
-                  marginTop: '2.5rem',
-                  paddingTop: '1.25rem',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
+                  position: 'relative',
+                  width: '100%',
+                  backgroundColor: '#0D0D0F',
+                  minHeight: '340px'
                 }}
               >
-                <span
-                  style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
-                    fontSize: '0.8rem',
-                    color: '#737378',
-                    fontWeight: 500
-                  }}
-                >
-                  StarX Live Artist
-                </span>
+                <BrandedImage
+                  src={member.image}
+                  alt={`${member.name} - ${member.role}`}
+                  aspectRatio="4/5"
+                  fallbackTitle={member.name}
+                  fallbackSubtitle={member.role}
+                  variant="member"
+                  objectFit="cover"
+                  objectPosition="center"
+                />
+              </div>
 
-                {member.instagram && (
-                  <a
-                    href={member.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
+              {/* Right: Artist / Crew Details */}
+              <div className="member-modal-details-col">
+                <div>
+                  {/* 1. Member Name: Sora */}
+                  <h3
                     style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      fontFamily: "'Geist', 'Inter', sans-serif",
-                      fontSize: '0.85rem',
-                      fontWeight: 500,
+                      fontFamily: "var(--font-heading)",
+                      fontSize: 'clamp(24px, 2.6vw, 32px)',
+                      fontWeight: 700,
+                      letterSpacing: '-0.025em',
                       color: '#F5F5F7',
-                      textDecoration: 'none',
-                      transition: 'color 0.25s ease'
+                      margin: '0 0 0.35rem 0',
+                      lineHeight: 1.15
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#C1121F')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = '#F5F5F7')}
                   >
-                    <Instagram size={16} />
-                    <span>Instagram</span>
-                  </a>
-                )}
+                    {member.name}
+                  </h3>
+
+                  {/* 2. Member Role: Inter */}
+                  <div
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: '14.5px',
+                      fontWeight: 500,
+                      letterSpacing: '0.01em',
+                      color: '#B3131B',
+                      marginBottom: '1.4rem',
+                      lineHeight: 1.35,
+                      overflowWrap: 'break-word',
+                      wordBreak: 'normal'
+                    }}
+                  >
+                    {member.role}
+                  </div>
+
+                  {/* 3. ABOUT Label */}
+                  <span
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      letterSpacing: '0.08em',
+                      color: '#737378',
+                      textTransform: 'uppercase',
+                      display: 'block',
+                      marginBottom: '0.65rem'
+                    }}
+                  >
+                    ABOUT
+                  </span>
+
+                  {/* 4. Biography (Two-paragraph structure preserved, unbolded, clean typography) */}
+                  <div
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: '15px',
+                      color: '#C7C7CC',
+                      lineHeight: 1.7,
+                      fontWeight: 400
+                    }}
+                  >
+                    {member.bio ? (
+                      member.bio.split(/\n\s*\n/).map((paragraph, pIdx, arr) => (
+                        <p
+                          key={pIdx}
+                          style={{
+                            margin: 0,
+                            marginBottom: pIdx < arr.length - 1 ? '14px' : '0',
+                            fontSize: '15px',
+                            lineHeight: 1.7,
+                            color: '#C7C7CC',
+                            fontWeight: 400
+                          }}
+                        >
+                          {paragraph.trim()}
+                        </p>
+                      ))
+                    ) : (
+                      <p style={{ margin: 0, fontSize: '15px', lineHeight: 1.7, color: '#C7C7CC', fontWeight: 400 }}>
+                        StarX Live Band member profile details will be updated soon. Artist background, performance information and additional profile details will be added here shortly.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bottom Row: Badge & Optional Social link */}
+                {(() => {
+                  const isJosh = member.name === 'B. Josh';
+                  const rawIg = !isJosh && (member.instagramUrl || member.instagram || '');
+                  const instagramUrl = typeof rawIg === 'string' && rawIg.trim().length > 0 ? rawIg.trim() : '';
+                  const instagramLabel = member.instagramLabel || (member.isCrew ? '@s_a_n_j_u_7__' : '@starxliveband');
+                  const hasInstagram = Boolean(instagramUrl);
+                  const badgeText = member.badge || (member.isCrew ? 'StarX Production & Crew' : 'StarX Live Artist');
+
+                  if (!badgeText && !hasInstagram) return null;
+
+                  return (
+                    <div
+                      style={{
+                        marginTop: '1.85rem',
+                        paddingTop: '1.25rem',
+                        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: hasInstagram ? 'space-between' : 'flex-start',
+                        gap: '1rem',
+                        flexWrap: 'wrap'
+                      }}
+                    >
+                      {badgeText ? (
+                        <span
+                          style={{
+                            fontFamily: "var(--font-body)",
+                            fontSize: '12px',
+                            color: '#737378',
+                            fontWeight: 500
+                          }}
+                        >
+                          {badgeText}
+                        </span>
+                      ) : null}
+
+                      {hasInstagram ? (
+                        <a
+                          href={instagramUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="member-modal-ig-btn"
+                          aria-label={`Open Instagram profile for ${member.name}`}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                            <Instagram size={16} color="#B3131B" />
+                            <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left', lineHeight: 1.2 }}>
+                              <span
+                                style={{
+                                  fontSize: '10px',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.06em',
+                                  color: '#8E8E93',
+                                  fontWeight: 600
+                                }}
+                              >
+                                Instagram
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: '12.5px',
+                                  fontWeight: 500,
+                                  color: '#F5F5F7'
+                                }}
+                              >
+                                {instagramLabel}
+                              </span>
+                            </div>
+                          </div>
+                          <ArrowRight size={14} className="ig-btn-arrow" />
+                        </a>
+                      ) : null}
+                    </div>
+                  );
+                })()}
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        <style>{`
-          @media (min-width: 768px) {
-            .member-modal-grid {
-              grid-template-columns: 45% 55% !important;
+          <style>{`
+            .member-modal-details-col {
+              padding: 2.5rem 2.25rem;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
             }
-          }
-        `}</style>
-      </motion.div>
+            .member-modal-ig-btn {
+              display: inline-flex;
+              align-items: center;
+              gap: 0.75rem;
+              padding: 0.5rem 0.85rem;
+              border-radius: 12px;
+              background-color: rgba(255, 255, 255, 0.03);
+              border: 1px solid rgba(255, 255, 255, 0.08);
+              text-decoration: none;
+              color: #F5F5F7;
+              transition: background-color 0.25s ease, border-color 0.25s ease;
+              cursor: pointer;
+            }
+            .member-modal-ig-btn:hover {
+              background-color: rgba(255, 255, 255, 0.05) !important;
+              border-color: rgba(255, 255, 255, 0.16) !important;
+            }
+            .member-modal-ig-btn .ig-btn-arrow {
+              color: #8E8E93;
+              transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s ease;
+            }
+            .member-modal-ig-btn:hover .ig-btn-arrow {
+              transform: translateX(3px);
+              color: #F5F5F7;
+            }
+            @media (min-width: 768px) {
+              .member-modal-grid {
+                grid-template-columns: 46% 54% !important;
+              }
+            }
+            @media (max-width: 767px) {
+              .member-modal-details-col {
+                padding: 1.65rem 1.35rem;
+              }
+            }
+          `}</style>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 };

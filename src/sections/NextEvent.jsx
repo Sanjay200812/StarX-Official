@@ -39,17 +39,17 @@ export const NextEvent = () => {
     <section
       id="next-event"
       ref={sectionRef}
+      className="section-standard"
       style={{
         position: 'relative',
-        backgroundColor: '#090909',
-        padding: '12rem 2rem 10rem 2rem',
+        backgroundColor: 'transparent',
         overflow: 'hidden',
         perspective: '1400px'
       }}
     >
-      <div className="container" style={{ maxWidth: '1280px' }}>
+      <div className="container">
         {/* Header Label & Title */}
-        <div style={{ textAlign: 'center', marginBottom: '4.5rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <div
             style={{
               display: 'inline-flex',
@@ -58,7 +58,7 @@ export const NextEvent = () => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#C1121F',
+              color: '#B3131B',
               textTransform: 'uppercase',
               marginBottom: '0.75rem'
             }}
@@ -68,7 +68,7 @@ export const NextEvent = () => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#C1121F'
+                backgroundColor: '#B3131B'
               }}
             />
             UPCOMING SHOWCASE
@@ -76,20 +76,20 @@ export const NextEvent = () => {
 
           <ScrollRevealHeading
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: 'clamp(2.8rem, 5.5vw, 4.8rem)',
+              fontFamily: "var(--font-heading)",
+              fontSize: 'clamp(34px, 3.8vw, 50px)',
               fontWeight: 750,
-              letterSpacing: '-0.04em',
+              letterSpacing: '-0.03em',
               color: '#F5F5F7',
               margin: 0
             }}
           >
-            NEXT PERFORMANCE.
+            NEXT PERFORMANCE
           </ScrollRevealHeading>
         </div>
 
         {nextEvent ? (
-          <div style={{ position: 'relative', width: '100%', maxWidth: '1160px', margin: '0 auto' }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: '900px', margin: '0 auto' }}>
             {/* Expanding Product Showcase Visual */}
             <motion.div
               style={{
@@ -126,22 +126,22 @@ export const NextEvent = () => {
                 }}
               />
 
-              {/* Bottom-Left Smoked-Glass Information Overlay (Section 10 & 22) */}
+              {/* Bottom-Left Smoked-Glass Information Overlay */}
               <motion.div
                 style={{
                   position: 'absolute',
-                  bottom: '2rem',
-                  left: '2rem',
-                  maxWidth: '520px',
-                  width: 'calc(100% - 4rem)',
-                  backgroundColor: 'rgba(16, 16, 18, 0.82)',
-                  backdropFilter: 'blur(22px) saturate(120%)',
-                  WebkitBackdropFilter: 'blur(22px) saturate(120%)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  bottom: '1.75rem',
+                  left: '1.75rem',
+                  maxWidth: '480px',
+                  width: 'calc(100% - 3.5rem)',
+                  backgroundColor: 'rgba(15, 15, 17, 0.48)',
+                  backdropFilter: 'blur(18px)',
+                  WebkitBackdropFilter: 'blur(18px)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
                   boxShadow:
-                    '0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
-                  borderRadius: '24px',
-                  padding: '2.25rem',
+                    '0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+                  borderRadius: '20px',
+                  padding: '1.85rem',
                   opacity: glassOpacity,
                   y: glassY,
                   zIndex: 10
@@ -150,11 +150,11 @@ export const NextEvent = () => {
                 <span
                   style={{
                     display: 'block',
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-body)",
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     letterSpacing: '0.08em',
-                    color: '#C1121F',
+                    color: '#B3131B',
                     textTransform: 'uppercase',
                     marginBottom: '0.4rem'
                   }}
@@ -164,12 +164,12 @@ export const NextEvent = () => {
 
                 <h3
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
-                    fontSize: 'clamp(1.8rem, 3.2vw, 2.5rem)',
+                    fontFamily: "var(--font-heading)",
+                    fontSize: 'clamp(20px, 2.2vw, 26px)',
                     fontWeight: 750,
-                    letterSpacing: '-0.03em',
+                    letterSpacing: '-0.025em',
                     color: '#F5F5F7',
-                    margin: '0 0 0.85rem 0',
+                    margin: '0 0 0.65rem 0',
                     lineHeight: 1.15
                   }}
                 >
@@ -178,11 +178,11 @@ export const NextEvent = () => {
 
                 <p
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
-                    fontSize: '1rem',
+                    fontFamily: "var(--font-body)",
+                    fontSize: 'clamp(14px, 1vw, 15.5px)',
                     color: '#A1A1A6',
                     lineHeight: 1.55,
-                    margin: '0 0 1.5rem 0'
+                    margin: '0 0 1.25rem 0'
                   }}
                 >
                   {nextEvent.description || 'Follow StarX for updates.'}
@@ -203,7 +203,7 @@ export const NextEvent = () => {
                   >
                     {nextEvent.venue && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <MapPin size={15} color="#C1121F" />
+                        <MapPin size={15} color="#B3131B" />
                         <span>
                           {nextEvent.venue}, {nextEvent.location}
                         </span>
@@ -212,7 +212,7 @@ export const NextEvent = () => {
 
                     {nextEvent.date && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <Calendar size={15} color="#C1121F" />
+                        <Calendar size={15} color="#B3131B" />
                         <span>{nextEvent.date}</span>
                       </div>
                     )}
@@ -248,7 +248,7 @@ export const NextEvent = () => {
           >
             <h3
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: '1.8rem',
                 fontWeight: 700,
                 color: '#F5F5F7',

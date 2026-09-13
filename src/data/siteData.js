@@ -60,7 +60,7 @@ export const siteData = {
     genresText: "CLASSIC • ROCK • WESTERN",
     languagesText: "TELUGU • HINDI",
     locationText: "HYDERABAD",
-    image: "/assets/gallery/gallery-02.jpg",
+    image: "/assets/gallery/gallery-03.jpg",
     imageAlt: "StarX Live stage performance"
   },
 
@@ -85,50 +85,94 @@ export const siteData = {
   },
 
   // ==========================================
-  // 4. MEMBERS (ARTISTS)
-  // Section 11 & 12: Premium placeholders
-  // DO NOT use current group photos as fake individual portraits.
+  // 4. MEMBERS (ARTISTS) - REAL STARX LINEUP
   // ==========================================
   members: [
     {
       id: 1,
-      name: "MEMBER 01",
-      role: "VOCALS",
-      image: "/assets/artists/member-01.jpg",
-      bio: "Artist profile and musician introduction will be updated soon. This section will feature their musical background, performance role in StarX, and vocal style.",
-      instagram: "https://www.instagram.com/starxliveband"
+      name: "B. Prasad",
+      role: "Rhythm Pad",
+      image: "/assets/artists/b-prasad.jpg",
+      bio: "Profile details will be updated soon.",
+      instagram: ""
     },
     {
       id: 2,
-      name: "MEMBER 02",
-      role: "LEAD GUITAR",
-      image: "/assets/artists/member-02.jpg",
-      bio: "Artist profile and musician introduction will be updated soon. This section will feature their guitar influences, riff crafting, and stage performance contribution.",
-      instagram: "https://www.instagram.com/starxliveband"
+      name: "B. Joseph",
+      role: "Drum Kit",
+      image: "/assets/artists/b-joseph.jpg",
+      bio: "Profile details will be updated soon.",
+      instagram: ""
     },
     {
       id: 3,
-      name: "MEMBER 03",
-      role: "KEYBOARD",
-      image: "/assets/artists/member-03.jpg",
-      bio: "Artist profile and musician introduction will be updated soon. This section will feature their synthesizer arrangements, soundscapes, and keyboard solos.",
-      instagram: "https://www.instagram.com/starxliveband"
+      name: "G. Perumalla Rao",
+      role: "Piano 1",
+      image: "/assets/artists/g-perumalla-rao.jpg",
+      bio: "Profile details will be updated soon.",
+      instagram: ""
     },
     {
       id: 4,
-      name: "MEMBER 04",
-      role: "BASS",
-      image: "/assets/artists/member-04.jpg",
-      bio: "Artist profile and musician introduction will be updated soon. This section will feature their low-end groove, rhythm foundation, and live performance energy.",
-      instagram: "https://www.instagram.com/starxliveband"
+      name: "N. Thirapatiyya",
+      role: "Lead Guitar",
+      image: "/assets/artists/n-thirapatiyya.jpg",
+      bio: "Profile details will be updated soon.",
+      instagram: ""
     },
     {
       id: 5,
-      name: "MEMBER 05",
-      role: "DRUMS",
-      image: "/assets/artists/member-05.jpg",
-      bio: "Artist profile and musician introduction will be updated soon. This section will feature their percussive drive, dynamic rhythm sections, and drum breakdowns.",
-      instagram: "https://www.instagram.com/starxliveband"
+      name: "E. Chandra Mohan",
+      role: "Bass Guitar",
+      image: "/assets/artists/e-chandra-mohan.jpg",
+      bio: "Profile details will be updated soon.",
+      instagram: ""
+    },
+    {
+      id: 6,
+      name: "K. Sudhakar",
+      role: "Singer",
+      image: "/assets/artists/k-sudhakar.jpg",
+      bio: "Profile details will be updated soon.",
+      instagram: ""
+    },
+    {
+      id: 7,
+      name: "G. Vijay",
+      role: "Singer",
+      image: "/assets/artists/g-vijay.jpg",
+      bio: "Profile details will be updated soon.",
+      instagram: ""
+    }
+  ],
+
+  // ==========================================
+  // 4.1 BEHIND STARX (CREW & PRODUCTION)
+  // ==========================================
+  crew: [
+    {
+      id: 1,
+      name: "B. Josh",
+      role: "Program & Event Manager",
+      image: "/assets/crew/b-josh.jpg",
+      bio: `B. Josh is the Program & Event Manager of StarX Live, handling programs, bookings, and event coordination. He manages communication with clients and organizers and coordinates the team for every performance.
+
+He is the primary contact for StarX Live bookings and inquiries, ensuring smooth planning and execution of every event.`,
+      instagramLabel: "",
+      instagramUrl: "",
+      isCrew: true
+    },
+    {
+      id: 2,
+      name: "B. Sanjay",
+      role: "Digital Media & Creative Director",
+      image: "/assets/crew/b-sanjay.jpg",
+      bio: `B. Sanjay is the Digital Media & Creative Director of StarX Live, handling the band’s digital presence and creative work. He manages video editing, social media content, and digital branding across Instagram, Facebook, and YouTube.
+
+He also manages and maintains the StarX Live website and online platforms, helping present the band’s music, performances, and events in a modern and engaging way.`,
+      instagramLabel: "@s_a_n_j_u_7__",
+      instagramUrl: "https://www.instagram.com/s_a_n_j_u_7__/",
+      isCrew: true
     }
   ],
 
@@ -185,52 +229,22 @@ export const siteData = {
   // ==========================================
   gallery: [
     {
-      id: "gal-1",
+      id: "gal-stage",
       type: "photo",
-      title: "StarX Live Stage Performance",
-      subtitle: "Live Concert Stage • Hyderabad",
+      title: "StarX Stage",
+      subtitle: "Live Stage Setup • Hyderabad",
       image: "/assets/gallery/gallery-01.jpg",
-      alt: "StarX Live stage performance"
+      alt: "StarX Stage - Live Stage Setup Hyderabad",
+      downloadFileName: "StarX-Stage.jpg"
     },
     {
-      id: "gal-2",
+      id: "gal-members",
       type: "photo",
-      title: "StarX Live Concert",
-      subtitle: "Stage Spotlight & Atmosphere",
-      image: "/assets/gallery/gallery-02.jpg",
-      alt: "StarX live concert"
-    },
-    {
-      id: "gal-3",
-      type: "photo",
-      title: "StarX Program Performance",
-      subtitle: "Concert Lights & Crowd Energy",
-      image: "/assets/gallery/gallery-03.jpg",
-      alt: "StarX program performance"
-    },
-    {
-      id: "gal-4",
-      type: "photo",
-      title: "StarX Live Stage Performance",
-      subtitle: "Musicians Under Stage Spotlights",
-      image: "/assets/gallery/gallery-04.jpg",
-      alt: "StarX Live stage performance"
-    },
-    {
-      id: "gal-5",
-      type: "photo",
-      title: "StarX Live Concert",
-      subtitle: "Band Arena Showcase",
+      title: "StarX Members",
+      subtitle: "StarX Live Band",
       image: "/assets/gallery/gallery-05.jpg",
-      alt: "StarX live concert"
-    },
-    {
-      id: "gal-6",
-      type: "photo",
-      title: "StarX Program Performance",
-      subtitle: "Live Rock Recreations",
-      image: "/assets/gallery/gallery-06.jpg",
-      alt: "StarX program performance"
+      alt: "StarX Members - StarX Live Band",
+      downloadFileName: "StarX-Members.jpg"
     }
   ],
 
@@ -330,19 +344,22 @@ export const siteData = {
   // ==========================================
   social: {
     instagram: {
-      label: "@starxliveband",
-      url: "https://www.instagram.com/starxliveband",
-      handle: "@starxliveband"
+      platform: "INSTAGRAM",
+      name: "StarX Live Band",
+      handle: "@starxliveband",
+      url: "https://www.instagram.com/starxliveband"
     },
     facebook: {
-      label: "@starxliveband",
-      url: "https://www.facebook.com/starxliveband",
-      handle: "@starxliveband"
+      platform: "FACEBOOK",
+      name: "Starx LiveBand",
+      handle: "@starxliveband",
+      url: "https://www.facebook.com/starxliveband?__tn__=%2Cd-UC*F"
     },
     youtube: {
-      label: "StarX Live",
-      url: "https://youtube.com/@starxlive",
-      handle: "@starxlive"
+      platform: "YOUTUBE",
+      name: "StarX Live Band",
+      handle: "@starxliveband",
+      url: "https://www.youtube.com/@starxliveband"
     }
   },
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
+import BrandLogo from '../components/BrandLogo';
 import { siteData } from '../data/siteData';
 
 /**
@@ -25,14 +26,15 @@ export const Footer = () => {
 
   return (
     <footer
+      id="footer"
       style={{
-        backgroundColor: '#050505',
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        padding: '6rem 0 3.5rem 0',
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        borderTop: '1.5px solid #B3131B',
+        padding: '3.25rem 0 2.25rem 0',
         position: 'relative'
       }}
     >
-      <div className="container" style={{ maxWidth: '1280px' }}>
+      <div className="container">
         {/* Main Footer Row */}
         <div
           style={{
@@ -40,35 +42,31 @@ export const Footer = () => {
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '2.5rem',
-            paddingBottom: '3.5rem',
+            gap: '2rem',
+            paddingBottom: '2.25rem',
             borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
           }}
         >
           {/* Left: Brand Identity */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <img
-              src={brand.logo}
-              alt="StarX Logo"
-              style={{ width: '28px', height: '28px', objectFit: 'contain' }}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <BrandLogo size="md" />
             <div>
               <span
                 style={{
-                  fontFamily: "'Geist', 'Inter', sans-serif",
-                  fontSize: '1.2rem',
+                  fontFamily: "var(--font-heading)",
+                  fontSize: '1.15rem',
                   fontWeight: 750,
                   letterSpacing: '-0.03em',
                   color: '#F5F5F7',
                   lineHeight: 1
                 }}
               >
-                STAR<span style={{ color: '#C1121F' }}>X</span> LIVE
+                STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
               </span>
               <span
                 style={{
                   display: 'block',
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-body)",
                   fontSize: '0.68rem',
                   fontWeight: 600,
                   letterSpacing: '0.08em',
@@ -82,14 +80,14 @@ export const Footer = () => {
           </div>
 
           {/* Center: Navigation Links */}
-          <nav style={{ display: 'flex', gap: '1.85rem', flexWrap: 'wrap' }}>
+          <nav style={{ display: 'flex', gap: '1.75rem', flexWrap: 'wrap' }}>
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 style={{
-                  fontFamily: "'Geist', 'Inter', sans-serif",
-                  fontSize: '0.85rem',
+                  fontFamily: "var(--font-body)",
+                  fontSize: '13.5px',
                   fontWeight: 500,
                   color: '#A1A1A6',
                   textDecoration: 'none',
@@ -112,10 +110,10 @@ export const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label="Instagram"
                 style={{ color: '#737378', transition: 'color 0.25s ease' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#C1121F')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#737378')}
               >
-                <Instagram size={19} />
+                <Instagram size={18} />
               </a>
             )}
             {social.facebook.url && (
@@ -125,10 +123,10 @@ export const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label="Facebook"
                 style={{ color: '#737378', transition: 'color 0.25s ease' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#C1121F')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#737378')}
               >
-                <Facebook size={19} />
+                <Facebook size={18} />
               </a>
             )}
             {social.youtube.url && (
@@ -138,10 +136,10 @@ export const Footer = () => {
                 rel="noopener noreferrer"
                 aria-label="YouTube"
                 style={{ color: '#737378', transition: 'color 0.25s ease' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#C1121F')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#737378')}
               >
-                <Youtube size={19} />
+                <Youtube size={18} />
               </a>
             )}
           </div>
@@ -156,7 +154,7 @@ export const Footer = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '1rem',
-            fontFamily: "'Geist', 'Inter', sans-serif",
+            fontFamily: "var(--font-body)",
             fontSize: '0.85rem',
             color: '#737378'
           }}
@@ -174,7 +172,7 @@ export const Footer = () => {
         <div
           style={{
             marginTop: '1.25rem',
-            fontFamily: "'Geist', 'Inter', sans-serif",
+            fontFamily: "var(--font-body)",
             fontSize: '0.75rem',
             color: '#55555A',
             lineHeight: 1.5

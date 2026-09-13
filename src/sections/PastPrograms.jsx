@@ -16,17 +16,17 @@ export const PastPrograms = ({ onOpenMoment }) => {
   return (
     <section
       id="events"
+      className="section-standard"
       style={{
-        backgroundColor: '#050505',
-        padding: '12rem 2rem 10rem 2rem',
+        backgroundColor: 'transparent',
         overflow: 'hidden'
       }}
     >
-      <div className="container" style={{ maxWidth: '1160px' }}>
+      <div className="container">
         {/* Section Header */}
         <div
           style={{
-            marginBottom: '5rem'
+            marginBottom: '3rem'
           }}
         >
           <div
@@ -37,7 +37,7 @@ export const PastPrograms = ({ onOpenMoment }) => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#C1121F',
+              color: '#B3131B',
               textTransform: 'uppercase',
               marginBottom: '0.75rem'
             }}
@@ -47,7 +47,7 @@ export const PastPrograms = ({ onOpenMoment }) => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#C1121F'
+                backgroundColor: '#B3131B'
               }}
             />
             PERFORMANCE ARCHIVE
@@ -55,21 +55,21 @@ export const PastPrograms = ({ onOpenMoment }) => {
 
           <ScrollRevealHeading
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: 'clamp(2.8rem, 5.5vw, 4.8rem)',
+              fontFamily: "var(--font-heading)",
+              fontSize: 'clamp(34px, 3.8vw, 50px)',
               fontWeight: 750,
-              letterSpacing: '-0.04em',
+              letterSpacing: '-0.03em',
               color: '#F5F5F7',
-              margin: '0 0 0.85rem 0'
+              margin: '0 0 0.65rem 0'
             }}
           >
-            ON THE STAGE.
+            ON THE STAGE
           </ScrollRevealHeading>
 
           <ScrollRevealParagraph
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: '1.2rem',
+              fontFamily: "var(--font-body)",
+              fontSize: 'clamp(15px, 1.1vw, 17px)',
               color: '#A1A1A6',
               letterSpacing: '-0.015em',
               margin: 0
@@ -122,10 +122,10 @@ const EventRow = ({ event, index, onOpenMoment }) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', flexWrap: 'wrap' }}>
         <span
           style={{
-            fontFamily: "'Geist', 'Inter', sans-serif",
+            fontFamily: "var(--font-body)",
             fontSize: '1rem',
             fontWeight: 700,
-            color: isHovered ? '#C1121F' : '#737378',
+            color: isHovered ? '#B3131B' : '#737378',
             width: '28px',
             transition: 'color 0.25s ease'
           }}
@@ -137,7 +137,7 @@ const EventRow = ({ event, index, onOpenMoment }) => {
           <div>
             <h3
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: 'clamp(1.5rem, 2.8vw, 2.1rem)',
                 fontWeight: 700,
                 letterSpacing: '-0.03em',
@@ -159,7 +159,7 @@ const EventRow = ({ event, index, onOpenMoment }) => {
                 fontSize: '0.92rem'
               }}
             >
-              <MapPin size={14} color={isHovered ? '#C1121F' : '#737378'} />
+              <MapPin size={14} color={isHovered ? '#B3131B' : '#737378'} />
               <span>
                 {event.venue}, {event.location}
               </span>
@@ -171,7 +171,7 @@ const EventRow = ({ event, index, onOpenMoment }) => {
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -8 }}
             transition={{ duration: 0.25 }}
-            style={{ color: '#C1121F' }}
+            style={{ color: '#B3131B' }}
           >
             <ArrowRight size={18} />
           </motion.div>
@@ -190,7 +190,7 @@ const EventRow = ({ event, index, onOpenMoment }) => {
             fontWeight: 500
           }}
         >
-          <Calendar size={15} color={isHovered ? '#C1121F' : '#737378'} />
+          <Calendar size={15} color={isHovered ? '#B3131B' : '#737378'} />
           <span>{event.date}</span>
         </div>
 
@@ -202,10 +202,11 @@ const EventRow = ({ event, index, onOpenMoment }) => {
             padding: '0 20px',
             fontSize: '13px',
             gap: '0.4rem',
-            color: isHovered ? '#FFFFFF' : '#A1A1A6'
+            color: isHovered ? '#FFFFFF' : '#A1A1A6',
+            textTransform: 'none'
           }}
         >
-          <span>View Media</span>
+          <span>View media</span>
           <ArrowUpRight size={14} />
         </button>
       </div>

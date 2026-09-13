@@ -20,7 +20,24 @@ export const BrandedImage = ({
   objectPosition = 'center center',
   variant = 'default' // 'default' | 'member'
 }) => {
+  const [currentSrc, setCurrentSrc] = useState(src);
   const [hasError, setHasError] = useState(!src);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  React.useEffect(() => {
+    setCurrentSrc(src);
+    setHasError(!src);
+    setIsLoaded(false);
+  }, [src]);
+
+  const handleImageError = () => {
+    if (currentSrc && currentSrc.endsWith('.jpg')) {
+      // If .jpg fails, check if the file was saved as .jpeg before falling back to placeholder
+      setCurrentSrc(currentSrc.replace(/\.jpg$/, '.jpeg'));
+    } else {
+      setHasError(true);
+    }
+  };
 
   return (
     <div
@@ -29,24 +46,13 @@ export const BrandedImage = ({
         aspectRatio,
         backgroundColor: '#0D0D0F',
         border: '1px solid rgba(255, 255, 255, 0.06)',
+        position: 'relative',
         ...style
       }}
     >
-      {!hasError && src ? (
-        <img
-          src={src}
-          alt={alt}
-          onError={() => setHasError(true)}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit,
-            objectPosition,
-            display: 'block'
-          }}
-          loading="lazy"
-        />
-      ) : variant === 'member' ? (
+      {/* Underlying Clean StarX Placeholder */}
+      {(hasError || variant === 'member') && (
+        variant === 'member' ? (
         /* Member Specific Placeholder (Section 12): dark charcoal, glass, large faint star, clean silhouette */
         <div
           style={{
@@ -78,7 +84,7 @@ export const BrandedImage = ({
               pointerEvents: 'none'
             }}
           >
-            <svg viewBox="0 0 100 100" fill="#C1121F">
+            <svg viewBox="0 0 100 100" fill="#B3131B">
               <polygon points="50,4 62,35 95,35 68,55 78,88 50,68 22,88 32,55 5,35 38,35" />
             </svg>
           </div>
@@ -117,36 +123,40 @@ export const BrandedImage = ({
           </div>
 
           {/* Member Name / Number */}
-          <span
-            style={{
-              position: 'relative',
-              zIndex: 2,
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: '1.1rem',
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              color: '#F5F5F7',
-              marginBottom: '0.35rem'
-            }}
-          >
-            {fallbackTitle}
-          </span>
+          {fallbackTitle ? (
+            <span
+              style={{
+                position: 'relative',
+                zIndex: 2,
+                fontFamily: "var(--font-heading)",
+                fontSize: '1.1rem',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                color: '#F5F5F7',
+                marginBottom: '0.35rem'
+              }}
+            >
+              {fallbackTitle}
+            </span>
+          ) : null}
 
           {/* Member Role */}
-          <span
-            style={{
-              position: 'relative',
-              zIndex: 2,
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: '0.78rem',
-              fontWeight: 600,
-              letterSpacing: '0.08em',
-              color: '#C1121F',
-              textTransform: 'uppercase'
-            }}
-          >
-            {fallbackSubtitle}
-          </span>
+          {fallbackSubtitle ? (
+            <span
+              style={{
+                position: 'relative',
+                zIndex: 2,
+                fontFamily: "var(--font-body)",
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+                color: '#B3131B',
+                textTransform: 'uppercase'
+              }}
+            >
+              {fallbackSubtitle}
+            </span>
+          ) : null}
         </div>
       ) : (
         /* Premium Smoked Dark Surface Placeholder (Section 27) */
@@ -180,14 +190,14 @@ export const BrandedImage = ({
               marginBottom: '1rem'
             }}
           >
-            <svg viewBox="0 0 100 100" fill="#C1121F" style={{ width: '22px', height: '22px' }}>
+            <svg viewBox="0 0 100 100" fill="#B3131B" style={{ width: '22px', height: '22px' }}>
               <polygon points="50,5 63,35 95,36 69,57 78,89 50,70 22,89 31,57 5,36 37,35" />
             </svg>
           </div>
 
           <span
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: '0.95rem',
               fontWeight: 700,
               letterSpacing: '-0.02em',
@@ -200,7 +210,7 @@ export const BrandedImage = ({
 
           <span
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
+              fontFamily: "var(--font-body)",
               fontSize: '0.75rem',
               fontWeight: 500,
               letterSpacing: '0.06em',
@@ -211,7 +221,30 @@ export const BrandedImage = ({
             {fallbackSubtitle}
           </span>
         </div>
-      )}
+      ))}
+
+      {/* Real Image Layer */}
+      {!hasError && currentSrc ? (
+        <img
+          src={currentSrc}
+          alt={alt}
+          onLoad={() => setIsLoaded(true)}
+          onError={handleImageError}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit,
+            objectPosition,
+            display: 'block',
+            zIndex: 2,
+            opacity: isLoaded ? 1 : 0,
+            transition: 'opacity 0.4s ease'
+          }}
+          loading="lazy"
+        />
+      ) : null}
     </div>
   );
 };

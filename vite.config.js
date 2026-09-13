@@ -9,7 +9,14 @@ export default defineConfig({
     open: false,
     host: true,
     watch: {
-      ignored: ['**/public/assets/**']
+      ignored: [
+        '**/public/assets/**',
+        '**/scratch/**',
+        '**/.git/**',
+        '**/dist/**',
+        '**/*.log',
+        '**/temp_*/**'
+      ]
     }
   }
 });

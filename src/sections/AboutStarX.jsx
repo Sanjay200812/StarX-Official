@@ -29,25 +29,24 @@ export const AboutStarX = () => {
     <section
       id="about"
       ref={sectionRef}
+      className="section-standard"
       style={{
-        backgroundColor: '#050505',
-        padding: '12rem 2rem 10rem 2rem',
+        backgroundColor: 'transparent',
         overflow: 'hidden'
       }}
     >
       <div
         className="container"
         style={{
-          maxWidth: '1280px',
           display: 'grid',
           gridTemplateColumns: '1fr',
-          gap: '4.5rem',
+          gap: '3.5rem',
           alignItems: 'center'
         }}
         id="about-container-grid"
       >
         {/* Left Side: Label, 3D Title, Narrative & Specs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <div>
             <div
               style={{
@@ -57,9 +56,9 @@ export const AboutStarX = () => {
                 fontSize: '0.8rem',
                 fontWeight: 700,
                 letterSpacing: '0.1em',
-                color: '#C1121F',
+                color: '#B3131B',
                 textTransform: 'uppercase',
-                marginBottom: '1.25rem'
+                marginBottom: '1rem'
               }}
             >
               <span
@@ -67,7 +66,7 @@ export const AboutStarX = () => {
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
-                  backgroundColor: '#C1121F'
+                  backgroundColor: '#B3131B'
                 }}
               />
               ABOUT US
@@ -75,28 +74,26 @@ export const AboutStarX = () => {
 
             <ScrollRevealHeading
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
-                fontSize: 'clamp(3.2rem, 6vw, 5.8rem)',
+                fontFamily: "var(--font-heading)",
+                fontSize: 'clamp(34px, 3.8vw, 50px)',
                 fontWeight: 750,
-                letterSpacing: '-0.04em',
-                lineHeight: 1.02,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.08,
                 color: '#F5F5F7',
                 margin: 0
               }}
             >
-              WE ARE
-              <br />
-              STARX.
+              WE ARE STARX
             </ScrollRevealHeading>
           </div>
 
           <ScrollRevealParagraph
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: 'clamp(1.15rem, 1.8vw, 1.35rem)',
+              fontFamily: "var(--font-body)",
+              fontSize: 'clamp(15px, 1.1vw, 17px)',
               fontWeight: 400,
               color: '#A1A1A6',
-              lineHeight: 1.65,
+              lineHeight: 1.6,
               margin: 0,
               letterSpacing: '-0.015em'
             }}
@@ -125,7 +122,7 @@ export const AboutStarX = () => {
               <span
                 style={{
                   display: 'block',
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-body)",
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   letterSpacing: '0.08em',
@@ -138,7 +135,7 @@ export const AboutStarX = () => {
               </span>
               <span
                 style={{
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: '1rem',
                   fontWeight: 600,
                   color: '#F5F5F7',
@@ -153,7 +150,7 @@ export const AboutStarX = () => {
               <span
                 style={{
                   display: 'block',
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-body)",
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   letterSpacing: '0.08em',
@@ -166,10 +163,10 @@ export const AboutStarX = () => {
               </span>
               <span
                 style={{
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: '1rem',
                   fontWeight: 600,
-                  color: '#C1121F',
+                  color: '#B3131B',
                   letterSpacing: '-0.015em'
                 }}
               >
@@ -181,7 +178,7 @@ export const AboutStarX = () => {
               <span
                 style={{
                   display: 'block',
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-body)",
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   letterSpacing: '0.08em',
@@ -194,7 +191,7 @@ export const AboutStarX = () => {
               </span>
               <span
                 style={{
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: '1rem',
                   fontWeight: 600,
                   color: '#F5F5F7',
@@ -213,17 +210,20 @@ export const AboutStarX = () => {
           style={{
             position: 'relative',
             perspective: '1400px',
-            transformStyle: 'preserve-3d'
+            transformStyle: 'preserve-3d',
+            maxWidth: '520px',
+            width: '100%',
+            margin: '0 auto'
           }}
         >
           <motion.div
             style={{
               position: 'relative',
-              borderRadius: '26px',
+              borderRadius: '20px',
               overflow: 'hidden',
               backgroundColor: '#0D0D0F',
-              boxShadow: '0 30px 80px rgba(0, 0, 0, 0.7)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.55)',
+              border: '1px solid rgba(255, 255, 255, 0.07)',
               scale: imageScale,
               z: imageZ,
               opacity: imageOpacity,
@@ -263,7 +263,7 @@ export const AboutStarX = () => {
             >
               <span
                 style={{
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-body)",
                   fontSize: '0.75rem',
                   fontWeight: 700,
                   letterSpacing: '0.08em',
@@ -279,7 +279,7 @@ export const AboutStarX = () => {
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    backgroundColor: '#C1121F'
+                    backgroundColor: '#B3131B'
                   }}
                 />
                 LIVE STAGE PERFORMANCE

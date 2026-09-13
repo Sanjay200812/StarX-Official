@@ -8,92 +8,54 @@ import BrandedImage from './BrandedImage';
  * Portrait card displaying StarX musician with 3D tilt, red rim lighting,
  * and dark concert aesthetic.
  */
-export const MemberCard = ({ member }) => {
-  const [rotate, setRotate] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleMouseMove = (e) => {
-    const isTouch = window.matchMedia('(hover: none)').matches;
-    if (isTouch) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-
-    // Subtle 3D tilt
-    setRotate({
-      x: -(y / (rect.height / 2)) * 7,
-      y: (x / (rect.width / 2)) * 7
-    });
-  };
-
-  const handleMouseLeave = () => {
-    setRotate({ x: 0, y: 0 });
-    setIsHovered(false);
-  };
-
-  const getRoleIcon = (role = '') => {
-    const r = role.toUpperCase();
-    if (r.includes('VOCAL')) return Mic;
-    if (r.includes('DRUM')) return Disc;
-    return Music;
-  };
-
+export const MemberCard = ({ member, onClick }) => {
   return (
     <motion.div
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      animate={{
-        rotateX: rotate.x,
-        rotateY: rotate.y,
-        scale: isHovered ? 1.03 : 1
+      onClick={onClick}
+      initial={{ opacity: 0, y: 30, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{
+        y: -3,
+        transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
       }}
-      transition={{ type: 'spring', damping: 22, stiffness: 220, mass: 0.5 }}
       style={{
-        transformStyle: 'preserve-3d',
-        perspective: 1000
+        position: 'relative',
+        cursor: 'pointer'
       }}
       className="stage-card"
     >
-      {/* Portrait Image Container */}
+      {/* Portrait Image Container: Aspect Ratio 4:5 */}
       <div
         style={{
           position: 'relative',
           width: '100%',
-          aspectRatio: '3/4',
+          aspectRatio: '4/5',
           overflow: 'hidden'
         }}
       >
-        <BrandedImage
-          src={member.image}
-          alt={`${member.name} - ${member.role}`}
-          aspectRatio="3/4"
-          fallbackTitle={member.name}
-          fallbackSubtitle={member.role}
-          icon={getRoleIcon(member.role)}
-        />
-
-        {/* Red Rim Light along top/side edges on hover */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            border: isHovered
-              ? '2px solid rgba(255, 42, 53, 0.6)'
-              : '2px solid transparent',
-            borderRadius: '12px',
-            pointerEvents: 'none',
-            transition: 'border 0.3s ease'
-          }}
-        />
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <BrandedImage
+            src={member.image}
+            alt={`${member.name} - ${member.role}`}
+            aspectRatio="4/5"
+            fallbackTitle={member.name}
+            fallbackSubtitle={member.role}
+            variant="member"
+          />
+        </motion.div>
 
         {/* Heavy Bottom Vignette */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(180deg, transparent 30%, rgba(5, 5, 5, 0.95) 90%)',
+            background: 'linear-gradient(180deg, transparent 50%, rgba(5, 5, 5, 0.9) 100%)',
             pointerEvents: 'none'
           }}
         />

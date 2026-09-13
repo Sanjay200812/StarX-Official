@@ -3,13 +3,14 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Play, ArrowRight } from 'lucide-react';
 import { siteData } from '../data/siteData';
 import BrandedImage from '../components/BrandedImage';
+import BrandLogo from '../components/BrandLogo';
 
 /**
  * Hero Section (Section 18, 19, 20)
  * Premium dark background with subtle radial gradient, faint StarX silhouette,
  * massive Geist/Inter typography, scroll-driven depth scaling, and pill glass buttons.
  */
-export const Hero = ({ isIntroActive = false }) => {
+export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
   const { brand } = siteData;
   const sectionRef = useRef(null);
 
@@ -44,33 +45,41 @@ export const Hero = ({ isIntroActive = false }) => {
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       style={{
         position: 'relative',
-        minHeight: '115vh',
-        backgroundColor: '#050505',
-        backgroundImage:
-          'radial-gradient(circle at 70% 40%, #18181b 0%, #080808 45%, #030303 100%)',
+        minHeight: '78vh',
+        backgroundColor: 'transparent',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '8rem 1.5rem 6rem 1.5rem',
+        padding: '5.5rem 1.5rem 3.5rem 1.5rem',
         overflow: 'hidden',
         perspective: '1400px'
       }}
     >
-      {/* Hero Atmospheric Background (Section 4, 17, 18) */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `linear-gradient(to bottom, rgba(5, 5, 5, 0.72) 0%, rgba(5, 5, 5, 0.55) 50%, rgba(5, 5, 5, 0.95) 100%), url(${siteData.hero.desktopImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 30%',
-          opacity: 0.35,
-          filter: 'brightness(0.5)',
-          pointerEvents: 'none',
-          zIndex: 0
-        }}
-      />
+      <style>{`
+        .starx-banner-preview-wrapper:hover .starx-long-banner-img {
+          transform: scale(1.01);
+          filter: brightness(1.0);
+        }
+        .starx-banner-preview-wrapper:hover .banner-hover-badge {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .starx-long-banner-img {
+          width: 100%;
+          height: auto;
+          max-height: 76vh;
+          object-fit: contain;
+          object-position: center;
+        }
+        @media (max-width: 768px) {
+          .starx-long-banner-img {
+            max-height: none !important;
+            width: 100% !important;
+            height: auto !important;
+          }
+        }
+      `}</style>
 
       {/* Faint StarX Star Silhouette (Section 19: opacity 0.04-0.08, NO particles/smoke) */}
       <div
@@ -86,7 +95,7 @@ export const Hero = ({ isIntroActive = false }) => {
           zIndex: 1
         }}
       >
-        <svg viewBox="0 0 100 100" fill="none" stroke="#C1121F" strokeWidth="1">
+        <svg viewBox="0 0 100 100" fill="none" stroke="#B3131B" strokeWidth="1">
           <polygon points="50,4 62,35 95,35 68,55 78,88 50,68 22,88 32,55 5,35 38,35" />
         </svg>
       </div>
@@ -106,16 +115,12 @@ export const Hero = ({ isIntroActive = false }) => {
           willChange: 'transform, opacity'
         }}
       >
-        {/* Authentic StarX Brand Logo Emblem (Section 2 & 5) */}
+        {/* Authentic StarX Brand Logo Emblem */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-          <img
-            src="/assets/brand/starx-logo.png"
-            alt="StarX Emblem"
+          <BrandLogo
+            size="xl"
             style={{
-              width: '54px',
-              height: 'auto',
-              display: 'block',
-              filter: 'drop-shadow(0 10px 25px rgba(0, 0, 0, 0.7))'
+              boxShadow: '0 10px 25px rgba(0, 0, 0, 0.7)'
             }}
           />
         </div>
@@ -143,34 +148,34 @@ export const Hero = ({ isIntroActive = false }) => {
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              backgroundColor: '#C1121F'
+              backgroundColor: '#B3131B'
             }}
           />
           ROCK BAND • HYDERABAD
         </div>
 
-        {/* Real StarX Wordmark / Major Hero Title (Section 2 & 5) */}
-        <div style={{ marginBottom: '1.25rem' }}>
+        {/* Real StarX Wordmark / Major Hero Title (48px to 68px desktop) */}
+        <div style={{ marginBottom: '1rem' }}>
           <h1
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: 'clamp(4rem, 8vw, 8rem)',
+              fontFamily: "var(--font-heading)",
+              fontSize: 'clamp(48px, 5.2vw, 68px)',
               fontWeight: 750,
-              letterSpacing: '-0.045em',
-              lineHeight: 0.96,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.04,
               color: '#F5F5F7',
               margin: '0 auto',
-              maxWidth: '1080px'
+              maxWidth: '1050px'
             }}
           >
-            STAR<span style={{ color: '#C1121F' }}>X</span> LIVE
+            STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
           </h1>
           <div
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: 'clamp(0.9rem, 1.8vw, 1.25rem)',
+              fontFamily: "var(--font-heading)",
+              fontSize: 'clamp(14px, 1.6vw, 17px)',
               fontWeight: 600,
-              letterSpacing: '0.16em',
+              letterSpacing: '0.18em',
               color: '#737378',
               textTransform: 'uppercase',
               marginTop: '0.65rem'
@@ -180,23 +185,23 @@ export const Hero = ({ isIntroActive = false }) => {
           </div>
         </div>
 
-        {/* Tagline (Section 5) */}
+        {/* Tagline */}
         <p
           style={{
-            fontFamily: "'Geist', 'Inter', sans-serif",
-            fontSize: 'clamp(1.15rem, 2.2vw, 1.6rem)',
+            fontFamily: "var(--font-body)",
+            fontSize: 'clamp(15px, 1.1vw, 17px)',
             fontWeight: 400,
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.015em',
             color: '#A1A1A6',
-            lineHeight: 1.45,
-            maxWidth: '660px',
-            margin: '0 auto 2.5rem auto'
+            lineHeight: 1.5,
+            maxWidth: '620px',
+            margin: '0 auto 2.25rem auto'
           }}
         >
           {brand.tagline}
         </p>
 
-        {/* Pill Action Buttons (Section 5: WATCH LIVE, CONTACT STARX) */}
+        {/* Pill Action Buttons (Height 44-48px, normal casing) */}
         <div
           style={{
             display: 'flex',
@@ -210,27 +215,29 @@ export const Hero = ({ isIntroActive = false }) => {
           <button
             onClick={() => scrollToSection('#performances')}
             className="btn btn-primary"
+            style={{ height: '46px', textTransform: 'none' }}
           >
-            <Play size={16} fill="#050505" />
-            WATCH LIVE
+            <Play size={15} fill="#050505" />
+            Watch performance
           </button>
 
           <button
             onClick={() => scrollToSection('#contact')}
             className="btn btn-glass"
+            style={{ height: '46px', textTransform: 'none' }}
           >
-            CONTACT STARX
-            <ArrowRight size={16} />
+            Contact StarX
+            <ArrowRight size={15} />
           </button>
         </div>
 
-        {/* Sub-features: Genres & Languages in clean minimal typography (Section 5) */}
+        {/* Sub-features: Genres & Languages */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.45rem',
             fontSize: '0.85rem',
             fontWeight: 500,
             color: '#737378',
@@ -239,52 +246,88 @@ export const Hero = ({ isIntroActive = false }) => {
         >
           <div>CLASSIC • ROCK • WESTERN</div>
           <div>
-            <span style={{ color: '#C1121F', fontWeight: 600 }}>TELUGU • HINDI</span>
+            <span style={{ color: '#B3131B', fontWeight: 600 }}>TELUGU • HINDI</span>
             <span style={{ color: 'rgba(255, 255, 255, 0.15)', margin: '0 0.5rem' }}>•</span>
             <span>HYDERABAD</span>
           </div>
         </div>
       </motion.div>
 
-      {/* Hero Visual Container: scale: 0.90 -> 1, translateZ: -120px -> 0 (Section 4 & 24) */}
+      {/* StarX Long Banner Container (Requirements 13-22): max-width 1160px, radius 20px, contain, clickable */}
       <motion.div
+        className="starx-banner-preview-wrapper"
+        onClick={() => onOpenBanner && onOpenBanner()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (onOpenBanner) onOpenBanner();
+          }
+        }}
+        aria-label="View StarX Live banner full size"
         style={{
           position: 'relative',
           zIndex: 2,
-          marginTop: '4.5rem',
+          marginTop: '3.5rem',
           width: '100%',
-          maxWidth: '1100px',
+          maxWidth: '1160px',
+          margin: '3.5rem auto 0 auto',
           scale: imageScale,
           z: imageZ,
           transformPerspective: 1400,
-          borderRadius: '26px',
+          borderRadius: '20px',
           overflow: 'hidden',
           backgroundColor: '#0D0D0F',
-          boxShadow: '0 30px 80px rgba(0, 0, 0, 0.65)',
-          border: '1px solid rgba(255, 255, 255, 0.08)'
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.55)',
+          border: '1px solid rgba(255, 255, 255, 0.07)',
+          cursor: 'pointer',
+          userSelect: 'none'
         }}
       >
-        <div style={{ position: 'relative', width: '100%' }}>
-          <BrandedImage
-            src={siteData.hero.desktopImage}
-            alt="StarX Live Band - Concert Stage Performance"
-            aspectRatio="16/9"
-            objectFit="cover"
-            objectPosition="center 35%"
-            fallbackTitle="STARX LIVE"
-            fallbackSubtitle="ROCK BAND • HYDERABAD"
-          />
-
-          {/* Dark Overlay (Section 4: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.75))) */}
-          <div
+        <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
+          <img
+            src="/assets/brand/starx-long-banner.png"
+            alt="StarX Live Official Banner"
+            className="starx-long-banner-img"
             style={{
-              position: 'absolute',
-              inset: 0,
-              background:
-                'linear-gradient(to bottom, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.4) 60%, rgba(0, 0, 0, 0.75) 100%)',
-              pointerEvents: 'none'
+              width: '100%',
+              height: 'auto',
+              display: 'block',
+              objectFit: 'contain',
+              objectPosition: 'center',
+              filter: 'brightness(0.96)',
+              transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease'
             }}
           />
+
+          {/* Subtle Hover Badge (Requirement 21) */}
+          <div
+            className="banner-hover-badge"
+            style={{
+              position: 'absolute',
+              bottom: '16px',
+              right: '16px',
+              backgroundColor: 'rgba(15, 15, 18, 0.88)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.14)',
+              borderRadius: '999px',
+              padding: '6px 14px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: '#F5F5F7',
+              fontSize: '12px',
+              fontWeight: 500,
+              opacity: 0,
+              transform: 'translateY(4px)',
+              transition: 'opacity 0.3s ease, transform 0.3s ease',
+              pointerEvents: 'none'
+            }}
+          >
+            <span>View banner</span>
+          </div>
         </div>
       </motion.div>
     </motion.section>

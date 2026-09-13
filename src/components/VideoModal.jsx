@@ -25,14 +25,12 @@ export const VideoModal = ({ isOpen, onClose, video }) => {
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen || !video) return null;
-
   const isYouTube =
-    video.videoType === 'youtube' ||
-    (video.videoUrl && (video.videoUrl.includes('youtube') || video.videoUrl.includes('youtu.be')));
+    video && (video.videoType === 'youtube' ||
+    (video.videoUrl && (video.videoUrl.includes('youtube') || video.videoUrl.includes('youtu.be'))));
 
   // Normalize YouTube URL for embed
-  let embedUrl = video.videoUrl || '';
+  let embedUrl = video?.videoUrl || '';
   if (isYouTube && embedUrl) {
     if (embedUrl.includes('watch?v=')) {
       embedUrl = embedUrl.replace('watch?v=', 'embed/');
@@ -43,10 +41,12 @@ export const VideoModal = ({ isOpen, onClose, video }) => {
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      {isOpen && video && (
+        <motion.div
+          key="video-modal-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
         transition={{ duration: 0.35 }}
         onClick={onClose}
         style={{
@@ -96,19 +96,19 @@ export const VideoModal = ({ isOpen, onClose, video }) => {
               <span
                 style={{
                   display: 'inline-block',
-                  color: '#C1121F',
+                  color: '#B3131B',
                   fontSize: '0.75rem',
                   fontWeight: 700,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  fontFamily: "'Geist', 'Inter', sans-serif"
+                  fontFamily: "var(--font-body)"
                 }}
               >
                 STARX LIVE STAGE
               </span>
               <h3
                 style={{
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontSize: '1.25rem',
                   fontWeight: 700,
                   color: '#F5F5F7',
@@ -243,6 +243,7 @@ export const VideoModal = ({ isOpen, onClose, video }) => {
           )}
         </motion.div>
       </motion.div>
+      )}
     </AnimatePresence>
   );
 };

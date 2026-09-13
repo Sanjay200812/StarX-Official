@@ -52,7 +52,7 @@ export const BrandIdentity = ({ onOpenPhoto }) => {
     <section
       id="identity"
       style={{
-        backgroundColor: '#050505',
+        backgroundColor: 'transparent',
         padding: '12rem 2rem 10rem 2rem',
         overflow: 'hidden'
       }}
@@ -73,7 +73,7 @@ export const BrandIdentity = ({ onOpenPhoto }) => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#C1121F',
+              color: '#B3131B',
               textTransform: 'uppercase',
               marginBottom: '0.75rem'
             }}
@@ -83,7 +83,7 @@ export const BrandIdentity = ({ onOpenPhoto }) => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#C1121F'
+                backgroundColor: '#B3131B'
               }}
             />
             BRAND SHOWCASE
@@ -91,7 +91,7 @@ export const BrandIdentity = ({ onOpenPhoto }) => {
 
           <ScrollRevealHeading
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
+              fontFamily: "var(--font-heading)",
               fontSize: 'clamp(2.8rem, 5.5vw, 4.8rem)',
               fontWeight: 750,
               letterSpacing: '-0.04em',
@@ -104,7 +104,7 @@ export const BrandIdentity = ({ onOpenPhoto }) => {
 
           <ScrollRevealParagraph
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
+              fontFamily: "var(--font-body)",
               fontSize: '1.2rem',
               color: '#A1A1A6',
               letterSpacing: '-0.015em',
@@ -169,7 +169,7 @@ export const BrandIdentity = ({ onOpenPhoto }) => {
               padding: '12px 24px'
             }}
           >
-            <CreditCard size={16} color="#C1121F" />
+            <CreditCard size={16} color="#B3131B" />
             <span>View Official Visiting Card</span>
             <Eye size={14} color="#737378" />
           </button>
@@ -269,11 +269,11 @@ const ArtworkPanel = ({ item, colSpan, aspectRatio, onClick }) => {
             <span
               style={{
                 display: 'block',
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-body)",
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
-                color: '#C1121F',
+                color: '#B3131B',
                 textTransform: 'uppercase',
                 marginBottom: '0.25rem'
               }}
@@ -282,7 +282,7 @@ const ArtworkPanel = ({ item, colSpan, aspectRatio, onClick }) => {
             </span>
             <h3
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: '1.35rem',
                 fontWeight: 700,
                 letterSpacing: '-0.025em',

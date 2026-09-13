@@ -72,7 +72,7 @@ export const FloatingWhatsApp = () => {
                 <div>
                   <h4
                     style={{
-                      fontFamily: "'Geist', 'Inter', sans-serif",
+                      fontFamily: "var(--font-heading)",
                       fontSize: '0.95rem',
                       fontWeight: 700,
                       margin: 0,
@@ -157,7 +157,7 @@ export const FloatingWhatsApp = () => {
                     </span>
                     <span
                       style={{
-                        fontFamily: "'Geist', 'Inter', sans-serif",
+                        fontFamily: "var(--font-heading)",
                         fontSize: '1rem',
                         fontWeight: 700,
                         color: '#F5F5F7'
@@ -187,7 +187,7 @@ export const FloatingWhatsApp = () => {
 
             <p
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-body)",
                 fontSize: '0.75rem',
                 color: '#737378',
                 textAlign: 'center',

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Instagram, Facebook, Youtube } from 'lucide-react';
+import { X, Instagram, Facebook, Youtube, ChevronDown } from 'lucide-react';
+import BrandLogo from './BrandLogo';
+import ContactPopover from './ContactPopover';
 import { siteData } from '../data/siteData';
 
 /**
@@ -9,6 +11,7 @@ import { siteData } from '../data/siteData';
  */
 export const MobileMenu = ({ isOpen, onClose, navLinks, activeSection }) => {
   const { social } = siteData;
+  const [isContactPanelOpen, setIsContactPanelOpen] = useState(false);
 
   const handleLinkClick = (href) => {
     onClose();
@@ -50,22 +53,18 @@ export const MobileMenu = ({ isOpen, onClose, navLinks, activeSection }) => {
               paddingBottom: '1.25rem'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-              <img
-                src={siteData.brand.logo}
-                alt="StarX"
-                style={{ width: '28px', height: '28px', objectFit: 'contain' }}
-              />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <BrandLogo size="sm" />
               <span
                 style={{
-                  fontFamily: "'Geist', 'Inter', sans-serif",
+                  fontFamily: "var(--font-heading)",
                   fontWeight: 750,
                   fontSize: '1.15rem',
                   letterSpacing: '-0.03em',
                   color: '#F5F5F7'
                 }}
               >
-                STAR<span style={{ color: '#C1121F' }}>X</span> LIVE
+                STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
               </span>
             </div>
 
@@ -104,7 +103,7 @@ export const MobileMenu = ({ isOpen, onClose, navLinks, activeSection }) => {
                   key={link.name}
                   onClick={() => handleLinkClick(link.href)}
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-heading)",
                     fontSize: 'clamp(1.6rem, 5vw, 2.2rem)',
                     fontWeight: isActive ? 700 : 450,
                     letterSpacing: '-0.035em',
@@ -126,7 +125,7 @@ export const MobileMenu = ({ isOpen, onClose, navLinks, activeSection }) => {
                         width: '6px',
                         height: '6px',
                         borderRadius: '50%',
-                        backgroundColor: '#C1121F',
+                        backgroundColor: '#B3131B',
                         display: 'inline-block'
                       }}
                     />
@@ -135,6 +134,50 @@ export const MobileMenu = ({ isOpen, onClose, navLinks, activeSection }) => {
                 </button>
               );
             })}
+          </div>
+
+          {/* Contact StarX Action Button (Opens Popover Panel, does NOT navigate) */}
+          <div style={{ margin: '0 0 1.5rem 0' }}>
+            <button
+              type="button"
+              id="mobile-contact-starx-btn"
+              onClick={() => setIsContactPanelOpen((prev) => !prev)}
+              aria-expanded={isContactPanelOpen}
+              aria-haspopup="dialog"
+              className="btn btn-glass"
+              style={{
+                width: '100%',
+                height: '46px',
+                borderRadius: '14px',
+                fontSize: '14px',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                backgroundColor: isContactPanelOpen ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.06)',
+                borderColor: isContactPanelOpen ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.10)',
+                color: '#FFFFFF',
+                cursor: 'pointer'
+              }}
+            >
+              <span>Contact StarX</span>
+              <ChevronDown
+                size={16}
+                style={{
+                  transform: isContactPanelOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.25s ease'
+                }}
+              />
+            </button>
+
+            <AnimatePresence>
+              {isContactPanelOpen && (
+                <div style={{ marginTop: '10px' }}>
+                  <ContactPopover isMobile={true} onClose={onClose} />
+                </div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Bottom Socials & Location */}
@@ -185,7 +228,7 @@ export const MobileMenu = ({ isOpen, onClose, navLinks, activeSection }) => {
 
             <span
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-body)",
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 color: '#737378',

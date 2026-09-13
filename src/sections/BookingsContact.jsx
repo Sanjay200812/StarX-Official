@@ -14,17 +14,28 @@ export const BookingsContact = () => {
   return (
     <section
       id="contact"
+      className="section-standard"
       style={{
-        backgroundColor: '#090909',
-        padding: '12rem 2rem 10rem 2rem',
+        backgroundColor: 'transparent',
         overflow: 'hidden'
       }}
     >
-      <div className="container" style={{ maxWidth: '1200px' }}>
+      <div className="container" style={{ maxWidth: '1120px' }}>
+        <div
+          style={{
+            backgroundColor: 'rgba(15, 15, 17, 0.48)',
+            backdropFilter: 'blur(18px)',
+            WebkitBackdropFilter: 'blur(18px)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            borderRadius: '20px',
+            padding: 'clamp(1.75rem, 3vw, 2.75rem)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35)'
+          }}
+        >
         {/* Large Editorial Headline */}
         <div
           style={{
-            marginBottom: '6rem'
+            marginBottom: '2.5rem'
           }}
         >
           <div
@@ -35,9 +46,9 @@ export const BookingsContact = () => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#C1121F',
+              color: '#B3131B',
               textTransform: 'uppercase',
-              marginBottom: '1rem'
+              marginBottom: '0.75rem'
             }}
           >
             <span
@@ -45,7 +56,7 @@ export const BookingsContact = () => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#C1121F'
+                backgroundColor: '#B3131B'
               }}
             />
             BOOKINGS & ENQUIRIES
@@ -53,28 +64,28 @@ export const BookingsContact = () => {
 
           <ScrollRevealHeading
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: 'clamp(3.8rem, 7.8vw, 7.5rem)',
+              fontFamily: "var(--font-heading)",
+              fontSize: 'clamp(30px, 3.6vw, 48px)',
               fontWeight: 750,
-              letterSpacing: '-0.045em',
+              letterSpacing: '-0.03em',
               color: '#F5F5F7',
-              lineHeight: 0.98,
-              margin: '0 0 1.5rem 0'
+              lineHeight: 1.08,
+              margin: '0 0 0.85rem 0'
             }}
           >
             BRING STARX
             <br />
-            <span style={{ color: '#C1121F' }}>TO YOUR STAGE.</span>
+            <span style={{ color: '#B3131B' }}>TO YOUR STAGE.</span>
           </ScrollRevealHeading>
 
           <ScrollRevealParagraph
             style={{
-              fontFamily: "'Geist', 'Inter', sans-serif",
-              fontSize: 'clamp(1.15rem, 2vw, 1.45rem)',
+              fontFamily: "var(--font-body)",
+              fontSize: 'clamp(15px, 1.1vw, 17px)',
               color: '#A1A1A6',
-              maxWidth: '660px',
+              maxWidth: '600px',
               margin: 0,
-              lineHeight: 1.55,
+              lineHeight: 1.6,
               letterSpacing: '-0.015em'
             }}
           >
@@ -103,7 +114,7 @@ export const BookingsContact = () => {
               <div>
                 <span
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
+                    fontFamily: "var(--font-body)",
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     letterSpacing: '0.1em',
@@ -118,12 +129,12 @@ export const BookingsContact = () => {
 
                 <div
                   style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
-                    fontSize: 'clamp(2.6rem, 5.5vw, 4.2rem)',
+                    fontFamily: "var(--font-heading)",
+                    fontSize: 'clamp(2rem, 3.8vw, 3rem)',
                     fontWeight: 750,
-                    letterSpacing: '-0.04em',
+                    letterSpacing: '-0.03em',
                     color: '#F5F5F7',
-                    lineHeight: 1
+                    lineHeight: 1.1
                   }}
                 >
                   {phone.display}
@@ -179,7 +190,7 @@ export const BookingsContact = () => {
           <div>
             <span
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-body)",
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
@@ -194,7 +205,7 @@ export const BookingsContact = () => {
             <a
               href={contact.emailMailto}
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: '1.25rem',
                 fontWeight: 600,
                 letterSpacing: '-0.02em',
@@ -203,7 +214,7 @@ export const BookingsContact = () => {
                 wordBreak: 'break-all',
                 transition: 'color 0.25s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#C1121F')}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
               onMouseLeave={(e) => (e.currentTarget.style.color = '#F5F5F7')}
             >
               {contact.email}
@@ -214,7 +225,7 @@ export const BookingsContact = () => {
           <div>
             <span
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-body)",
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
@@ -228,7 +239,7 @@ export const BookingsContact = () => {
             </span>
             <div
               style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
+                fontFamily: "var(--font-heading)",
                 fontSize: '1.25rem',
                 fontWeight: 600,
                 letterSpacing: '-0.02em',
@@ -238,6 +249,7 @@ export const BookingsContact = () => {
               {contact.location}
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>

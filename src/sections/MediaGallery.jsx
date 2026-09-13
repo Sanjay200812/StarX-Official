@@ -1,329 +1,316 @@
-import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { Play } from 'lucide-react';
-import { siteData } from '../data/siteData';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Eye, Download } from 'lucide-react';
 import BrandedImage from '../components/BrandedImage';
-import { ScrollRevealHeading } from '../components/ScrollReveal';
+import { ScrollRevealHeading, ScrollRevealParagraph } from '../components/ScrollReveal';
 
 /**
- * MediaGallery Section (Section 30)
- * Premium dark editorial photography portfolio on #090909 with 26px radius,
- * subtle smoked-glass captions, and clean text filter tabs.
+ * MediaGallery Section
+ * "STARX IN ACTION"
+ * Standard In-Page 2-Card Grid.
+ *
+ * Requirements:
+ * - Single section: STARX IN ACTION
+ * - Normal in-page layout (no sticky, no 1-by-1 scroll scene)
+ * - 2 images side-by-side on desktop (StarX Stage, StarX Members)
+ * - Mobile: 1 image per row
+ * - Card max-width: ~520px each
+ * - Image ratio: 16:10 (height ~320px–380px)
+ * - Same visual design, radius, typography (Title 18–22px, Subtitle 13–14px)
+ * - Hover: image scale 1.02, card translateY -3px
+ * - Lightbox with original file download (StarX-Stage.jpg, StarX-Members.jpg)
  */
-export const MediaGallery = ({ onOpenPhoto, onPlayVideo }) => {
-  const { gallery } = siteData;
-  const [filter, setFilter] = useState('all');
+export const MediaGallery = ({ onOpenPhoto }) => {
+  const [isMobile, setIsMobile] = useState(false);
 
-  const filteredItems = gallery.filter((item) => {
-    if (filter === 'photos') return item.type === 'photo';
-    if (filter === 'videos') return item.type === 'video';
-    return true;
-  });
+  // Exact 2 featured media items requested (no duplicate / repeated stage images)
+  const mediaItems = [
+    {
+      id: 'gal-stage',
+      title: 'StarX Stage',
+      subtitle: 'Live Stage Setup • Hyderabad',
+      image: '/assets/gallery/gallery-01.jpg',
+      alt: 'StarX Stage - Live Stage Setup Hyderabad',
+      objectPosition: '55% 45%',
+      downloadFileName: 'StarX-Stage.jpg'
+    },
+    {
+      id: 'gal-members',
+      title: 'StarX Members',
+      subtitle: 'StarX Live Band',
+      image: '/assets/gallery/gallery-05.jpg',
+      alt: 'StarX Members - StarX Live Band',
+      objectPosition: 'center 32%',
+      downloadFileName: 'StarX-Members.jpg'
+    }
+  ];
 
-  const handleCardClick = (item) => {
-    if (item.type === 'video') {
-      onPlayVideo(item);
-    } else {
-      const photos = gallery.filter((g) => g.type === 'photo');
-      const idx = photos.findIndex((p) => p.id === item.id);
-      onOpenPhoto(photos, idx >= 0 ? idx : 0);
+  useEffect(() => {
+    const checkScreen = () => setIsMobile(window.innerWidth < 768);
+    checkScreen();
+    window.addEventListener('resize', checkScreen);
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
+
+  const handleCardClick = (index) => {
+    if (onOpenPhoto) {
+      onOpenPhoto(mediaItems, index);
     }
   };
 
   return (
     <section
       id="media"
+      className="section-standard"
       style={{
-        backgroundColor: '#090909',
-        padding: '12rem 2rem 10rem 2rem',
+        position: 'relative',
+        backgroundColor: 'transparent',
         overflow: 'hidden'
       }}
     >
-      <div className="container" style={{ maxWidth: '1280px' }}>
-        {/* Header & Minimal Text Filter Tabs */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            gap: '2rem',
-            marginBottom: '5rem'
-          }}
-        >
-          <div>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                color: '#C1121F',
-                textTransform: 'uppercase',
-                marginBottom: '0.75rem'
-              }}
-            >
-              <span
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  backgroundColor: '#C1121F'
-                }}
-              />
-              VISUAL ARCHIVE
-            </div>
-
-            <ScrollRevealHeading
-              style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
-                fontSize: 'clamp(2.8rem, 5.5vw, 4.8rem)',
-                fontWeight: 750,
-                letterSpacing: '-0.04em',
-                color: '#F5F5F7',
-                margin: 0
-              }}
-            >
-              STARX IN ACTION.
-            </ScrollRevealHeading>
-          </div>
-
-          {/* Simple Text Tabs with Red Underline */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-            {['all', 'photos', 'videos'].map((f) => {
-              const isActive = filter === f;
-              return (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  style={{
-                    fontFamily: "'Geist', 'Inter', sans-serif",
-                    fontSize: '0.88rem',
-                    fontWeight: isActive ? 700 : 500,
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                    color: isActive ? '#FFFFFF' : '#737378',
-                    position: 'relative',
-                    paddingBottom: '0.5rem',
-                    cursor: 'pointer',
-                    background: 'none',
-                    border: 'none',
-                    transition: 'color 0.25s ease'
-                  }}
-                >
-                  {f}
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeFilterUnderline"
-                      style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: '2px',
-                        backgroundColor: '#C1121F',
-                        borderRadius: '2px'
-                      }}
-                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Editorial Mixed-Composition Grid (Section 7: 1 large, 2 medium, 1 wide, 2 smaller) */}
-        <motion.div
-          layout
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(12, 1fr)',
-            gap: '2.5rem'
-          }}
-        >
-          <AnimatePresence>
-            {filteredItems.map((item, idx) => {
-              let colSpan = 'span 6';
-              let aspectRatio = '4/3';
-
-              if (idx === 0) {
-                // 1. One large landscape image
-                colSpan = 'span 12';
-                aspectRatio = '16/9';
-              } else if (idx === 1 || idx === 2) {
-                // 2 & 3. Two medium images
-                colSpan = 'span 6';
-                aspectRatio = '4/3';
-              } else if (idx === 3) {
-                // 4. One wide image
-                colSpan = 'span 12';
-                aspectRatio = '21/9';
-              } else if (idx === 4 || idx === 5) {
-                // 5 & 6. Two smaller images
-                colSpan = 'span 6';
-                aspectRatio = '4/3';
-              }
-
-              return (
-                <EditorialCard
-                  key={item.id}
-                  item={item}
-                  colSpan={colSpan}
-                  aspectRatio={aspectRatio}
-                  onClick={() => handleCardClick(item)}
-                />
-              );
-            })}
-          </AnimatePresence>
-        </motion.div>
-      </div>
-
       <style>{`
-        @media (max-width: 860px) {
-          .editorial-media-card {
-            grid-column: span 12 !important;
+        .media-grid-container {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 520px));
+          gap: 2rem;
+          justify-content: center;
+          margin: 0 auto;
+        }
+
+        @media (max-width: 820px) {
+          .media-grid-container {
+            grid-template-columns: minmax(0, 520px);
+            gap: 1.75rem;
           }
         }
+
+        .media-card-item {
+          transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .media-card-item:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+        }
+
+        .media-image-zoom {
+          transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .media-card-item:hover .media-image-zoom {
+          transform: scale(1.02);
+        }
       `}</style>
-    </section>
-  );
-};
 
-/**
- * EditorialCard Component (Section 7 & 8)
- * Scale: 0.94 -> 1, translateZ: -80px -> 0, opacity: 0.4 -> 1
- * border-radius: 24px (20-28px), no 3D tilting.
- */
-const EditorialCard = ({ item, colSpan, aspectRatio, onClick }) => {
-  const cardRef = useRef(null);
-
-  const { scrollYProgress } = useScroll({
-    target: cardRef,
-    offset: ['start 92%', 'start 55%']
-  });
-
-  const scale = useTransform(scrollYProgress, [0, 1], [0.94, 1]);
-  const z = useTransform(scrollYProgress, [0, 1], [-80, 0]);
-  const opacity = useTransform(scrollYProgress, [0, 0.75], [0.4, 1]);
-
-  const isVideo = item.type === 'video';
-
-  return (
-    <motion.div
-      ref={cardRef}
-      layout
-      onClick={onClick}
-      style={{
-        position: 'relative',
-        gridColumn: colSpan,
-        perspective: '1400px',
-        transformStyle: 'preserve-3d',
-        cursor: 'pointer'
-      }}
-      className="editorial-media-card"
-    >
-      <motion.div
+      {/* Top Header */}
+      <div
+        className="container"
         style={{
-          position: 'relative',
-          borderRadius: '24px',
-          overflow: 'hidden',
-          backgroundColor: '#0D0D0F',
-          border: '1px solid rgba(255, 255, 255, 0.07)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.55)',
-          scale,
-          z,
-          opacity,
-          transformPerspective: 1400,
-          willChange: 'transform, opacity'
+          textAlign: 'center',
+          marginBottom: isMobile ? '2.5rem' : '3.5rem'
         }}
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div style={{ position: 'relative', width: '100%', aspectRatio, overflow: 'hidden' }}>
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            style={{ width: '100%', height: '100%' }}
-          >
-            <BrandedImage
-              src={item.image}
-              alt={item.title || 'StarX Live stage performance'}
-              aspectRatio={aspectRatio}
-              objectFit="cover"
-              objectPosition="center 30%"
-              fallbackTitle={item.title}
-              fallbackSubtitle={item.subtitle}
-            />
-          </motion.div>
-
-          {/* Dark gradient overlay */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background:
-                'linear-gradient(180deg, transparent 50%, rgba(5, 5, 5, 0.85) 100%)',
-              pointerEvents: 'none'
-            }}
-          />
-
-          {/* Play Badge if Video */}
-          {isVideo && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                width: '44px',
-                height: '44px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(20, 20, 24, 0.75)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#F5F5F7',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.4)'
-              }}
-            >
-              <Play size={18} fill="#F5F5F7" style={{ marginLeft: '2px' }} />
-            </div>
-          )}
-
-          {/* Bottom Smoked-Glass Caption Overlay */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              padding: '1.75rem 2rem',
-              zIndex: 2
-            }}
-          >
-            <h4
-              style={{
-                fontFamily: "'Geist', 'Inter', sans-serif",
-                fontSize: '1.35rem',
-                fontWeight: 700,
-                letterSpacing: '-0.025em',
-                color: '#F5F5F7',
-                margin: '0 0 0.25rem 0'
-              }}
-            >
-              {item.title}
-            </h4>
-            <span style={{ fontSize: '0.85rem', color: '#A1A1A6' }}>
-              {item.subtitle}
-            </span>
-          </div>
+        <div className="label-accent" style={{ marginBottom: '0.75rem' }}>
+          <span className="label-accent-dot" />
+          VISUAL ARCHIVE
         </div>
-      </motion.div>
-    </motion.div>
+
+        <ScrollRevealHeading
+          className="section-title"
+          style={{ margin: '0 0 0.65rem 0' }}
+        >
+          STARX IN ACTION
+        </ScrollRevealHeading>
+
+        <ScrollRevealParagraph
+          className="section-subtitle"
+          style={{ maxWidth: '520px', margin: '0 auto' }}
+        >
+          Moments from live stages and sound checks across Hyderabad.
+        </ScrollRevealParagraph>
+      </div>
+
+      {/* 2-Card In-Page Media Grid */}
+      <div className="container">
+        <div className="media-grid-container">
+          {mediaItems.map((item, index) => (
+            <motion.div
+              key={item.id}
+              className="media-card-item"
+              initial={{ opacity: 0, y: 22, scale: 0.99 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{
+                duration: 0.75,
+                delay: index * 0.12,
+                ease: [0.22, 1, 0.36, 1]
+              }}
+              onClick={() => handleCardClick(index)}
+              style={{
+                backgroundColor: 'rgba(14, 14, 16, 0.44)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRadius: '18px',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                width: '100%',
+                maxWidth: '520px',
+                justifySelf: 'center',
+                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.35)'
+              }}
+            >
+              {/* Image Container (Ratio 16:10, cover) */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: '16 / 10',
+                  overflow: 'hidden',
+                  backgroundColor: '#0D0D10'
+                }}
+              >
+                <div className="media-image-zoom" style={{ width: '100%', height: '100%' }}>
+                  <BrandedImage
+                    src={item.image}
+                    alt={item.alt || item.title}
+                    aspectRatio="16/10"
+                    objectFit="cover"
+                    objectPosition={item.objectPosition}
+                    fallbackTitle={item.title}
+                    fallbackSubtitle={item.subtitle}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                </div>
+
+                {/* Subtle bottom gradient */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(180deg, transparent 55%, rgba(5, 5, 5, 0.82) 100%)',
+                    pointerEvents: 'none'
+                  }}
+                />
+
+                {/* Minimal Top-Right Action Controls (View & Download) */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    zIndex: 10
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleCardClick(index)}
+                    aria-label="View fullscreen"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                      height: '32px',
+                      padding: '0 12px',
+                      borderRadius: '999px',
+                      backgroundColor: 'rgba(15, 15, 18, 0.85)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      color: '#F5F5F7',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.16)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(15, 15, 18, 0.85)')}
+                  >
+                    <Eye size={12} />
+                    <span>View</span>
+                  </button>
+
+                  <a
+                    href={item.image}
+                    download={item.downloadFileName || 'StarX.jpg'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Download ${item.downloadFileName}`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                      height: '32px',
+                      padding: '0 12px',
+                      borderRadius: '999px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.10)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255, 255, 255, 0.14)',
+                      color: '#FFFFFF',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.18)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.10)')}
+                  >
+                    <Download size={12} />
+                    <span>Download</span>
+                  </a>
+                </div>
+
+                {/* Bottom Overlay Info (Title: 18px-22px, Subtitle: 13px-14px) */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: '1rem 1.25rem',
+                    zIndex: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.15rem'
+                  }}
+                >
+                  <h4
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: 'clamp(18px, 1.8vw, 21px)',
+                      fontWeight: 700,
+                      letterSpacing: '-0.025em',
+                      color: '#F5F5F7',
+                      margin: 0,
+                      lineHeight: 1.2
+                    }}
+                  >
+                    {item.title}
+                  </h4>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: '13px',
+                      fontWeight: 400,
+                      color: '#A1A1A6',
+                      letterSpacing: '-0.01em'
+                    }}
+                  >
+                    {item.subtitle}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
 
