@@ -290,8 +290,8 @@ export const BandMembers = () => {
 
         /* Crew Cards Hover & Responsive (Specs 3 & 4) */
         .crew-card {
-          flex: 0 1 240px;
-          max-width: 240px;
+          flex: 0 1 250px;
+          max-width: 255px;
           width: 100%;
           background-color: rgba(15, 15, 17, 0.52);
           backdrop-filter: blur(18px);
@@ -333,30 +333,30 @@ export const BandMembers = () => {
           flex-wrap: wrap;
           justify-content: center;
           gap: 1.5rem;
-          max-width: 560px;
+          max-width: 860px;
           margin: 0 auto;
           width: 100%;
         }
 
-        @media (max-width: 620px) {
+        @media (max-width: 767px) {
           .crew-grid-flow {
             flex-direction: column;
             align-items: center;
             gap: 1.25rem;
           }
           .crew-card {
-            flex: 0 0 min(100%, 260px) !important;
-            max-width: min(100%, 260px) !important;
+            flex: 0 0 min(100%, 280px) !important;
+            max-width: min(100%, 280px) !important;
           }
           .crew-role-text {
-            font-size: 12.5px !important;
+            font-size: 12px !important;
             line-height: 1.35 !important;
           }
         }
 
         .crew-role-text {
-          font-size: 13.5px;
-          line-height: 1.35;
+          font-size: 13px;
+          line-height: 1.38;
           word-break: normal;
           overflow-wrap: break-word;
         }

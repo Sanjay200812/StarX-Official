@@ -282,8 +282,8 @@ export const ImageLightbox = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              maxWidth: '90vw',
-              maxHeight: '85vh',
+              maxWidth: '92vw',
+              maxHeight: '92vh',
               position: 'relative'
             }}
             className="lightbox-image-stage"
@@ -293,8 +293,8 @@ export const ImageLightbox = ({
               alt={currentItem.title || 'StarX Live'}
               className="lightbox-fitted-image"
               style={{
-                maxWidth: '90vw',
-                maxHeight: '82vh',
+                maxWidth: '92vw',
+                maxHeight: '88vh',
                 width: 'auto',
                 height: 'auto',
                 objectFit: 'contain',

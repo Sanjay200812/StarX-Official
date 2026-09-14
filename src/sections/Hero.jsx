@@ -51,15 +51,25 @@ export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '5.5rem 1.5rem 3.5rem 1.5rem',
+        padding: 'clamp(4.25rem, 6.5vw, 5.25rem) 1.25rem clamp(2.5rem, 4vw, 3.5rem) 1.25rem',
         overflow: 'hidden',
         perspective: '1400px'
       }}
     >
       <style>{`
+        .starx-banner-preview-wrapper {
+          position: relative;
+          z-index: 2;
+          width: min(100%, 560px);
+          max-width: 560px;
+          margin: 3rem auto 0 auto;
+          background-color: transparent !important;
+          border-radius: 16px;
+        }
         .starx-banner-preview-wrapper:hover .starx-long-banner-img {
-          transform: scale(1.01);
+          transform: scale(1.015);
           filter: brightness(1.0);
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
         }
         .starx-banner-preview-wrapper:hover .banner-hover-badge {
           opacity: 1;
@@ -68,15 +78,27 @@ export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
         .starx-long-banner-img {
           width: 100%;
           height: auto;
-          max-height: 76vh;
+          max-height: 75vh;
           object-fit: contain;
           object-position: center;
+          display: block;
+          border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+          transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease, box-shadow 0.5s ease;
         }
         @media (max-width: 768px) {
+          .starx-banner-preview-wrapper {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 2.25rem auto 0 auto !important;
+            border-radius: 12px !important;
+          }
           .starx-long-banner-img {
             max-height: none !important;
             width: 100% !important;
             height: auto !important;
+            border-radius: 12px !important;
           }
         }
       `}</style>
@@ -154,15 +176,15 @@ export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
           ROCK BAND • HYDERABAD
         </div>
 
-        {/* Real StarX Wordmark / Major Hero Title (48px to 68px desktop) */}
-        <div style={{ marginBottom: '1rem' }}>
+        {/* Real StarX Wordmark / Major Hero Title (34px-56px clamp) */}
+        <div style={{ marginBottom: '0.85rem' }}>
           <h1
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: 'clamp(48px, 5.2vw, 68px)',
+              fontSize: 'clamp(34px, 4.4vw, 56px)',
               fontWeight: 750,
-              letterSpacing: '-0.04em',
-              lineHeight: 1.04,
+              letterSpacing: '-0.035em',
+              lineHeight: 1.05,
               color: '#F5F5F7',
               margin: '0 auto',
               maxWidth: '1050px'
@@ -173,12 +195,12 @@ export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
           <div
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: 'clamp(14px, 1.6vw, 17px)',
+              fontSize: 'clamp(13px, 1.3vw, 15px)',
               fontWeight: 600,
-              letterSpacing: '0.18em',
+              letterSpacing: '0.16em',
               color: '#737378',
               textTransform: 'uppercase',
-              marginTop: '0.65rem'
+              marginTop: '0.5rem'
             }}
           >
             ROCK BAND
@@ -189,45 +211,45 @@ export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: 'clamp(15px, 1.1vw, 17px)',
+            fontSize: 'clamp(14px, 1.05vw, 15.5px)',
             fontWeight: 400,
             letterSpacing: '-0.015em',
             color: '#A1A1A6',
-            lineHeight: 1.5,
-            maxWidth: '620px',
-            margin: '0 auto 2.25rem auto'
+            lineHeight: 1.55,
+            maxWidth: '600px',
+            margin: '0 auto 2rem auto'
           }}
         >
           {brand.tagline}
         </p>
 
-        {/* Pill Action Buttons (Height 44-48px, normal casing) */}
+        {/* Pill Action Buttons (Height 44-46px, normal casing) */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '1rem',
+            gap: '0.85rem',
             flexWrap: 'wrap',
-            marginBottom: '2.5rem'
+            marginBottom: '2.25rem'
           }}
         >
           <button
             onClick={() => scrollToSection('#performances')}
             className="btn btn-primary"
-            style={{ height: '46px', textTransform: 'none' }}
+            style={{ height: '44px', fontSize: '13.5px', textTransform: 'none' }}
           >
-            <Play size={15} fill="#050505" />
+            <Play size={14} fill="#050505" />
             Watch performance
           </button>
 
           <button
             onClick={() => scrollToSection('#contact')}
             className="btn btn-glass"
-            style={{ height: '46px', textTransform: 'none' }}
+            style={{ height: '44px', fontSize: '13.5px', textTransform: 'none' }}
           >
             Contact StarX
-            <ArrowRight size={15} />
+            <ArrowRight size={14} />
           </button>
         </div>
 
@@ -237,8 +259,8 @@ export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.45rem',
-            fontSize: '0.85rem',
+            gap: '0.4rem',
+            fontSize: '0.82rem',
             fontWeight: 500,
             color: '#737378',
             letterSpacing: '0.06em'
@@ -253,7 +275,7 @@ export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
         </div>
       </motion.div>
 
-      {/* StarX Long Banner Container (Requirements 13-22): max-width 1160px, radius 20px, contain, clickable */}
+      {/* StarX Long Banner Container: Transparent wrapper naturally sizing around the portrait poster */}
       <motion.div
         className="starx-banner-preview-wrapper"
         onClick={() => onOpenBanner && onOpenBanner()}
@@ -265,22 +287,14 @@ export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
             if (onOpenBanner) onOpenBanner();
           }
         }}
-        aria-label="View StarX Live banner full size"
+        aria-label="View StarX Live promotional banner full size"
         style={{
           position: 'relative',
           zIndex: 2,
-          marginTop: '3.5rem',
-          width: '100%',
-          maxWidth: '1160px',
-          margin: '3.5rem auto 0 auto',
           scale: imageScale,
           z: imageZ,
           transformPerspective: 1400,
-          borderRadius: '20px',
-          overflow: 'hidden',
-          backgroundColor: '#0D0D0F',
-          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.55)',
-          border: '1px solid rgba(255, 255, 255, 0.07)',
+          backgroundColor: 'transparent',
           cursor: 'pointer',
           userSelect: 'none'
         }}
@@ -290,15 +304,6 @@ export const Hero = ({ isIntroActive = false, onOpenBanner }) => {
             src="/assets/brand/starx-long-banner.png"
             alt="StarX Live Official Banner"
             className="starx-long-banner-img"
-            style={{
-              width: '100%',
-              height: 'auto',
-              display: 'block',
-              objectFit: 'contain',
-              objectPosition: 'center',
-              filter: 'brightness(0.96)',
-              transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease'
-            }}
           />
 
           {/* Subtle Hover Badge (Requirement 21) */}

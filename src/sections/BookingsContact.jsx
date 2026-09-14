@@ -65,12 +65,12 @@ export const BookingsContact = () => {
           <ScrollRevealHeading
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: 'clamp(30px, 3.6vw, 48px)',
+              fontSize: 'clamp(26px, 2.8vw, 40px)',
               fontWeight: 750,
               letterSpacing: '-0.03em',
               color: '#F5F5F7',
-              lineHeight: 1.08,
-              margin: '0 0 0.85rem 0'
+              lineHeight: 1.1,
+              margin: '0 0 0.75rem 0'
             }}
           >
             BRING STARX
@@ -81,7 +81,7 @@ export const BookingsContact = () => {
           <ScrollRevealParagraph
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: 'clamp(15px, 1.1vw, 17px)',
+              fontSize: 'clamp(14px, 1.05vw, 15.5px)',
               color: '#A1A1A6',
               maxWidth: '600px',
               margin: 0,
@@ -93,11 +93,15 @@ export const BookingsContact = () => {
           </ScrollRevealParagraph>
         </div>
 
-        {/* Thin Hairline Divider */}
-        <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.08)', width: '100%' }} />
-
-        {/* Dual Phone Numbers (Large Minimal Rows) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '3.5rem', margin: '4.5rem 0' }}>
+        {/* Real Phone Numbers Row */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem',
+            marginBottom: '2.5rem'
+          }}
+        >
           {contact.phoneNumbers.map((phone, idx) => (
             <div
               key={phone.id}
@@ -106,22 +110,22 @@ export const BookingsContact = () => {
                 flexWrap: 'wrap',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '2rem',
-                paddingBottom: '3rem',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+                gap: '1.5rem',
+                padding: '1.5rem 0',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
               }}
             >
               <div>
                 <span
                   style={{
+                    display: 'block',
                     fontFamily: "var(--font-body)",
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.1em',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    letterSpacing: '0.08em',
                     color: '#737378',
                     textTransform: 'uppercase',
-                    display: 'block',
-                    marginBottom: '0.5rem'
+                    marginBottom: '0.35rem'
                   }}
                 >
                   DIRECT LINE 0{idx + 1}
@@ -130,11 +134,11 @@ export const BookingsContact = () => {
                 <div
                   style={{
                     fontFamily: "var(--font-heading)",
-                    fontSize: 'clamp(2rem, 3.8vw, 3rem)',
+                    fontSize: 'clamp(22px, 2.4vw, 32px)',
                     fontWeight: 750,
                     letterSpacing: '-0.03em',
                     color: '#F5F5F7',
-                    lineHeight: 1.1
+                    lineHeight: 1.15
                   }}
                 >
                   {phone.display}

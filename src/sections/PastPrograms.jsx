@@ -56,9 +56,10 @@ export const PastPrograms = ({ onOpenMoment }) => {
           <ScrollRevealHeading
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: 'clamp(34px, 3.8vw, 50px)',
+              fontSize: 'clamp(26px, 2.8vw, 40px)',
               fontWeight: 750,
               letterSpacing: '-0.03em',
+              lineHeight: 1.12,
               color: '#F5F5F7',
               margin: '0 0 0.65rem 0'
             }}
@@ -69,7 +70,7 @@ export const PastPrograms = ({ onOpenMoment }) => {
           <ScrollRevealParagraph
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: 'clamp(15px, 1.1vw, 17px)',
+              fontSize: 'clamp(14px, 1.05vw, 15.5px)',
               color: '#A1A1A6',
               letterSpacing: '-0.015em',
               margin: 0

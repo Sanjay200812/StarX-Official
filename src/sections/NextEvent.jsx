@@ -77,9 +77,10 @@ export const NextEvent = () => {
           <ScrollRevealHeading
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: 'clamp(34px, 3.8vw, 50px)',
+              fontSize: 'clamp(26px, 2.8vw, 40px)',
               fontWeight: 750,
               letterSpacing: '-0.03em',
+              lineHeight: 1.12,
               color: '#F5F5F7',
               margin: 0
             }}

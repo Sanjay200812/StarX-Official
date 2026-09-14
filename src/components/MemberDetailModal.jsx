@@ -151,7 +151,7 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
                   <h3
                     style={{
                       fontFamily: "var(--font-heading)",
-                      fontSize: 'clamp(24px, 2.6vw, 32px)',
+                      fontSize: 'clamp(22px, 2.2vw, 28px)',
                       fontWeight: 700,
                       letterSpacing: '-0.025em',
                       color: '#F5F5F7',
@@ -166,12 +166,12 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
                   <div
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontSize: '14.5px',
+                      fontSize: 'clamp(12.5px, 1.1vw, 14px)',
                       fontWeight: 500,
                       letterSpacing: '0.01em',
                       color: '#B3131B',
-                      marginBottom: '1.4rem',
-                      lineHeight: 1.35,
+                      marginBottom: '1.25rem',
+                      lineHeight: 1.4,
                       overflowWrap: 'break-word',
                       wordBreak: 'normal'
                     }}
@@ -199,7 +199,7 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
                   <div
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontSize: '15px',
+                      fontSize: 'clamp(13.5px, 1.05vw, 15px)',
                       color: '#C7C7CC',
                       lineHeight: 1.7,
                       fontWeight: 400
@@ -212,7 +212,7 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
                           style={{
                             margin: 0,
                             marginBottom: pIdx < arr.length - 1 ? '14px' : '0',
-                            fontSize: '15px',
+                            fontSize: 'clamp(13.5px, 1.05vw, 15px)',
                             lineHeight: 1.7,
                             color: '#C7C7CC',
                             fontWeight: 400
@@ -222,7 +222,7 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
                         </p>
                       ))
                     ) : (
-                      <p style={{ margin: 0, fontSize: '15px', lineHeight: 1.7, color: '#C7C7CC', fontWeight: 400 }}>
+                      <p style={{ margin: 0, fontSize: 'clamp(13.5px, 1.05vw, 15px)', lineHeight: 1.7, color: '#C7C7CC', fontWeight: 400 }}>
                         StarX Live Band member profile details will be updated soon. Artist background, performance information and additional profile details will be added here shortly.
                       </p>
                     )}
@@ -231,10 +231,9 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
 
                 {/* Bottom Row: Badge & Optional Social link */}
                 {(() => {
-                  const isJosh = member.name === 'B. Josh';
-                  const rawIg = !isJosh && (member.instagramUrl || member.instagram || '');
+                  const rawIg = member.instagramUrl || member.instagram || '';
                   const instagramUrl = typeof rawIg === 'string' && rawIg.trim().length > 0 ? rawIg.trim() : '';
-                  const instagramLabel = member.instagramLabel || (member.isCrew ? '@s_a_n_j_u_7__' : '@starxliveband');
+                  const instagramLabel = member.instagramLabel || (member.isCrew ? '@starxliveband' : '@starxliveband');
                   const hasInstagram = Boolean(instagramUrl);
                   const badgeText = member.badge || (member.isCrew ? 'StarX Production & Crew' : 'StarX Live Artist');
 

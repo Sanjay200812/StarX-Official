@@ -50,8 +50,9 @@ export const ContactPopover = ({ onClose, isMobile = false }) => {
         position: isMobile ? 'relative' : 'absolute',
         top: isMobile ? 'auto' : 'calc(100% + 12px)',
         right: 0,
-        width: isMobile ? '100%' : '315px',
-        maxWidth: 'calc(100vw - 32px)',
+        width: isMobile ? 'calc(100vw - 24px)' : '325px',
+        maxWidth: isMobile ? '330px' : 'calc(100vw - 24px)',
+        margin: isMobile ? '0 auto' : undefined,
         boxSizing: 'border-box',
         backgroundColor: 'rgba(14, 14, 16, 0.94)',
         backdropFilter: 'blur(24px) saturate(115%)',
@@ -387,7 +388,7 @@ const rowStyle = {
   display: 'flex',
   alignItems: 'center',
   gap: '10px',
-  padding: '8px 10px',
+  padding: '7px 9px',
   borderRadius: '12px',
   textDecoration: 'none',
   background: 'transparent',
@@ -423,7 +424,7 @@ const iconBoxStyle = {
 
 const platformLabelStyle = {
   fontFamily: "var(--font-body)",
-  fontSize: '11px',
+  fontSize: '10.5px',
   fontWeight: 500,
   letterSpacing: '0.01em',
   color: '#8E8E93',
@@ -434,7 +435,7 @@ const platformLabelStyle = {
 
 const accountNameStyle = {
   fontFamily: "var(--font-heading)",
-  fontSize: '13px',
+  fontSize: '14.5px',
   fontWeight: 600,
   color: '#F5F5F7',
   lineHeight: 1.25,
@@ -443,7 +444,7 @@ const accountNameStyle = {
 
 const usernameStyle = {
   fontFamily: "var(--font-body)",
-  fontSize: '11px',
+  fontSize: '12px',
   color: '#737378',
   lineHeight: 1.2,
   marginTop: '1px'
@@ -451,7 +452,7 @@ const usernameStyle = {
 
 const titleStyle = {
   fontFamily: "var(--font-heading)",
-  fontSize: '13px',
+  fontSize: '14px',
   fontWeight: 550,
   color: '#F5F5F7',
   lineHeight: 1.25
@@ -459,7 +460,7 @@ const titleStyle = {
 
 const subtitleStyle = {
   fontFamily: "var(--font-body)",
-  fontSize: '11.5px',
+  fontSize: '12px',
   color: '#8E8E93',
   lineHeight: 1.25
 };

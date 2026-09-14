@@ -139,9 +139,10 @@ export const Navbar = ({ isIntroActive = false }) => {
             <BrandLogo size={34} className="navbar-logo-wrapper" priority />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem' }}>
               <span
+                className="navbar-brand-title"
                 style={{
                   fontFamily: "var(--font-heading)",
-                  fontSize: '15px',
+                  fontSize: '14.5px',
                   fontWeight: 750,
                   letterSpacing: '-0.03em',
                   color: '#F5F5F7'
@@ -150,11 +151,12 @@ export const Navbar = ({ isIntroActive = false }) => {
                 STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
               </span>
               <span
+                className="navbar-brand-desc"
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: '9.5px',
+                  fontSize: '9px',
                   fontWeight: 600,
-                  letterSpacing: '0.1em',
+                  letterSpacing: '0.08em',
                   color: '#737378',
                   textTransform: 'uppercase'
                 }}
@@ -281,6 +283,20 @@ export const Navbar = ({ isIntroActive = false }) => {
         @media (min-width: 768px) {
           .glass-navbar-header {
             width: calc(100% - 48px);
+          }
+        }
+        @media (max-width: 480px) {
+          .glass-navbar-header {
+            width: calc(100% - 20px);
+          }
+          .glass-navbar-header > div {
+            padding: 0 1rem !important;
+          }
+          .navbar-brand-title {
+            font-size: 13.5px !important;
+          }
+          .navbar-brand-desc {
+            display: none !important;
           }
         }
         @media (min-width: 960px) {

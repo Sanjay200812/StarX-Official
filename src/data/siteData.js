@@ -92,7 +92,7 @@ export const siteData = {
       id: 1,
       name: "B. Prasad",
       role: "Rhythm Pad",
-      image: "/assets/artists/b-prasad.jpg",
+      image: null,
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -100,7 +100,7 @@ export const siteData = {
       id: 2,
       name: "B. Joseph",
       role: "Drum Kit",
-      image: "/assets/artists/b-joseph.jpg",
+      image: null,
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -108,7 +108,7 @@ export const siteData = {
       id: 3,
       name: "G. Perumalla Rao",
       role: "Piano 1",
-      image: "/assets/artists/g-perumalla-rao.jpg",
+      image: null,
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -116,7 +116,7 @@ export const siteData = {
       id: 4,
       name: "N. Thirapatiyya",
       role: "Lead Guitar",
-      image: "/assets/artists/n-thirapatiyya.jpg",
+      image: null,
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -124,7 +124,7 @@ export const siteData = {
       id: 5,
       name: "E. Chandra Mohan",
       role: "Bass Guitar",
-      image: "/assets/artists/e-chandra-mohan.jpg",
+      image: null,
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -153,13 +153,13 @@ export const siteData = {
     {
       id: 1,
       name: "B. Josh",
-      role: "Program & Event Manager",
-      image: "/assets/crew/b-josh.jpg",
-      bio: `B. Josh is the Program & Event Manager of StarX Live, handling programs, bookings, and event coordination. He manages communication with clients and organizers and coordinates the team for every performance.
+      role: "Manager & Event Organizer | Primary Contact",
+      image: "/assets/crew/b-josh.jpeg",
+      bio: `Josh is the Manager and Event Organizer of StarX Live, handling programs, bookings, and event coordination. He manages communication with clients and organizers and coordinates the team for every performance.
 
-He is the primary contact for StarX Live bookings and inquiries, ensuring smooth planning and execution of every event.`,
-      instagramLabel: "",
-      instagramUrl: "",
+He is the Primary Contact for StarX Live, handling event inquiries, bookings, and program-related communication to ensure everything runs smoothly.`,
+      instagramLabel: "@starxliveband",
+      instagramUrl: "https://www.instagram.com/starxliveband",
       isCrew: true
     },
     {
@@ -172,6 +172,16 @@ He is the primary contact for StarX Live bookings and inquiries, ensuring smooth
 He also manages and maintains the StarX Live website and online platforms, helping present the band’s music, performances, and events in a modern and engaging way.`,
       instagramLabel: "@s_a_n_j_u_7__",
       instagramUrl: "https://www.instagram.com/s_a_n_j_u_7__/",
+      isCrew: true
+    },
+    {
+      id: 3,
+      name: "B. Balu",
+      role: "Producer",
+      image: "/assets/crew/b-balu.jpg",
+      bio: `B. Balu is a Producer at StarX Live, supporting the planning and production of the band’s programs and events. He works with the team to manage production activities and helps ensure every performance is well organized and delivered smoothly.`,
+      instagramLabel: "",
+      instagramUrl: "",
       isCrew: true
     }
   ],
@@ -202,7 +212,7 @@ He also manages and maintains the StarX Live website and online platforms, helpi
       venue: "Live Stage Arena",
       location: "Hyderabad",
       date: "Festival Set",
-      thumbnail: "/assets/gallery/gallery-04.jpg",
+      thumbnail: "/assets/gallery/gallery-06.jpg",
       videoUrl: "",
       videoType: "coming-soon",
       duration: "Video Coming Soon",
@@ -296,7 +306,7 @@ He also manages and maintains the StarX Live website and online platforms, helpi
       venue: "Hitex Arena Grounds",
       location: "Hyderabad",
       date: "Festival Appearance",
-      image: "/assets/gallery/gallery-02.jpg",
+      image: "/assets/gallery/gallery-05.jpg",
       description: "High-energy open-air live rock performance connecting classic riffs with modern crowd melodies."
     },
     {
