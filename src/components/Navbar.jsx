@@ -105,7 +105,7 @@ export const Navbar = ({
         style={{
           position: 'sticky',
           top: '12px',
-          zIndex: 9000,
+          zIndex: 50,
           margin: '0 auto',
           opacity: isIntroActive ? 0 : 1,
           transform: isIntroActive ? 'translateY(-14px)' : 'translateY(0)',

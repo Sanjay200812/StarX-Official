@@ -16,11 +16,17 @@ const ENCODED_WA_MESSAGE = encodeURIComponent(WHATSAPP_PREFILLED_MESSAGE);
 
 export const siteData = {
   // ==========================================
-  // 0. RESPONSIVE SITE BACKGROUNDS
+  // 0. RESPONSIVE SITE BACKGROUND & INTRO VIDEOS (Spec 1, 5, 6, 17)
   // ==========================================
   background: {
-    desktop: "/assets/brand/starx-pc-bg.jpeg",
-    mobile: "/assets/brand/starx-mobile-bg.png"
+    desktopVideo: "/assets/videos/starx-bg-pc.mp4",
+    mobileVideo: "/assets/videos/starx-bg-mobile.mp4",
+    desktopFallback: "/assets/brand/starx-pc-bg.jpeg",
+    mobileFallback: "/assets/brand/starx-mobile-bg.png"
+  },
+  intro: {
+    desktopVideo: "/assets/videos/starx-intro-pc.mp4",
+    mobileVideo: "/assets/videos/starx-intro-mobile.mp4"
   },
 
   // ==========================================

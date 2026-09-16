@@ -61,7 +61,7 @@ export const ContactPopover = ({ onClose, isMobile = false }) => {
         borderRadius: '18px',
         boxShadow: '0 18px 50px rgba(0, 0, 0, 0.45)',
         padding: '14px 14px 12px 14px',
-        zIndex: 9999,
+        zIndex: 100,
         userSelect: 'none'
       }}
     >

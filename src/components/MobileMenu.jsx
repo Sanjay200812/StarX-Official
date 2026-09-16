@@ -43,7 +43,7 @@ export const MobileMenu = ({
             backgroundColor: 'rgba(8, 8, 10, 0.96)',
             backdropFilter: 'blur(24px) saturate(120%)',
             WebkitBackdropFilter: 'blur(24px) saturate(120%)',
-            zIndex: 99998,
+            zIndex: 60,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',

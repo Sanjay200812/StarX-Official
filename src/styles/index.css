@@ -323,33 +323,18 @@ img, video {
 }
 
 /* ====================================================================
-   GLOBAL FIXED STARX BACKGROUND SYSTEM
+   GLOBAL FIXED STARX RESPONSIVE VIDEO BACKGROUND SYSTEM (Spec 15-20, 38)
    ==================================================================== */
+.site-video-background,
 .site-background {
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100vh;
   height: 100dvh;
-  z-index: -1;
+  z-index: -3;
   overflow: hidden;
   pointer-events: none;
-}
-
-.site-background-picture {
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  inset: 0;
-}
-
-.site-background-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
+  background-color: #050505;
 }
 
 .site-background-overlay {
@@ -357,12 +342,13 @@ img, video {
   inset: 0;
   background-color: rgba(0, 0, 0, 0.58);
   pointer-events: none;
+  z-index: -2;
   transition: background-color 0.4s ease;
 }
 
 @media (max-width: 767px) {
   .site-background-overlay {
-    background-color: rgba(0, 0, 0, 0.62);
+    background-color: rgba(0, 0, 0, 0.64);
   }
 }
 

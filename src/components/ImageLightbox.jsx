@@ -118,7 +118,7 @@ export const ImageLightbox = ({
             backgroundColor: 'rgba(0, 0, 0, 0.92)',
             backdropFilter: 'blur(20px) saturate(110%)',
             WebkitBackdropFilter: 'blur(20px) saturate(110%)',
-            zIndex: 99999,
+            zIndex: 500,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',

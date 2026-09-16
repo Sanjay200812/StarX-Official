@@ -1,23 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { siteData } from '../data/siteData';
 
 /**
  * StarXIntro Component
- * Replaces the old code-based glyph animation with the uploaded fullscreen intro video.
+ * Responsive fullscreen cinematic entry video system for StarX Live.
  *
- * Requirements:
- * - File: /assets/videos/StarX Intro.mov
- * - Fullscreen fixed overlay (inset: 0, 100vw, 100dvh, #000, z-index above site)
- * - autoPlay, muted, playsInline, no controls
- * - object-fit: contain with black background to ensure zero cropping of StarX intro text
- * - Clean SKIP button at top-right (desktop: top 28px/right 32px, mobile: top 18px/right 18px)
- * - Smooth 750ms exit fade on video finish or skip click
- * - Session storage guard: plays once per session
+ * Requirements (Spec 1, 4, 5, 6, 8-13, 21, 32-34, 38):
+ * - Desktop (>= 768px): /assets/videos/starx-intro-pc.mp4
+ * - Mobile (<= 767px): /assets/videos/starx-intro-mobile.mp4
+ * - Only downloads the selected responsive source
+ * - Fullscreen fixed overlay (inset: 0, 100vw, 100dvh, #000, z-index: 1000)
+ * - autoPlay, muted, playsInline, zero browser controls
+ * - object-fit: cover, object-position: center
+ * - Clean SKIP button (desktop: top 24px/right 28px; mobile: top max(16px, env(safe-area-inset-top))/right max(16px, env(safe-area-inset-right)))
+ * - SKIP button styling: rgba(7,7,9,0.42), blur(14px), 1px solid rgba(255,255,255,0.16), 12px-13px Inter
+ * - Smooth 750ms crossfade into the pre-running background video and website content
  * - Graceful fallback on load error / playback failure
  */
 export const StarXIntro = ({ onComplete, onStartTransition }) => {
+  const isMobile = useIsMobile();
   const [isExiting, setIsExiting] = useState(false);
   const videoRef = useRef(null);
   const exitCalledRef = useRef(false);
+
+  const { intro } = siteData;
+  const currentVideoSrc = isMobile ? intro.mobileVideo : intro.desktopVideo;
 
   const handleExit = () => {
     if (exitCalledRef.current) return;
@@ -35,6 +43,16 @@ export const StarXIntro = ({ onComplete, onStartTransition }) => {
 
     setIsExiting(true);
 
+    // Pause intro video cleanly on exit
+    if (videoRef.current) {
+      try {
+        videoRef.current.pause();
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // 750ms smooth exit transition (Spec 12 & 13)
     setTimeout(() => {
       if (onComplete) {
         onComplete();
@@ -46,24 +64,25 @@ export const StarXIntro = ({ onComplete, onStartTransition }) => {
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
+      video.muted = true;
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch(() => {
-          // If browser policy blocks autoplay even with muted, or video fails, gracefully exit
+          // If browser policy blocks autoplay or video fails, gracefully reveal site
           handleExit();
         });
       }
     }
 
-    // Safety timeout: If video takes longer than 25 seconds or gets stuck, smoothly reveal site
+    // Safety timeout: PC intro is ~7.5s, Mobile is ~10s. 14s safety timer ensures user is never stuck.
     const safetyTimer = setTimeout(() => {
       handleExit();
-    }, 25000);
+    }, 14000);
 
     return () => {
       clearTimeout(safetyTimer);
     };
-  }, []);
+  }, [currentVideoSrc]);
 
   return (
     <div
@@ -74,7 +93,7 @@ export const StarXIntro = ({ onComplete, onStartTransition }) => {
         width: '100vw',
         height: '100dvh',
         backgroundColor: '#000000',
-        zIndex: 99999,
+        zIndex: 1000,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -87,26 +106,27 @@ export const StarXIntro = ({ onComplete, onStartTransition }) => {
       <style>{`
         .intro-skip-btn {
           position: absolute;
-          top: 28px;
-          right: 32px;
-          z-index: 100000;
+          top: 24px;
+          right: 28px;
+          z-index: 10;
           font-family: 'Inter', -apple-system, sans-serif;
           font-size: 12.5px;
           font-weight: 500;
-          letter-spacing: 0.04em;
+          letter-spacing: 0.06em;
           color: #F5F5F7;
-          background: rgba(10, 10, 10, 0.45);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.18);
+          background: rgba(7, 7, 9, 0.42);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border: 1px solid rgba(255, 255, 255, 0.16);
           border-radius: 999px;
-          padding: 9px 14px;
+          padding: 8px 14px;
           cursor: pointer;
           transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           user-select: none;
+          box-shadow: none;
         }
 
         .intro-skip-btn:hover {
@@ -117,17 +137,19 @@ export const StarXIntro = ({ onComplete, onStartTransition }) => {
 
         @media (max-width: 767px) {
           .intro-skip-btn {
-            top: 18px;
-            right: 18px;
+            top: max(16px, env(safe-area-inset-top));
+            right: max(16px, env(safe-area-inset-right));
             font-size: 12px;
-            padding: 8px 13px;
+            padding: 7px 12px;
           }
         }
       `}</style>
 
-      {/* Intro Video: contain fit with #000 background to avoid cropping StarX text */}
+      {/* Intro Video Element (Spec 8 & 9) */}
       <video
         ref={videoRef}
+        key={currentVideoSrc}
+        src={currentVideoSrc}
         autoPlay
         muted
         playsInline
@@ -136,17 +158,14 @@ export const StarXIntro = ({ onComplete, onStartTransition }) => {
         style={{
           width: '100%',
           height: '100%',
-          objectFit: 'contain',
+          objectFit: 'cover',
+          objectPosition: 'center',
           backgroundColor: '#000000',
           display: 'block'
         }}
-      >
-        <source src="/assets/videos/StarX%20Intro.mov" type="video/mp4" />
-        <source src="/assets/videos/StarX%20Intro.mov" type="video/quicktime" />
-        <source src="/assets/videos/StarX Intro.mov" type="video/mp4" />
-      </video>
+      />
 
-      {/* Top-Right SKIP Button */}
+      {/* Clean SKIP Button (Spec 10 & 11) */}
       <button
         type="button"
         id="intro-skip-button"

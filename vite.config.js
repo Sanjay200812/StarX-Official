@@ -10,7 +10,6 @@ export default defineConfig({
     host: true,
     watch: {
       ignored: [
-        '**/public/assets/**',
         '**/scratch/**',
         '**/.git/**',
         '**/dist/**',

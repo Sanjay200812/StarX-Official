@@ -55,7 +55,7 @@ export const VideoModal = ({ isOpen, onClose, video }) => {
           backgroundColor: 'rgba(0, 0, 0, 0.75)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          zIndex: 99999,
+          zIndex: 500,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

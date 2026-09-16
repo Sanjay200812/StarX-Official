@@ -54,7 +54,7 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
             backgroundColor: 'rgba(0, 0, 0, 0.76)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            zIndex: 99998,
+            zIndex: 500,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

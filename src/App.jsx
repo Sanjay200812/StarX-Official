@@ -27,6 +27,10 @@ export function App() {
   // Intro State backed by sessionStorage (Spec 11 & 67)
   const [isIntroComplete, setIsIntroComplete] = useState(() => {
     try {
+      if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
+        sessionStorage.removeItem('starxIntroPlayed');
+        return false;
+      }
       return sessionStorage.getItem('starxIntroPlayed') === 'true';
     } catch (e) {
       return false;
@@ -35,6 +39,9 @@ export function App() {
 
   const [isIntroTransitioning, setIsIntroTransitioning] = useState(() => {
     try {
+      if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
+        return false;
+      }
       return sessionStorage.getItem('starxIntroPlayed') === 'true';
     } catch (e) {
       return false;
@@ -127,7 +134,7 @@ export function App() {
       }}
     >
       {/* 0. Single Global Fixed Background Layer (Spec 2 & 3) */}
-      <SiteBackground />
+      <SiteBackground currentView={currentView} />
 
       {/* 1. Fullscreen Intro Video Overlay (Spec 6-12) */}
       <AnimatePresence>
@@ -147,11 +154,15 @@ export function App() {
       />
 
       <motion.main
+        style={{
+          position: 'relative',
+          zIndex: 1
+        }}
         animate={{
           opacity: isIntroActive ? 0 : 1,
-          y: isIntroActive ? 12 : 0
+          y: isIntroActive ? 8 : 0
         }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
         <AnimatePresence mode="wait">
           {/* =======================================================
@@ -161,10 +172,10 @@ export function App() {
           {currentView === 'home' && (
             <motion.div
               key="homepage-flow"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
             >
               {/* 1. Hero / Home */}
               <Hero onNavigate={handleNavigate} isIntroActive={isIntroActive} />
@@ -184,56 +195,93 @@ export function App() {
           )}
 
           {/* =======================================================
-              DEDICATED VIEWS: Direct navigation targets (Spec 13, 14, 60)
+              DEDICATED VIEWS: Direct navigation targets (Spec 13, 14, 26, 60)
              ======================================================= */}
           {currentView === 'about' && (
-            <AboutView
+            <motion.div
               key="about-view"
-              onBackHome={() => handleNavigate('home')}
-            />
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <AboutView onBackHome={() => handleNavigate('home')} />
+            </motion.div>
           )}
 
           {currentView === 'artists' && (
-            <ArtistsView
+            <motion.div
               key="artists-view"
-              onBackHome={() => handleNavigate('home')}
-            />
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <ArtistsView onBackHome={() => handleNavigate('home')} />
+            </motion.div>
           )}
 
           {currentView === 'performances' && (
-            <PerformancesView
+            <motion.div
               key="performances-view"
-              onBackHome={() => handleNavigate('home')}
-            />
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <PerformancesView onBackHome={() => handleNavigate('home')} />
+            </motion.div>
           )}
 
           {currentView === 'media' && (
-            <MediaView
+            <motion.div
               key="media-view"
-              onBackHome={() => handleNavigate('home')}
-              onOpenPhoto={handleOpenPhoto}
-            />
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <MediaView
+                onBackHome={() => handleNavigate('home')}
+                onOpenPhoto={handleOpenPhoto}
+              />
+            </motion.div>
           )}
 
           {currentView === 'events' && (
-            <EventsView
+            <motion.div
               key="events-view"
-              onBackHome={() => handleNavigate('home')}
-            />
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <EventsView onBackHome={() => handleNavigate('home')} />
+            </motion.div>
           )}
 
           {currentView === 'crew' && (
-            <CrewView
+            <motion.div
               key="crew-view"
-              onBackHome={() => handleNavigate('home')}
-            />
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <CrewView onBackHome={() => handleNavigate('home')} />
+            </motion.div>
           )}
 
           {currentView === 'contact' && (
-            <ContactView
+            <motion.div
               key="contact-view"
-              onBackHome={() => handleNavigate('home')}
-            />
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <ContactView onBackHome={() => handleNavigate('home')} />
+            </motion.div>
           )}
         </AnimatePresence>
       </motion.main>
