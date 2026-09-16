@@ -12,21 +12,20 @@ import { siteData } from '../data/siteData';
  * Height: 60px to 64px desktop.
  * Font size: 13px to 14px (Inter).
  *
- * Navigation Items:
- * - Home (Homepage Hero)
- * - Artists (Homepage Section)
- * - Performances (Homepage Section)
- * - About (Dedicated View /about)
- * - Media (Dedicated View /media)
- * - Events (Dedicated View /events)
- * - Crew (Dedicated View /crew)
- * - Contact (Homepage Section)
+ * Direct Navigation:
+ * - Home (/)
+ * - About (/about)
+ * - Artists (/artists)
+ * - Performances (/performances)
+ * - Media (/media)
+ * - Events (/events)
+ * - Crew (/crew)
+ * - Contact (/contact)
  * - Contact StarX (Quick Contact Popup)
  */
 export const Navbar = ({
   isIntroActive = false,
   currentView = 'home',
-  activeSection = 'home',
   onNavigate
 }) => {
   const { brand } = siteData;
@@ -36,14 +35,14 @@ export const Navbar = ({
   const popoverWrapperRef = useRef(null);
 
   const navLinks = [
-    { name: 'Home', type: 'section', target: 'home' },
-    { name: 'Artists', type: 'section', target: 'artists' },
-    { name: 'Performances', type: 'section', target: 'performances' },
-    { name: 'About', type: 'view', target: 'about' },
-    { name: 'Media', type: 'view', target: 'media' },
-    { name: 'Events', type: 'view', target: 'events' },
-    { name: 'Crew', type: 'view', target: 'crew' },
-    { name: 'Contact', type: 'section', target: 'contact' }
+    { name: 'Home', target: 'home' },
+    { name: 'About', target: 'about' },
+    { name: 'Artists', target: 'artists' },
+    { name: 'Performances', target: 'performances' },
+    { name: 'Media', target: 'media' },
+    { name: 'Events', target: 'events' },
+    { name: 'Crew', target: 'crew' },
+    { name: 'Contact', target: 'contact' }
   ];
 
   // Close popover on click outside, ESC key, or scroll
@@ -85,17 +84,17 @@ export const Navbar = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
+      setIsScrolled(window.scrollY > 20);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleItemClick = (e, link) => {
+  const handleItemClick = (e, target) => {
     e.preventDefault();
     if (onNavigate) {
-      onNavigate(link.target, link.type);
+      onNavigate(target, 'view');
     }
   };
 
@@ -138,7 +137,7 @@ export const Navbar = ({
           {/* LEFT: STARX LIVE Logo & Wordmark */}
           <a
             href="/"
-            onClick={(e) => handleItemClick(e, { target: 'home', type: 'section' })}
+            onClick={(e) => handleItemClick(e, 'home')}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -146,13 +145,13 @@ export const Navbar = ({
               textDecoration: 'none'
             }}
           >
-            <BrandLogo size={32} className="navbar-logo-wrapper" priority />
+            <BrandLogo size={30} className="navbar-logo-wrapper" priority />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem' }}>
               <span
                 className="navbar-brand-title"
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: '14px',
+                  fontSize: '13.5px',
                   fontWeight: 700,
                   letterSpacing: '-0.02em',
                   color: '#F5F5F7'
@@ -182,24 +181,21 @@ export const Navbar = ({
               style={{
                 display: 'none',
                 alignItems: 'center',
-                gap: '1.25rem'
+                gap: '1.15rem'
               }}
               className="desktop-navbar-links"
             >
               {navLinks.map((link) => {
-                const isActive =
-                  link.type === 'view'
-                    ? currentView === link.target
-                    : currentView === 'home' && (activeSection === link.target || (link.target === 'artists' && activeSection === 'members'));
+                const isActive = currentView === link.target;
 
                 return (
                   <a
                     key={link.name}
-                    href={`#${link.target}`}
-                    onClick={(e) => handleItemClick(e, link)}
+                    href={`/${link.target === 'home' ? '' : link.target}`}
+                    onClick={(e) => handleItemClick(e, link.target)}
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontSize: '13.5px',
+                      fontSize: '13px',
                       fontWeight: isActive ? 600 : 500,
                       letterSpacing: '-0.01em',
                       color: isActive ? '#FFFFFF' : '#A1A1A6',
@@ -232,7 +228,7 @@ export const Navbar = ({
               })}
             </nav>
 
-            {/* Pill Button: Contact StarX (Opens popup directly, does not navigate) */}
+            {/* Pill Button: Contact StarX (Opens popup directly) */}
             <div
               ref={popoverWrapperRef}
               className="desktop-navbar-btn"
@@ -249,7 +245,7 @@ export const Navbar = ({
                 style={{
                   height: '34px',
                   padding: '0 14px',
-                  fontSize: '13px',
+                  fontSize: '12.5px',
                   fontWeight: 500,
                   borderRadius: '999px',
                   cursor: 'pointer',
@@ -327,7 +323,6 @@ export const Navbar = ({
         onClose={() => setIsMobileMenuOpen(false)}
         navLinks={navLinks}
         currentView={currentView}
-        activeSection={activeSection}
         onNavigate={onNavigate}
       />
     </>

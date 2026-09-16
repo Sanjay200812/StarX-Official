@@ -3,54 +3,68 @@ import { motion, AnimatePresence } from 'framer-motion';
 import StarXIntro from './components/StarXIntro';
 import SiteBackground from './components/SiteBackground';
 import Navbar from './components/Navbar';
-import VideoModal from './components/VideoModal';
-import ImageLightbox from './components/ImageLightbox';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
-import ScrollProgress from './components/ScrollProgress';
+import ImageLightbox from './components/ImageLightbox';
 
-// 4 Core Homepage Sections (Spec 1 & 2)
+// 5 Core Homepage Components (Spec 16 & 71)
 import Hero from './sections/Hero';
-import BandMembers from './sections/BandMembers';
+import AboutPreview from './sections/AboutPreview';
 import FeaturedPerformances from './sections/FeaturedPerformances';
-import BookingsContact from './sections/BookingsContact';
+import BandMembers from './sections/BandMembers';
+import CrewPreview from './sections/CrewPreview';
 import Footer from './sections/Footer';
 
-// 4 Dedicated Internal Views (Spec 3, 4, 31-36)
+// Dedicated Direct Views (Spec 13, 14, 60)
 import AboutView from './views/AboutView';
+import ArtistsView from './views/ArtistsView';
+import PerformancesView from './views/PerformancesView';
 import MediaView from './views/MediaView';
 import EventsView from './views/EventsView';
 import CrewView from './views/CrewView';
+import ContactView from './views/ContactView';
 
 export function App() {
+  // Intro State backed by sessionStorage (Spec 11 & 67)
   const [isIntroComplete, setIsIntroComplete] = useState(() => {
     try {
-      return sessionStorage.getItem('starx_intro_seen') === 'true';
-    } catch (e) {
-      return false;
-    }
-  });
-  const [isIntroTransitioning, setIsIntroTransitioning] = useState(() => {
-    try {
-      return sessionStorage.getItem('starx_intro_seen') === 'true';
+      return sessionStorage.getItem('starxIntroPlayed') === 'true';
     } catch (e) {
       return false;
     }
   });
 
-  // Dedicated View routing state: 'home' | 'about' | 'media' | 'events' | 'crew'
+  const [isIntroTransitioning, setIsIntroTransitioning] = useState(() => {
+    try {
+      return sessionStorage.getItem('starxIntroPlayed') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
+
+  // Dedicated Route / View State (Spec 13 & 68)
   const [currentView, setCurrentView] = useState(() => {
     try {
       const path = window.location.pathname.replace(/^\//, '').toLowerCase();
-      if (['about', 'media', 'events', 'crew'].includes(path)) {
+      const validViews = ['about', 'artists', 'performances', 'media', 'events', 'crew', 'contact'];
+      if (validViews.includes(path)) {
         return path;
       }
     } catch (e) {
-      // ignore
+      // fallback
     }
     return 'home';
   });
 
-  const [activeSection, setActiveSection] = useState('home');
+  // Photo Lightbox State (for MediaView)
+  const [lightboxItems, setLightboxItems] = useState([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  const handleOpenPhoto = (items, index = 0) => {
+    setLightboxItems(items);
+    setLightboxIndex(index);
+    setIsLightboxOpen(true);
+  };
 
   const handleStartTransition = useCallback(() => {
     setIsIntroTransitioning(true);
@@ -60,18 +74,19 @@ export function App() {
     setIsIntroTransitioning(true);
     setIsIntroComplete(true);
     try {
-      sessionStorage.setItem('starx_intro_seen', 'true');
+      sessionStorage.setItem('starxIntroPlayed', 'true');
     } catch (e) {
       // ignore
     }
   }, []);
 
-  // Listen to browser Back/Forward navigation
+  // Listen to browser Back/Forward navigation (Spec 68)
   useEffect(() => {
     const handlePopState = () => {
       try {
         const path = window.location.pathname.replace(/^\//, '').toLowerCase();
-        if (['about', 'media', 'events', 'crew'].includes(path)) {
+        const validViews = ['about', 'artists', 'performances', 'media', 'events', 'crew', 'contact'];
+        if (validViews.includes(path)) {
           setCurrentView(path);
         } else {
           setCurrentView('home');
@@ -79,89 +94,26 @@ export function App() {
       } catch (e) {
         setCurrentView('home');
       }
+      window.scrollTo({ top: 0, behavior: 'instant' });
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Track active section for coordinated background darkness transitions
-  useEffect(() => {
-    if (currentView !== 'home') {
-      setActiveSection(currentView);
-      return;
+  // Central Direct Navigation Handler (Spec 14, 60, 69)
+  const handleNavigate = (target) => {
+    const route = target === 'home' ? '' : target;
+    setCurrentView(target);
+
+    try {
+      window.history.pushState(null, '', `/${route}`);
+    } catch (e) {
+      // ignore
     }
 
-    const handleScroll = () => {
-      const sectionIds = ['home', 'artists', 'performances', 'contact'];
-      for (const id of sectionIds) {
-        const el = document.getElementById(id) || (id === 'artists' ? document.getElementById('members') : null);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= window.innerHeight * 0.45 && rect.bottom >= window.innerHeight * 0.2) {
-            setActiveSection(id);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [currentView]);
-
-  // Video Modal State
-  const [activeVideo, setActiveVideo] = useState(null);
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-
-  // Lightbox State
-  const [lightboxItems, setLightboxItems] = useState([]);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-
-  const handlePlayVideo = (videoData) => {
-    setActiveVideo(videoData);
-    setIsVideoModalOpen(true);
-  };
-
-  const handleOpenPhoto = (items, index = 0) => {
-    setLightboxItems(items);
-    setLightboxIndex(index);
-    setIsLightboxOpen(true);
-  };
-
-  // Central Navigation Handler (Specs 3 & 4)
-  const handleNavigate = (target, type) => {
-    if (type === 'view') {
-      setCurrentView(target);
-      try {
-        window.history.pushState(null, '', `/${target}`);
-      } catch (e) {}
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      // Navigating to a homepage section
-      const wasNotHome = currentView !== 'home';
-      if (wasNotHome) {
-        setCurrentView('home');
-        try {
-          window.history.pushState(null, '', '/');
-        } catch (e) {}
-      }
-
-      setTimeout(() => {
-        if (target === 'home') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          const el =
-            document.getElementById(target) ||
-            (target === 'artists' ? document.getElementById('members') : null);
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-      }, wasNotHome ? 120 : 0);
-    }
+    // Scroll restoration: always start at the top on navigation (Spec 69)
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const isIntroActive = !isIntroTransitioning && !isIntroComplete;
@@ -174,10 +126,10 @@ export function App() {
         color: '#F5F5F7'
       }}
     >
-      {/* 0. Single Global Fixed Background Layer (Continuous across full site) */}
-      <SiteBackground activeSection={currentView !== 'home' ? currentView : activeSection} />
+      {/* 0. Single Global Fixed Background Layer (Spec 2 & 3) */}
+      <SiteBackground />
 
-      {/* 1. Opening StarX Typography Cinematic Animation */}
+      {/* 1. Fullscreen Intro Video Overlay (Spec 6-12) */}
       <AnimatePresence>
         {!isIntroComplete && (
           <StarXIntro
@@ -187,14 +139,10 @@ export function App() {
         )}
       </AnimatePresence>
 
-      {/* Sleek Top Scroll Progress Bar */}
-      <ScrollProgress />
-
-      {/* 2. Floating Island Smoked-Glass Top Navbar */}
+      {/* 2. Floating Smoked-Glass Top Navbar (Spec 14 & 15) */}
       <Navbar
         isIntroActive={isIntroActive}
         currentView={currentView}
-        activeSection={activeSection}
         onNavigate={handleNavigate}
       />
 
@@ -203,43 +151,66 @@ export function App() {
           opacity: isIntroActive ? 0 : 1,
           y: isIntroActive ? 12 : 0
         }}
-        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       >
         <AnimatePresence mode="wait">
+          {/* =======================================================
+              HOME PAGE: ONLY Hero, About Preview, Best Performance,
+              Meet StarX, Behind StarX, and Footer (Spec 16 & 71)
+             ======================================================= */}
           {currentView === 'home' && (
             <motion.div
               key="homepage-flow"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
-              {/* 1. Home / Hero (Spec 1 & 11) */}
-              <Hero isIntroActive={isIntroActive} />
+              {/* 1. Hero / Home */}
+              <Hero onNavigate={handleNavigate} isIntroActive={isIntroActive} />
 
-              {/* 2. Meet StarX / Artists (Spec 1 & 13) */}
-              <BandMembers />
+              {/* 2. About StarX Preview */}
+              <AboutPreview onNavigate={handleNavigate} />
 
-              {/* 3. Demo Performances (Spec 1 & 20) */}
-              <FeaturedPerformances onPlayVideo={handlePlayVideo} />
+              {/* 3. Best Performance Preview */}
+              <FeaturedPerformances onNavigate={handleNavigate} />
 
-              {/* 4. Bookings & Contact (Spec 1 & 23) */}
-              <BookingsContact />
+              {/* 4. Artists Preview (Meet StarX) */}
+              <BandMembers onNavigate={handleNavigate} />
+
+              {/* 5. Crew Preview (Behind StarX) */}
+              <CrewPreview onNavigate={handleNavigate} />
             </motion.div>
           )}
 
-          {/* Dedicated Internal Views (Spec 3 & 4: 400-550ms transition) */}
+          {/* =======================================================
+              DEDICATED VIEWS: Direct navigation targets (Spec 13, 14, 60)
+             ======================================================= */}
           {currentView === 'about' && (
             <AboutView
               key="about-view"
-              onBackHome={() => handleNavigate('home', 'section')}
+              onBackHome={() => handleNavigate('home')}
+            />
+          )}
+
+          {currentView === 'artists' && (
+            <ArtistsView
+              key="artists-view"
+              onBackHome={() => handleNavigate('home')}
+            />
+          )}
+
+          {currentView === 'performances' && (
+            <PerformancesView
+              key="performances-view"
+              onBackHome={() => handleNavigate('home')}
             />
           )}
 
           {currentView === 'media' && (
             <MediaView
               key="media-view"
-              onBackHome={() => handleNavigate('home', 'section')}
+              onBackHome={() => handleNavigate('home')}
               onOpenPhoto={handleOpenPhoto}
             />
           )}
@@ -247,33 +218,33 @@ export function App() {
           {currentView === 'events' && (
             <EventsView
               key="events-view"
-              onBackHome={() => handleNavigate('home', 'section')}
+              onBackHome={() => handleNavigate('home')}
             />
           )}
 
           {currentView === 'crew' && (
             <CrewView
               key="crew-view"
-              onBackHome={() => handleNavigate('home', 'section')}
+              onBackHome={() => handleNavigate('home')}
+            />
+          )}
+
+          {currentView === 'contact' && (
+            <ContactView
+              key="contact-view"
+              onBackHome={() => handleNavigate('home')}
             />
           )}
         </AnimatePresence>
       </motion.main>
 
-      {/* Minimal Dark Footer */}
+      {/* Compact Professional StarX Footer (Spec 38-46) */}
       <Footer onNavigate={handleNavigate} />
 
-      {/* Floating WhatsApp Quick Contact Button */}
+      {/* Floating WhatsApp Quick Contact Button (Spec 58) */}
       <FloatingWhatsApp />
 
-      {/* Smoked-Glass Video Modal */}
-      <VideoModal
-        isOpen={isVideoModalOpen}
-        onClose={() => setIsVideoModalOpen(false)}
-        video={activeVideo}
-      />
-
-      {/* Deep Black Photo Lightbox */}
+      {/* Deep Black Photo Lightbox (Spec 51) */}
       <ImageLightbox
         isOpen={isLightboxOpen}
         onClose={() => setIsLightboxOpen(false)}

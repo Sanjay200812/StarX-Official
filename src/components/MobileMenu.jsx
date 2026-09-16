@@ -8,23 +8,24 @@ import { siteData } from '../data/siteData';
 /**
  * MobileMenu Component
  * Compact, dark smoked-glass mobile navigation drawer.
- * Reduced font sizes (14px-16px in Inter) to prevent oversized text.
+ * Direct navigation for all 8 primary pages:
+ * - Home, About, Artists, Performances, Media, Events, Crew, Contact
+ * - Contact StarX quick panel
  */
 export const MobileMenu = ({
   isOpen,
   onClose,
   navLinks,
   currentView = 'home',
-  activeSection = 'home',
   onNavigate
 }) => {
   const { social } = siteData;
   const [isContactPanelOpen, setIsContactPanelOpen] = useState(false);
 
-  const handleItemClick = (link) => {
+  const handleItemClick = (target) => {
     onClose();
     if (onNavigate) {
-      onNavigate(link.target, link.type);
+      onNavigate(target, 'view');
     }
   };
 
@@ -46,7 +47,7 @@ export const MobileMenu = ({
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            padding: '1.75rem 1.5rem',
+            padding: '1.5rem 1.25rem',
             overflowY: 'auto'
           }}
         >
@@ -57,7 +58,7 @@ export const MobileMenu = ({
               alignItems: 'center',
               justifyContent: 'space-between',
               borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-              paddingBottom: '1rem'
+              paddingBottom: '0.85rem'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
@@ -94,38 +95,34 @@ export const MobileMenu = ({
             </button>
           </div>
 
-          {/* Links List - Clean, compact, fits without overwhelming the screen */}
+          {/* Links List */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '0.4rem',
-              margin: '1.5rem 0'
+              gap: '0.35rem',
+              margin: '1.25rem 0'
             }}
           >
             {navLinks.map((link) => {
-              const isActive =
-                link.type === 'view'
-                  ? currentView === link.target
-                  : currentView === 'home' &&
-                    (activeSection === link.target || (link.target === 'artists' && activeSection === 'members'));
+              const isActive = currentView === link.target;
 
               return (
                 <button
                   key={link.name}
-                  onClick={() => handleItemClick(link)}
+                  onClick={() => handleItemClick(link.target)}
                   style={{
                     fontFamily: "var(--font-body)",
-                    fontSize: '15px',
+                    fontSize: '14.5px',
                     fontWeight: isActive ? 600 : 450,
                     letterSpacing: '-0.01em',
                     textAlign: 'left',
                     color: isActive ? '#FFFFFF' : '#A1A1A6',
                     cursor: 'pointer',
-                    background: isActive ? 'rgba(255, 255, 255, 0.05)' : 'none',
+                    background: isActive ? 'rgba(255, 255, 255, 0.06)' : 'none',
                     border: 'none',
                     borderRadius: '8px',
-                    padding: '0.65rem 0.75rem',
+                    padding: '0.6rem 0.75rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -150,7 +147,7 @@ export const MobileMenu = ({
           </div>
 
           {/* Contact StarX Action Button */}
-          <div style={{ margin: '0 0 1.25rem 0' }}>
+          <div style={{ margin: '0 0 1rem 0' }}>
             <button
               type="button"
               id="mobile-contact-starx-btn"
@@ -160,9 +157,9 @@ export const MobileMenu = ({
               className="btn btn-glass"
               style={{
                 width: '100%',
-                height: '42px',
+                height: '40px',
                 borderRadius: '12px',
-                fontSize: '13.5px',
+                fontSize: '13px',
                 fontWeight: 500,
                 display: 'flex',
                 alignItems: 'center',
@@ -201,13 +198,13 @@ export const MobileMenu = ({
           <div
             style={{
               borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-              paddingTop: '1.25rem',
+              paddingTop: '1rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between'
             }}
           >
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '0.85rem' }}>
               {social.instagram.url && (
                 <a
                   href={social.instagram.url}
@@ -216,7 +213,7 @@ export const MobileMenu = ({
                   aria-label="Instagram"
                   style={{ color: '#A1A1A6' }}
                 >
-                  <Instagram size={17} />
+                  <Instagram size={16} />
                 </a>
               )}
               {social.facebook.url && (
@@ -227,7 +224,7 @@ export const MobileMenu = ({
                   aria-label="Facebook"
                   style={{ color: '#A1A1A6' }}
                 >
-                  <Facebook size={17} />
+                  <Facebook size={16} />
                 </a>
               )}
               {social.youtube.url && (
@@ -238,7 +235,7 @@ export const MobileMenu = ({
                   aria-label="YouTube"
                   style={{ color: '#A1A1A6' }}
                 >
-                  <Youtube size={17} />
+                  <Youtube size={16} />
                 </a>
               )}
             </div>

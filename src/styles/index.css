@@ -328,9 +328,10 @@ img, video {
 .site-background {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: -1;
   overflow: hidden;
   pointer-events: none;
 }
@@ -347,79 +348,48 @@ img, video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 45%;
-  filter: brightness(0.42) contrast(1.10) saturate(0.95);
-  transform-origin: center center;
-  will-change: transform;
-}
-
-@media (max-width: 1024px) {
-  .site-background-image {
-    object-position: center 45%;
-  }
-}
-
-@media (max-width: 768px) {
-  .site-background-image {
-    object-position: 55% center;
-    filter: brightness(0.40) contrast(1.10) saturate(0.95);
-  }
-}
-
-/* Hero Media Container (16:9 desktop, responsive mobile, tuned object-position) */
-.hero-media-container {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-}
-
-.hero-media-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-}
-
-@media (max-width: 768px) {
-  .hero-media-container {
-    aspect-ratio: 4 / 5;
-  }
-  .hero-media-container img {
-    object-position: center top;
-  }
+  object-position: center;
+  display: block;
 }
 
 .site-background-overlay {
   position: absolute;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.64);
+  background-color: rgba(0, 0, 0, 0.58);
   pointer-events: none;
+  transition: background-color 0.4s ease;
 }
 
-.site-background-transition {
-  position: absolute;
-  inset: 0;
-  background-color: #000000;
-  pointer-events: none;
-  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+@media (max-width: 767px) {
+  .site-background-overlay {
+    background-color: rgba(0, 0, 0, 0.62);
+  }
 }
 
-/* Section Spacing (Desktop 70-90px, Tablet 55-65px, Mobile 44-58px) */
+/* Editorial Heading (Bodoni Moda: Desktop 34px-42px, Mobile 25px-30px) */
+.editorial-heading {
+  font-family: var(--font-editorial);
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
+  color: var(--text-primary);
+}
+
+@media (max-width: 767px) {
+  .editorial-heading {
+    font-size: clamp(25px, 6.2vw, 30px);
+  }
+}
+
+/* Section Spacing (Desktop 65px-82px, Mobile 42px-54px) */
 .section-dark,
 .section-secondary,
 .section-standard {
   position: relative;
-  padding: 80px 0;
+  padding: 72px 0;
   background-color: transparent;
   overflow: hidden;
-}
-
-@media (max-width: 1024px) {
-  .section-dark,
-  .section-secondary,
-  .section-standard {
-    padding: 60px 0;
-  }
 }
 
 @media (max-width: 768px) {

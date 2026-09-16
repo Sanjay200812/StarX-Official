@@ -7,7 +7,22 @@
  * ====================================================================
  */
 
+export const DEMO_PERFORMANCE_URL = "https://www.youtube.com/@starxliveband";
+
+export const WHATSAPP_PREFILLED_MESSAGE =
+  "Hi StarX Live, I would like to enquire about booking the band for an event. Please share your availability and booking details.";
+
+const ENCODED_WA_MESSAGE = encodeURIComponent(WHATSAPP_PREFILLED_MESSAGE);
+
 export const siteData = {
+  // ==========================================
+  // 0. RESPONSIVE SITE BACKGROUNDS
+  // ==========================================
+  background: {
+    desktop: "/assets/brand/starx-pc-bg.jpeg",
+    mobile: "/assets/brand/starx-mobile-bg.png"
+  },
+
   // ==========================================
   // 1. BRAND IDENTITY
   // ==========================================
@@ -45,8 +60,8 @@ export const siteData = {
   // 1.1 HERO PRESENTATION ASSETS
   // ==========================================
   hero: {
-    desktopImage: "/assets/brand/starx-banner.png",
-    mobileImage: "/assets/brand/starx-post.png",
+    desktopImage: "/assets/brand/starx-pc-bg.jpeg",
+    mobileImage: "/assets/brand/starx-mobile-bg.png",
     stageImage: "/assets/gallery/gallery-01.jpg"
   },
 
@@ -54,9 +69,9 @@ export const siteData = {
   // 2. ABOUT US
   // ==========================================
   about: {
-    title: "WE ARE STARX.",
+    title: "ABOUT STARX",
     description:
-      "StarX Live is a Hyderabad-based live rock band performing Classic, Rock and Western music in Telugu and Hindi. Our focus is simple: real musicians, real energy and memorable live performances.",
+      "StarX Live is a Hyderabad-based live rock band performing Classic, Rock and Western music in Telugu and Hindi. The band focuses on live musicianship, energetic performances and recreating familiar music for live audiences.",
     genresText: "CLASSIC • ROCK • WESTERN",
     languagesText: "TELUGU • HINDI",
     locationText: "HYDERABAD",
@@ -330,14 +345,14 @@ He also manages and maintains the StarX Live website and online platforms, helpi
         number: "7337253898",
         display: "7337253898",
         call: "tel:+917337253898",
-        whatsapp: "https://wa.me/917337253898?text=Hi%20StarX%20Live%2C%20I%20would%20like%20to%20enquire%20about%20booking%20the%20band%20for%20an%20event.%20Please%20share%20your%20availability%20and%20booking%20details."
+        whatsapp: `https://wa.me/917337253898?text=${ENCODED_WA_MESSAGE}`
       },
       {
         id: "phone-2",
         number: "9390754569",
         display: "9390754569",
         call: "tel:+919390754569",
-        whatsapp: "https://wa.me/919390754569?text=Hi%20StarX%20Live%2C%20I%20would%20like%20to%20enquire%20about%20booking%20the%20band%20for%20an%20event.%20Please%20share%20your%20availability%20and%20booking%20details."
+        whatsapp: `https://wa.me/919390754569?text=${ENCODED_WA_MESSAGE}`
       }
     ],
 
