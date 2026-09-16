@@ -32,8 +32,9 @@ export const BrandedImage = ({
 
   const handleImageError = () => {
     if (currentSrc && currentSrc.endsWith('.jpg')) {
-      // If .jpg fails, check if the file was saved as .jpeg before falling back to placeholder
       setCurrentSrc(currentSrc.replace(/\.jpg$/, '.jpeg'));
+    } else if (currentSrc && currentSrc.endsWith('.jpeg')) {
+      setCurrentSrc(currentSrc.replace(/\.jpeg$/, '.png'));
     } else {
       setHasError(true);
     }

@@ -4,33 +4,37 @@ import BrandLogo from '../components/BrandLogo';
 import { siteData } from '../data/siteData';
 
 /**
- * Footer Component (Section 36)
- * Near-black #050505 footer with thin divider rgba(255, 255, 255, 0.08):
- * Left: STARX LIVE / ROCK BAND
- * Center: Clean navigation links
- * Right: Minimal social links
- * Bottom: Tagline, copyright, and music recreation legal disclaimer.
+ * Footer Component
+ * Minimal dark footer matching editorial brand guidelines.
  */
-export const Footer = () => {
+export const Footer = ({ onNavigate }) => {
   const { brand, social } = siteData;
 
   const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Members', href: '#members' },
-    { name: 'Performances', href: '#performances' },
-    { name: 'Media', href: '#media' },
-    { name: 'Events', href: '#events' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Home', type: 'section', target: 'home' },
+    { name: 'Artists', type: 'section', target: 'artists' },
+    { name: 'Performances', type: 'section', target: 'performances' },
+    { name: 'About', type: 'view', target: 'about' },
+    { name: 'Media', type: 'view', target: 'media' },
+    { name: 'Events', type: 'view', target: 'events' },
+    { name: 'Crew', type: 'view', target: 'crew' },
+    { name: 'Contact', type: 'section', target: 'contact' }
   ];
+
+  const handleLinkClick = (e, link) => {
+    e.preventDefault();
+    if (onNavigate) {
+      onNavigate(link.target, link.type);
+    }
+  };
 
   return (
     <footer
       id="footer"
       style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        borderTop: '1.5px solid #B3131B',
-        padding: '3.25rem 0 2.25rem 0',
+        backgroundColor: 'rgba(6, 6, 8, 0.85)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        padding: '3rem 0 2rem 0',
         position: 'relative'
       }}
     >
@@ -42,21 +46,21 @@ export const Footer = () => {
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '2rem',
-            paddingBottom: '2.25rem',
+            gap: '1.75rem',
+            paddingBottom: '2rem',
             borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
           }}
         >
           {/* Left: Brand Identity */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <BrandLogo size="md" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <BrandLogo size={32} />
             <div>
               <span
                 style={{
-                  fontFamily: "var(--font-heading)",
-                  fontSize: '1.15rem',
-                  fontWeight: 750,
-                  letterSpacing: '-0.03em',
+                  fontFamily: "var(--font-body)",
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  letterSpacing: '-0.02em',
                   color: '#F5F5F7',
                   lineHeight: 1
                 }}
@@ -67,11 +71,12 @@ export const Footer = () => {
                 style={{
                   display: 'block',
                   fontFamily: "var(--font-body)",
-                  fontSize: '0.68rem',
+                  fontSize: '9px',
                   fontWeight: 600,
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.12em',
                   color: '#737378',
-                  marginTop: '0.2rem'
+                  marginTop: '0.2rem',
+                  textTransform: 'uppercase'
                 }}
               >
                 ROCK BAND
@@ -80,18 +85,19 @@ export const Footer = () => {
           </div>
 
           {/* Center: Navigation Links */}
-          <nav style={{ display: 'flex', gap: '1.75rem', flexWrap: 'wrap' }}>
+          <nav style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
             {navLinks.map((link) => (
               <a
                 key={link.name}
-                href={link.href}
+                href={`#${link.target}`}
+                onClick={(e) => handleLinkClick(e, link)}
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: '13.5px',
+                  fontSize: '13px',
                   fontWeight: 500,
                   color: '#A1A1A6',
                   textDecoration: 'none',
-                  transition: 'color 0.25s ease'
+                  transition: 'color 0.2s ease'
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#A1A1A6')}
@@ -102,18 +108,18 @@ export const Footer = () => {
           </nav>
 
           {/* Right: Minimal Social Links */}
-          <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             {social.instagram.url && (
               <a
                 href={social.instagram.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                style={{ color: '#737378', transition: 'color 0.25s ease' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+                style={{ color: '#737378', transition: 'color 0.2s ease' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#737378')}
               >
-                <Instagram size={18} />
+                <Instagram size={17} />
               </a>
             )}
             {social.facebook.url && (
@@ -122,11 +128,11 @@ export const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                style={{ color: '#737378', transition: 'color 0.25s ease' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+                style={{ color: '#737378', transition: 'color 0.2s ease' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#737378')}
               >
-                <Facebook size={18} />
+                <Facebook size={17} />
               </a>
             )}
             {social.youtube.url && (
@@ -135,11 +141,11 @@ export const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
-                style={{ color: '#737378', transition: 'color 0.25s ease' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+                style={{ color: '#737378', transition: 'color 0.2s ease' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#737378')}
               >
-                <Youtube size={18} />
+                <Youtube size={17} />
               </a>
             )}
           </div>
@@ -148,14 +154,14 @@ export const Footer = () => {
         {/* Bottom Row: Tagline & Copyright */}
         <div
           style={{
-            paddingTop: '2.5rem',
+            paddingTop: '1.75rem',
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '1rem',
             fontFamily: "var(--font-body)",
-            fontSize: '0.85rem',
+            fontSize: '12.5px',
             color: '#737378'
           }}
         >
@@ -171,10 +177,10 @@ export const Footer = () => {
         {/* Music Recreation Legal Note */}
         <div
           style={{
-            marginTop: '1.25rem',
+            marginTop: '1rem',
             fontFamily: "var(--font-body)",
-            fontSize: '0.75rem',
-            color: '#55555A',
+            fontSize: '11.5px',
+            color: '#52525B',
             lineHeight: 1.5
           }}
         >

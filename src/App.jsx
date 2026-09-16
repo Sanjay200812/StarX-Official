@@ -8,17 +8,18 @@ import ImageLightbox from './components/ImageLightbox';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
 import ScrollProgress from './components/ScrollProgress';
 
-// Sections in Exact Sequence (Section 45)
+// 4 Core Homepage Sections (Spec 1 & 2)
 import Hero from './sections/Hero';
-import AboutStarX from './sections/AboutStarX';
-import NextEvent from './sections/NextEvent';
 import BandMembers from './sections/BandMembers';
 import FeaturedPerformances from './sections/FeaturedPerformances';
-import MediaGallery from './sections/MediaGallery';
-import PastPrograms from './sections/PastPrograms';
 import BookingsContact from './sections/BookingsContact';
-import QrConnect from './sections/QrConnect';
 import Footer from './sections/Footer';
+
+// 4 Dedicated Internal Views (Spec 3, 4, 31-36)
+import AboutView from './views/AboutView';
+import MediaView from './views/MediaView';
+import EventsView from './views/EventsView';
+import CrewView from './views/CrewView';
 
 export function App() {
   const [isIntroComplete, setIsIntroComplete] = useState(() => {
@@ -35,6 +36,20 @@ export function App() {
       return false;
     }
   });
+
+  // Dedicated View routing state: 'home' | 'about' | 'media' | 'events' | 'crew'
+  const [currentView, setCurrentView] = useState(() => {
+    try {
+      const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+      if (['about', 'media', 'events', 'crew'].includes(path)) {
+        return path;
+      }
+    } catch (e) {
+      // ignore
+    }
+    return 'home';
+  });
+
   const [activeSection, setActiveSection] = useState('home');
 
   const handleStartTransition = useCallback(() => {
@@ -51,22 +66,36 @@ export function App() {
     }
   }, []);
 
-  // Track active section for coordinated darkness transitions & navigation
+  // Listen to browser Back/Forward navigation
   useEffect(() => {
+    const handlePopState = () => {
+      try {
+        const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+        if (['about', 'media', 'events', 'crew'].includes(path)) {
+          setCurrentView(path);
+        } else {
+          setCurrentView('home');
+        }
+      } catch (e) {
+        setCurrentView('home');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Track active section for coordinated background darkness transitions
+  useEffect(() => {
+    if (currentView !== 'home') {
+      setActiveSection(currentView);
+      return;
+    }
+
     const handleScroll = () => {
-      const sectionIds = [
-        'home',
-        'about',
-        'next-event',
-        'members',
-        'performances',
-        'media',
-        'events',
-        'contact',
-        'connect'
-      ];
+      const sectionIds = ['home', 'artists', 'performances', 'contact'];
       for (const id of sectionIds) {
-        const el = document.getElementById(id);
+        const el = document.getElementById(id) || (id === 'artists' ? document.getElementById('members') : null);
         if (el) {
           const rect = el.getBoundingClientRect();
           if (rect.top <= window.innerHeight * 0.45 && rect.bottom >= window.innerHeight * 0.2) {
@@ -80,7 +109,7 @@ export function App() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [currentView]);
 
   // Video Modal State
   const [activeVideo, setActiveVideo] = useState(null);
@@ -90,6 +119,7 @@ export function App() {
   const [lightboxItems, setLightboxItems] = useState([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
   const handlePlayVideo = (videoData) => {
     setActiveVideo(videoData);
     setIsVideoModalOpen(true);
@@ -101,27 +131,37 @@ export function App() {
     setIsLightboxOpen(true);
   };
 
-  const handleOpenMoment = (eventData) => {
-    handleOpenPhoto([
-      {
-        id: eventData.id,
-        image: eventData.image,
-        title: eventData.eventName,
-        subtitle: `${eventData.venue} • ${eventData.location}`
+  // Central Navigation Handler (Specs 3 & 4)
+  const handleNavigate = (target, type) => {
+    if (type === 'view') {
+      setCurrentView(target);
+      try {
+        window.history.pushState(null, '', `/${target}`);
+      } catch (e) {}
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Navigating to a homepage section
+      const wasNotHome = currentView !== 'home';
+      if (wasNotHome) {
+        setCurrentView('home');
+        try {
+          window.history.pushState(null, '', '/');
+        } catch (e) {}
       }
-    ], 0);
-  };
 
-  const handleOpenBanner = () => {
-    handleOpenPhoto([
-      {
-        id: 'starx-long-banner',
-        image: '/assets/brand/starx-long-banner.png',
-        title: 'STARX LIVE',
-        subtitle: 'Official Long Banner',
-        downloadFileName: 'StarX-Live-Banner.png'
-      }
-    ], 0);
+      setTimeout(() => {
+        if (target === 'home') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const el =
+            document.getElementById(target) ||
+            (target === 'artists' ? document.getElementById('members') : null);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      }, wasNotHome ? 120 : 0);
+    }
   };
 
   const isIntroActive = !isIntroTransitioning && !isIntroComplete;
@@ -135,7 +175,7 @@ export function App() {
       }}
     >
       {/* 0. Single Global Fixed Background Layer (Continuous across full site) */}
-      <SiteBackground activeSection={activeSection} />
+      <SiteBackground activeSection={currentView !== 'home' ? currentView : activeSection} />
 
       {/* 1. Opening StarX Typography Cinematic Animation */}
       <AnimatePresence>
@@ -151,53 +191,80 @@ export function App() {
       <ScrollProgress />
 
       {/* 2. Floating Island Smoked-Glass Top Navbar */}
-      <Navbar isIntroActive={isIntroActive} />
+      <Navbar
+        isIntroActive={isIntroActive}
+        currentView={currentView}
+        activeSection={activeSection}
+        onNavigate={handleNavigate}
+      />
 
       <motion.main
         animate={{
           opacity: isIntroActive ? 0 : 1,
           y: isIntroActive ? 12 : 0
         }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
       >
-        {/* 3. Home / Hero (#home) */}
-        <Hero isIntroActive={isIntroActive} onOpenBanner={handleOpenBanner} />
+        <AnimatePresence mode="wait">
+          {currentView === 'home' && (
+            <motion.div
+              key="homepage-flow"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* 1. Home / Hero (Spec 1 & 11) */}
+              <Hero isIntroActive={isIntroActive} />
 
-        {/* 4. About Us (#about) */}
-        <AboutStarX />
+              {/* 2. Meet StarX / Artists (Spec 1 & 13) */}
+              <BandMembers />
 
-        {/* 5. Next Event (#next-event) */}
-        <NextEvent />
+              {/* 3. Demo Performances (Spec 1 & 20) */}
+              <FeaturedPerformances onPlayVideo={handlePlayVideo} />
 
-        {/* 6. Meet StarX / Members (#members) */}
-        <BandMembers />
+              {/* 4. Bookings & Contact (Spec 1 & 23) */}
+              <BookingsContact />
+            </motion.div>
+          )}
 
-        {/* 7. Live Performances (#performances) */}
-        <FeaturedPerformances onPlayVideo={handlePlayVideo} />
+          {/* Dedicated Internal Views (Spec 3 & 4: 400-550ms transition) */}
+          {currentView === 'about' && (
+            <AboutView
+              key="about-view"
+              onBackHome={() => handleNavigate('home', 'section')}
+            />
+          )}
 
-        {/* 8. StarX in Action / Media (#media) */}
-        <MediaGallery
-          onOpenPhoto={handleOpenPhoto}
-          onPlayVideo={handlePlayVideo}
-        />
+          {currentView === 'media' && (
+            <MediaView
+              key="media-view"
+              onBackHome={() => handleNavigate('home', 'section')}
+              onOpenPhoto={handleOpenPhoto}
+            />
+          )}
 
-        {/* 9. On The Stage / Events (#events) */}
-        <PastPrograms onOpenMoment={handleOpenMoment} />
+          {currentView === 'events' && (
+            <EventsView
+              key="events-view"
+              onBackHome={() => handleNavigate('home', 'section')}
+            />
+          )}
 
-        {/* 10. Bookings & Enquiries (#contact) */}
-        <BookingsContact />
-
-        {/* 11. Connect With StarX (#connect) */}
-        <QrConnect />
+          {currentView === 'crew' && (
+            <CrewView
+              key="crew-view"
+              onBackHome={() => handleNavigate('home', 'section')}
+            />
+          )}
+        </AnimatePresence>
       </motion.main>
 
-      {/* 12. Minimal Dark Footer */}
-      <Footer />
+      {/* Minimal Dark Footer */}
+      <Footer onNavigate={handleNavigate} />
 
       {/* Floating WhatsApp Quick Contact Button */}
       <FloatingWhatsApp />
-
-
 
       {/* Smoked-Glass Video Modal */}
       <VideoModal

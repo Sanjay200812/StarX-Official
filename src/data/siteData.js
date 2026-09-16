@@ -92,7 +92,7 @@ export const siteData = {
       id: 1,
       name: "B. Prasad",
       role: "Rhythm Pad",
-      image: null,
+      image: "/assets/artists/b-prasad.jpg",
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -100,7 +100,7 @@ export const siteData = {
       id: 2,
       name: "B. Joseph",
       role: "Drum Kit",
-      image: null,
+      image: "/assets/artists/b-joseph.jpg",
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -108,7 +108,7 @@ export const siteData = {
       id: 3,
       name: "G. Perumalla Rao",
       role: "Piano 1",
-      image: null,
+      image: "/assets/artists/g-perumalla-rao.jpg",
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -330,14 +330,14 @@ He also manages and maintains the StarX Live website and online platforms, helpi
         number: "7337253898",
         display: "7337253898",
         call: "tel:+917337253898",
-        whatsapp: "https://wa.me/917337253898?text=Hello%20StarX%20Live,%20I%20would%20like%20to%20enquire%20about%20booking%20the%20band%20for%20an%20event."
+        whatsapp: "https://wa.me/917337253898?text=Hi%20StarX%20Live%2C%20I%20would%20like%20to%20enquire%20about%20booking%20the%20band%20for%20an%20event.%20Please%20share%20your%20availability%20and%20booking%20details."
       },
       {
         id: "phone-2",
         number: "9390754569",
         display: "9390754569",
         call: "tel:+919390754569",
-        whatsapp: "https://wa.me/919390754569?text=Hello%20StarX%20Live,%20I%20would%20like%20to%20enquire%20about%20booking%20the%20band%20for%20an%20event."
+        whatsapp: "https://wa.me/919390754569?text=Hi%20StarX%20Live%2C%20I%20would%20like%20to%20enquire%20about%20booking%20the%20band%20for%20an%20event.%20Please%20share%20your%20availability%20and%20booking%20details."
       }
     ],
 

@@ -147,13 +147,13 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
               {/* Right: Artist / Crew Details */}
               <div className="member-modal-details-col">
                 <div>
-                  {/* 1. Member Name: Sora */}
+                  {/* 1. Member Name: Inter (24px to 28px desktop, 20px to 23px mobile) */}
                   <h3
                     style={{
-                      fontFamily: "var(--font-heading)",
-                      fontSize: 'clamp(22px, 2.2vw, 28px)',
-                      fontWeight: 700,
-                      letterSpacing: '-0.025em',
+                      fontFamily: "var(--font-body)",
+                      fontSize: 'clamp(20px, 2.2vw, 26px)',
+                      fontWeight: 650,
+                      letterSpacing: '-0.02em',
                       color: '#F5F5F7',
                       margin: '0 0 0.35rem 0',
                       lineHeight: 1.15

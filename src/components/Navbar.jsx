@@ -7,32 +7,46 @@ import ContactPopover from './ContactPopover';
 import { siteData } from '../data/siteData';
 
 /**
- * Navbar Component (Section 7, 8, 19)
- * Floating island smoked-glass navigation bar.
- * Uses real StarX logo / wordmark.
- * Position: sticky, top: 12px, border-radius: 18px.
- * Background: rgba(10, 10, 12, 0.70) with 24px blur.
+ * Navbar Component
+ * Compact, sticky, smoked-glass navigation bar.
+ * Height: 60px to 64px desktop.
+ * Font size: 13px to 14px (Inter).
+ *
+ * Navigation Items:
+ * - Home (Homepage Hero)
+ * - Artists (Homepage Section)
+ * - Performances (Homepage Section)
+ * - About (Dedicated View /about)
+ * - Media (Dedicated View /media)
+ * - Events (Dedicated View /events)
+ * - Crew (Dedicated View /crew)
+ * - Contact (Homepage Section)
+ * - Contact StarX (Quick Contact Popup)
  */
-export const Navbar = ({ isIntroActive = false }) => {
+export const Navbar = ({
+  isIntroActive = false,
+  currentView = 'home',
+  activeSection = 'home',
+  onNavigate
+}) => {
   const { brand } = siteData;
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
-
-  const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Members', href: '#members' },
-    { name: 'Performances', href: '#performances' },
-    { name: 'Media', href: '#media' },
-    { name: 'Events', href: '#events' },
-    { name: 'Contact', href: '#contact' }
-  ];
-
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const popoverWrapperRef = useRef(null);
 
-  // Close popover on click outside, ESC key, or scroll movement
+  const navLinks = [
+    { name: 'Home', type: 'section', target: 'home' },
+    { name: 'Artists', type: 'section', target: 'artists' },
+    { name: 'Performances', type: 'section', target: 'performances' },
+    { name: 'About', type: 'view', target: 'about' },
+    { name: 'Media', type: 'view', target: 'media' },
+    { name: 'Events', type: 'view', target: 'events' },
+    { name: 'Crew', type: 'view', target: 'crew' },
+    { name: 'Contact', type: 'section', target: 'contact' }
+  ];
+
+  // Close popover on click outside, ESC key, or scroll
   useEffect(() => {
     if (!isPopoverOpen) return;
 
@@ -51,12 +65,11 @@ export const Navbar = ({ isIntroActive = false }) => {
     };
 
     const handleScrollClose = () => {
-      if (Math.abs(window.scrollY - initialScroll) > 25) {
+      if (Math.abs(window.scrollY - initialScroll) > 30) {
         setIsPopoverOpen(false);
       }
     };
 
-    // Use mousedown and click to reliably intercept outside clicks
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('click', handleClickOutside);
     window.addEventListener('keydown', handleKeyDown);
@@ -72,24 +85,19 @@ export const Navbar = ({ isIntroActive = false }) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
-
-      const sectionIds = ['home', 'about', 'members', 'performances', 'media', 'events', 'contact'];
-      for (const id of sectionIds) {
-        const el = document.getElementById(id);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 240 && rect.bottom >= 200) {
-            setActiveSection(id);
-            break;
-          }
-        }
-      }
+      setIsScrolled(window.scrollY > 30);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleItemClick = (e, link) => {
+    e.preventDefault();
+    if (onNavigate) {
+      onNavigate(link.target, link.type);
+    }
+  };
 
   return (
     <>
@@ -101,18 +109,19 @@ export const Navbar = ({ isIntroActive = false }) => {
           zIndex: 9000,
           margin: '0 auto',
           opacity: isIntroActive ? 0 : 1,
-          transform: isIntroActive ? 'translateY(-16px)' : 'translateY(0)',
+          transform: isIntroActive ? 'translateY(-14px)' : 'translateY(0)',
           pointerEvents: isIntroActive ? 'none' : 'auto',
           height: isScrolled ? '60px' : '64px',
           borderRadius: '16px',
-          backgroundColor: isScrolled ? 'rgba(10, 10, 12, 0.88)' : 'rgba(10, 10, 12, 0.68)',
+          backgroundColor: isScrolled ? 'rgba(10, 10, 12, 0.90)' : 'rgba(10, 10, 12, 0.75)',
           backdropFilter: 'blur(20px) saturate(115%)',
           WebkitBackdropFilter: 'blur(20px) saturate(115%)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
+          border: '1px solid rgba(255, 255, 255, 0.07)',
           boxShadow: isScrolled
-            ? '0 18px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06)'
+            ? '0 16px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06)'
             : '0 8px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
-          transition: 'opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1), transform 0.95s cubic-bezier(0.22, 1, 0.36, 1), height 0.4s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+          transition:
+            'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), height 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
           display: 'flex',
           alignItems: 'center'
         }}
@@ -123,12 +132,13 @@ export const Navbar = ({ isIntroActive = false }) => {
             alignItems: 'center',
             justifyContent: 'space-between',
             width: '100%',
-            padding: '0 1.5rem'
+            padding: '0 1.25rem'
           }}
         >
-          {/* LEFT: STARX LIVE Wordmark / Logo */}
+          {/* LEFT: STARX LIVE Logo & Wordmark */}
           <a
-            href="#home"
+            href="/"
+            onClick={(e) => handleItemClick(e, { target: 'home', type: 'section' })}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -136,15 +146,15 @@ export const Navbar = ({ isIntroActive = false }) => {
               textDecoration: 'none'
             }}
           >
-            <BrandLogo size={34} className="navbar-logo-wrapper" priority />
+            <BrandLogo size={32} className="navbar-logo-wrapper" priority />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem' }}>
               <span
                 className="navbar-brand-title"
                 style={{
-                  fontFamily: "var(--font-heading)",
-                  fontSize: '14.5px',
-                  fontWeight: 750,
-                  letterSpacing: '-0.03em',
+                  fontFamily: "var(--font-body)",
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  letterSpacing: '-0.02em',
                   color: '#F5F5F7'
                 }}
               >
@@ -156,7 +166,7 @@ export const Navbar = ({ isIntroActive = false }) => {
                   fontFamily: "var(--font-body)",
                   fontSize: '9px',
                   fontWeight: 600,
-                  letterSpacing: '0.08em',
+                  letterSpacing: '0.1em',
                   color: '#737378',
                   textTransform: 'uppercase'
                 }}
@@ -166,29 +176,34 @@ export const Navbar = ({ isIntroActive = false }) => {
             </div>
           </a>
 
-          {/* RIGHT: Navigation Links + Contact Button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.75rem' }}>
+          {/* RIGHT: Navigation Links + Contact StarX Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
             <nav
               style={{
                 display: 'none',
                 alignItems: 'center',
-                gap: '1.75rem'
+                gap: '1.25rem'
               }}
               className="desktop-navbar-links"
             >
               {navLinks.map((link) => {
-                const isActive = activeSection === link.href.substring(1);
+                const isActive =
+                  link.type === 'view'
+                    ? currentView === link.target
+                    : currentView === 'home' && (activeSection === link.target || (link.target === 'artists' && activeSection === 'members'));
+
                 return (
                   <a
                     key={link.name}
-                    href={link.href}
+                    href={`#${link.target}`}
+                    onClick={(e) => handleItemClick(e, link)}
                     style={{
                       fontFamily: "var(--font-body)",
                       fontSize: '13.5px',
-                      fontWeight: 500,
-                      letterSpacing: '-0.015em',
+                      fontWeight: isActive ? 600 : 500,
+                      letterSpacing: '-0.01em',
                       color: isActive ? '#FFFFFF' : '#A1A1A6',
-                      transition: 'color 0.25s ease',
+                      transition: 'color 0.2s ease',
                       position: 'relative',
                       padding: '0.35rem 0'
                     }}
@@ -205,7 +220,7 @@ export const Navbar = ({ isIntroActive = false }) => {
                           bottom: 0,
                           left: '50%',
                           transform: 'translateX(-50%)',
-                          width: '16px',
+                          width: '14px',
                           height: '2px',
                           borderRadius: '1px',
                           backgroundColor: '#B3131B'
@@ -217,7 +232,7 @@ export const Navbar = ({ isIntroActive = false }) => {
               })}
             </nav>
 
-            {/* Pill Button: Contact StarX (Opens popover, does NOT navigate) */}
+            {/* Pill Button: Contact StarX (Opens popup directly, does not navigate) */}
             <div
               ref={popoverWrapperRef}
               className="desktop-navbar-btn"
@@ -232,17 +247,15 @@ export const Navbar = ({ isIntroActive = false }) => {
                 aria-controls="contact-starx-popover"
                 className="btn btn-glass"
                 style={{
-                  height: '35px',
-                  padding: '0 16px',
-                  fontSize: '12px',
+                  height: '34px',
+                  padding: '0 14px',
+                  fontSize: '13px',
                   fontWeight: 500,
                   borderRadius: '999px',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  backgroundColor: isPopoverOpen ? 'rgba(255, 255, 255, 0.14)' : undefined,
-                  borderColor: isPopoverOpen ? 'rgba(255, 255, 255, 0.18)' : undefined
+                  backgroundColor: isPopoverOpen ? 'rgba(255, 255, 255, 0.14)' : undefined
                 }}
               >
                 <span>Contact StarX</span>
@@ -255,7 +268,7 @@ export const Navbar = ({ isIntroActive = false }) => {
               </AnimatePresence>
             </div>
 
-            {/* Mobile Menu Trigger */}
+            {/* Mobile Menu Hamburger Trigger */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open menu"
@@ -269,7 +282,7 @@ export const Navbar = ({ isIntroActive = false }) => {
                 cursor: 'pointer'
               }}
             >
-              <Menu size={22} />
+              <Menu size={20} />
             </button>
           </div>
         </div>
@@ -278,7 +291,7 @@ export const Navbar = ({ isIntroActive = false }) => {
       <style>{`
         .glass-navbar-header {
           width: calc(100% - 28px);
-          max-width: 1160px;
+          max-width: 1180px;
         }
         @media (min-width: 768px) {
           .glass-navbar-header {
@@ -287,19 +300,16 @@ export const Navbar = ({ isIntroActive = false }) => {
         }
         @media (max-width: 480px) {
           .glass-navbar-header {
-            width: calc(100% - 20px);
+            width: calc(100% - 24px);
           }
           .glass-navbar-header > div {
-            padding: 0 1rem !important;
-          }
-          .navbar-brand-title {
-            font-size: 13.5px !important;
+            padding: 0 0.85rem !important;
           }
           .navbar-brand-desc {
             display: none !important;
           }
         }
-        @media (min-width: 960px) {
+        @media (min-width: 980px) {
           .desktop-navbar-links {
             display: flex !important;
           }
@@ -316,7 +326,9 @@ export const Navbar = ({ isIntroActive = false }) => {
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         navLinks={navLinks}
+        currentView={currentView}
         activeSection={activeSection}
+        onNavigate={onNavigate}
       />
     </>
   );

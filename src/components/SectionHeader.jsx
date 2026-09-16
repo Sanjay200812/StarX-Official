@@ -39,12 +39,18 @@ export const SectionHeader = ({
 
       {title && (
         <motion.h2
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="rock-title"
-          style={{ marginBottom: '0.75rem' }}
+          transition={{ duration: 0.5, delay: 0.08 }}
+          className="editorial-heading"
+          style={{
+            fontSize: 'clamp(26px, 3.2vw, 42px)',
+            fontWeight: 600,
+            letterSpacing: '-0.015em',
+            color: '#F5F5F7',
+            marginBottom: '0.65rem'
+          }}
         >
           {title}
         </motion.h2>
@@ -52,12 +58,16 @@ export const SectionHeader = ({
 
       {subtitle && (
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="rock-subtitle"
+          transition={{ duration: 0.5, delay: 0.15 }}
           style={{
+            fontFamily: "var(--font-body)",
+            fontSize: 'clamp(13.5px, 1.05vw, 15px)',
+            color: '#A1A1A6',
+            lineHeight: 1.6,
+            letterSpacing: '-0.01em',
             margin: isCenter ? '0 auto' : '0'
           }}
         >
@@ -65,19 +75,18 @@ export const SectionHeader = ({
         </motion.p>
       )}
 
-      {/* Red Accent Underline */}
+      {/* Subtle StarX Red Accent Line */}
       <motion.div
         initial={{ scaleX: 0, opacity: 0 }}
         whileInView={{ scaleX: 1, opacity: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.7, delay: 0.25 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
         style={{
-          width: '70px',
-          height: '3px',
-          background: 'linear-gradient(90deg, #FF2A35, #E50914)',
-          marginTop: '1.25rem',
-          borderRadius: '2px',
-          boxShadow: '0 0 12px rgba(255, 42, 53, 0.7)',
+          width: '28px',
+          height: '2px',
+          backgroundColor: '#B3131B',
+          marginTop: '1rem',
+          borderRadius: '1px',
           transformOrigin: isCenter ? 'center' : 'left'
         }}
       />

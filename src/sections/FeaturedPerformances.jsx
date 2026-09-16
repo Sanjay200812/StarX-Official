@@ -3,29 +3,32 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Play } from 'lucide-react';
 import { siteData } from '../data/siteData';
 import BrandedImage from '../components/BrandedImage';
-import { ScrollRevealHeading, ScrollRevealParagraph } from '../components/ScrollReveal';
 
 /**
  * FeaturedPerformances Section
- * One large featured video on #050505 that expands on scroll (scale 0.92 -> 1, border-radius 30px -> 22px, opacity 0.6 -> 1)
- * with smoked-glass information overlay and sleek controls.
+ * "DEMO PERFORMANCES"
+ *
+ * Specifications:
+ * - Bodoni Moda for "DEMO PERFORMANCES" (34px to 42px desktop, 26px to 30px mobile).
+ * - Compact layout: one main featured performance + up to two smaller previews.
+ * - Mobile: stack vertically.
+ * - Stage photo thumbnails with clearly marked "Video coming soon" placeholders.
+ * - No fake YouTube links.
  */
 export const FeaturedPerformances = ({ onPlayVideo }) => {
   const { performances } = siteData;
   const mainPerf = performances[0];
-  const secondaryPerfs = performances.slice(1);
+  const secondaryPerfs = performances.slice(1, 3);
 
   const featuredRef = useRef(null);
 
-  // Featured video expansion on scroll: scale 0.92 -> 1, border-radius 30px -> 22px
   const { scrollYProgress: videoProgress } = useScroll({
     target: featuredRef,
-    offset: ['start 90%', 'center center']
+    offset: ['start 92%', 'center center']
   });
 
-  const videoScale = useTransform(videoProgress, [0, 1], [0.92, 1]);
-  const videoRadius = useTransform(videoProgress, [0, 1], ['30px', '22px']);
-  const videoOpacity = useTransform(videoProgress, [0, 0.8], [0.6, 1]);
+  const videoScale = useTransform(videoProgress, [0, 1], [0.96, 1]);
+  const videoOpacity = useTransform(videoProgress, [0, 0.8], [0.75, 1]);
 
   return (
     <section
@@ -37,85 +40,66 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
       }}
     >
       <div className="container">
-        {/* Section Header with Depth Reveal */}
+        {/* Section Header: Bodoni Moda (34px-42px desktop, 26px-30px mobile) */}
         <div
           style={{
             textAlign: 'center',
-            marginBottom: '3.5rem'
+            marginBottom: '3rem'
           }}
         >
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.45rem',
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              color: '#B3131B',
-              textTransform: 'uppercase',
-              marginBottom: '0.75rem'
-            }}
-          >
-            <span
-              style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                backgroundColor: '#B3131B'
-              }}
-            />
-            LIVE CONCERTS
+          <div className="label-accent" style={{ marginBottom: '0.65rem', fontSize: '12px' }}>
+            <span className="label-accent-dot" />
+            LIVE STAGE ARCHIVE
           </div>
 
-          <ScrollRevealHeading
+          <h2
+            className="editorial-heading"
             style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: 'clamp(26px, 2.8vw, 40px)',
-              fontWeight: 750,
-              letterSpacing: '-0.03em',
+              fontSize: 'clamp(26px, 3.2vw, 40px)',
+              fontWeight: 600,
+              letterSpacing: '-0.015em',
               lineHeight: 1.12,
               color: '#F5F5F7',
-              margin: '0 0 0.65rem 0'
+              margin: '0 0 0.5rem 0'
             }}
           >
-            LIVE PERFORMANCES
-          </ScrollRevealHeading>
+            DEMO PERFORMANCES
+          </h2>
 
-          <ScrollRevealParagraph
+          <p
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: 'clamp(14px, 1.05vw, 15.5px)',
+              fontSize: 'clamp(13.5px, 1.05vw, 15px)',
               color: '#A1A1A6',
-              letterSpacing: '-0.015em',
-              margin: 0
+              letterSpacing: '-0.01em',
+              margin: 0,
+              lineHeight: 1.6
             }}
           >
-            Raw sound. Real energy. Captured live on stage.
-          </ScrollRevealParagraph>
+            Raw sound and concert energy captured live on stage. Video mastering in progress.
+          </p>
         </div>
 
-        {/* 1. Large Main Featured Performance (16:9 Canvas) */}
+        {/* 1. Large Main Featured Performance */}
         {mainPerf && (
-          <div ref={featuredRef} style={{ position: 'relative', maxWidth: '950px', margin: '0 auto 3rem auto' }}>
+          <div ref={featuredRef} style={{ position: 'relative', maxWidth: '920px', margin: '0 auto 2.5rem auto' }}>
             <motion.div
               onClick={() => {
-                if (mainPerf.videoUrl) {
+                if (mainPerf.videoUrl && onPlayVideo) {
                   onPlayVideo(mainPerf);
                 }
               }}
               style={{
                 position: 'relative',
                 width: '100%',
-                borderRadius: videoRadius,
+                borderRadius: '18px',
                 overflow: 'hidden',
                 backgroundColor: '#0D0D0F',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                boxShadow: '0 30px 80px rgba(0, 0, 0, 0.75)',
+                boxShadow: '0 24px 60px rgba(0, 0, 0, 0.65)',
                 cursor: mainPerf.videoUrl ? 'pointer' : 'default',
                 scale: videoScale,
-                opacity: videoOpacity,
-                willChange: 'transform, opacity, border-radius'
+                opacity: videoOpacity
               }}
             >
               <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
@@ -135,12 +119,12 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
                     position: 'absolute',
                     inset: 0,
                     background:
-                      'linear-gradient(180deg, transparent 40%, rgba(5,5,5,0.85) 100%)',
+                      'linear-gradient(180deg, transparent 40%, rgba(5,5,8,0.7) 70%, rgba(5,5,8,0.92) 100%)',
                     pointerEvents: 'none'
                   }}
                 />
 
-                {/* Center Indicator (Section 13) */}
+                {/* Center Coming Soon Indicator */}
                 <div
                   style={{
                     position: 'absolute',
@@ -153,212 +137,199 @@ export const FeaturedPerformances = ({ onPlayVideo }) => {
                 >
                   <div
                     style={{
-                      padding: '12px 24px',
+                      padding: '10px 20px',
                       borderRadius: '999px',
-                      backgroundColor: 'rgba(20, 20, 24, 0.85)',
-                      backdropFilter: 'blur(16px)',
-                      WebkitBackdropFilter: 'blur(16px)',
+                      backgroundColor: 'rgba(15, 15, 18, 0.82)',
+                      backdropFilter: 'blur(14px)',
+                      WebkitBackdropFilter: 'blur(14px)',
                       border: '1px solid rgba(255, 255, 255, 0.12)',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.6rem',
+                      gap: '0.5rem',
                       color: '#F5F5F7',
-                      boxShadow: '0 16px 40px rgba(0,0,0,0.5)',
-                      fontSize: '0.85rem',
-                      fontWeight: 600,
-                      letterSpacing: '0.06em',
-                      textTransform: 'uppercase'
+                      fontSize: '12.5px',
+                      fontWeight: 500,
+                      boxShadow: '0 12px 32px rgba(0, 0, 0, 0.5)'
                     }}
                   >
-                    <Play size={16} fill="#F5F5F7" />
-                    <span>{mainPerf.videoUrl ? 'Watch Live' : 'Video Coming Soon'}</span>
+                    <Play size={13} fill="#F5F5F7" />
+                    <span>{mainPerf.videoUrl ? 'Play preview' : 'Video coming soon'}</span>
                   </div>
                 </div>
 
-                {/* Bottom Smoked-Glass Metadata & Button */}
+                {/* Bottom Overlay Info */}
                 <div
                   style={{
                     position: 'absolute',
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    padding: '2.5rem 3rem',
+                    padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
                     display: 'flex',
-                    flexWrap: 'wrap',
                     alignItems: 'flex-end',
                     justifyContent: 'space-between',
-                    gap: '1.5rem',
-                    zIndex: 2
+                    gap: '1rem',
+                    flexWrap: 'wrap'
                   }}
                 >
                   <div>
                     <span
                       style={{
                         fontFamily: "var(--font-body)",
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        letterSpacing: '0.08em',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        letterSpacing: '0.1em',
                         color: '#B3131B',
-                        textTransform: 'uppercase'
+                        textTransform: 'uppercase',
+                        display: 'block',
+                        marginBottom: '0.2rem'
                       }}
                     >
                       LIVE PERFORMANCE
                     </span>
                     <h3
                       style={{
-                        fontFamily: "var(--font-heading)",
-                        fontSize: 'clamp(1.8rem, 3.5vw, 2.6rem)',
-                        fontWeight: 750,
-                        letterSpacing: '-0.03em',
+                        fontFamily: "var(--font-body)",
+                        fontSize: 'clamp(18px, 2.4vw, 24px)',
+                        fontWeight: 650,
+                        letterSpacing: '-0.02em',
                         color: '#F5F5F7',
-                        margin: '0.3rem 0 0.4rem 0'
+                        margin: '0 0 0.25rem 0',
+                        lineHeight: 1.2
                       }}
                     >
                       {mainPerf.title}
                     </h3>
-                    <span style={{ fontSize: '0.95rem', color: '#A1A1A6' }}>
-                      {mainPerf.venue || 'Performance video coming soon.'}
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: '13px', color: '#A1A1A6' }}>
+                      {mainPerf.venue || 'Concert capture in Hyderabad'}
                     </span>
                   </div>
 
-                  <button
-                    className={mainPerf.videoUrl ? 'btn btn-primary' : 'btn btn-glass'}
+                  <span
                     style={{
-                      height: '44px',
-                      padding: '0 24px',
-                      fontSize: '13.5px',
-                      opacity: mainPerf.videoUrl ? 1 : 0.8,
-                      cursor: mainPerf.videoUrl ? 'pointer' : 'default',
-                      textTransform: 'none'
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (mainPerf.videoUrl) {
-                        onPlayVideo(mainPerf);
-                      }
+                      fontFamily: "var(--font-body)",
+                      fontSize: '11.5px',
+                      fontWeight: 500,
+                      color: '#8E8E93',
+                      letterSpacing: '0.04em'
                     }}
                   >
-                    <Play size={15} fill={mainPerf.videoUrl ? '#050505' : '#F5F5F7'} />
-                    {mainPerf.videoUrl ? 'Watch video' : 'Video coming soon'}
-                  </button>
+                    MASTERING IN PROGRESS
+                  </span>
                 </div>
               </div>
             </motion.div>
           </div>
         )}
 
-        {/* 2. Secondary Performances Grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '2.5rem'
-          }}
-        >
-          {secondaryPerfs.map((perf) => (
-            <div
-              key={perf.id}
-              onClick={() => {
-                if (perf.videoUrl) {
-                  onPlayVideo(perf);
-                }
-              }}
-              style={{
-                backgroundColor: '#0D0D0F',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
-                borderRadius: '22px',
-                overflow: 'hidden',
-                cursor: perf.videoUrl ? 'pointer' : 'default',
-                transition: 'all 0.35s cubic-bezier(0.22, 1, 0.36, 1)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
-                e.currentTarget.style.boxShadow = '0 20px 50px rgba(0,0,0,0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.06)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
-                <BrandedImage
-                  src={perf.thumbnail}
-                  alt="StarX Live stage performance"
-                  aspectRatio="16/9"
-                  objectFit="cover"
-                  objectPosition="center 30%"
-                  fallbackTitle={perf.title}
-                  fallbackSubtitle={perf.venue}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    pointerEvents: 'none'
-                  }}
-                >
+        {/* 2. Secondary Previews Grid (up to two smaller previews) */}
+        {secondaryPerfs.length > 0 && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
+              gap: '1.5rem',
+              maxWidth: '920px',
+              margin: '0 auto'
+            }}
+          >
+            {secondaryPerfs.map((perf) => (
+              <div
+                key={perf.id}
+                style={{
+                  backgroundColor: 'rgba(14, 14, 18, 0.65)',
+                  border: '1px solid rgba(255, 255, 255, 0.07)',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  transition: 'transform 0.35s ease, border-color 0.35s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.14)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.07)';
+                }}
+              >
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
+                  <BrandedImage
+                    src={perf.thumbnail}
+                    alt="StarX Live stage performance"
+                    aspectRatio="16/9"
+                    objectFit="cover"
+                    objectPosition="center 30%"
+                    fallbackTitle={perf.title}
+                    fallbackSubtitle={perf.venue}
+                  />
                   <div
                     style={{
-                      padding: '8px 16px',
-                      borderRadius: '999px',
-                      backgroundColor: 'rgba(20, 20, 24, 0.8)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      position: 'absolute',
+                      inset: 0,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.4rem',
-                      color: '#F5F5F7',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      letterSpacing: '0.04em'
+                      justifyContent: 'center',
+                      pointerEvents: 'none'
                     }}
                   >
-                    <Play size={13} fill="#F5F5F7" />
-                    <span>{perf.videoUrl ? 'Play' : 'Coming soon'}</span>
+                    <div
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '999px',
+                        backgroundColor: 'rgba(15, 15, 18, 0.82)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        color: '#F5F5F7',
+                        fontSize: '11px',
+                        fontWeight: 500
+                      }}
+                    >
+                      <Play size={11} fill="#F5F5F7" />
+                      <span>{perf.videoUrl ? 'Play' : 'Demo soon'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div style={{ padding: '1.75rem' }}>
-                <span
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.08em',
-                    color: '#B3131B',
-                    textTransform: 'uppercase',
-                    display: 'block',
-                    marginBottom: '0.35rem'
-                  }}
-                >
-                  LIVE PERFORMANCE
-                </span>
-                <h4
-                  style={{
-                    fontFamily: "var(--font-heading)",
-                    fontSize: '1.25rem',
-                    fontWeight: 700,
-                    letterSpacing: '-0.025em',
-                    color: '#F5F5F7',
-                    margin: '0 0 0.4rem 0'
-                  }}
-                >
-                  {perf.title}
-                </h4>
-                <p style={{ fontSize: '0.88rem', color: '#A1A1A6', margin: 0 }}>
-                  {perf.venue || 'Performance video coming soon.'}
-                </p>
+                <div style={{ padding: '1.25rem' }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: '10.5px',
+                      fontWeight: 600,
+                      letterSpacing: '0.08em',
+                      color: '#B3131B',
+                      textTransform: 'uppercase',
+                      display: 'block',
+                      marginBottom: '0.2rem'
+                    }}
+                  >
+                    LIVE SET
+                  </span>
+                  <h4
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      letterSpacing: '-0.015em',
+                      color: '#F5F5F7',
+                      margin: '0 0 0.25rem 0',
+                      lineHeight: 1.25
+                    }}
+                  >
+                    {perf.title}
+                  </h4>
+                  <p style={{ fontFamily: "var(--font-body)", fontSize: '13px', color: '#8E8E93', margin: 0 }}>
+                    {perf.venue || 'Concert capture'}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
