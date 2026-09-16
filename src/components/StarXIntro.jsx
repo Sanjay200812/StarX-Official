@@ -106,7 +106,7 @@ export const StarXIntro = ({ onFinishIntro, onComplete, onStartTransition }) => 
         justifyContent: 'center',
         overflow: 'hidden',
         opacity: isExiting ? 0 : 1,
-        transition: 'opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1)',
+        transition: 'opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
         pointerEvents: isExiting ? 'none' : 'auto'
       }}
     >

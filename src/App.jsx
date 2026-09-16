@@ -174,7 +174,7 @@ export function App() {
               HOME PAGE: ONLY Hero, About Preview, Best Performance,
               Meet StarX, Behind StarX, and Footer (Spec 16 & 71)
              ======================================================= */}
-          {currentView === 'home' && (
+          {introFinished && currentView === 'home' && (
             <motion.div
               key={`homepage-flow-${homeAnimationKey}`}
               initial={{ opacity: 0 }}
