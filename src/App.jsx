@@ -265,13 +265,7 @@ export function App() {
                 Meet StarX, Behind StarX, and Footer (Spec 16 & 71)
                ======================================================= */}
             {currentView === 'home' && (
-              <motion.div
-                key={`homepage-flow-${homeAnimationKey}`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              >
+              <div id="homepage-flow">
                 {/* 1. Hero / Home */}
                 <Hero
                   onNavigate={handleNavigate}
@@ -290,7 +284,7 @@ export function App() {
 
                 {/* 5. Crew Preview (Behind StarX) */}
                 <CrewPreview onNavigate={handleNavigate} />
-              </motion.div>
+              </div>
             )}
 
             {/* =======================================================

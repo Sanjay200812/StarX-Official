@@ -24,8 +24,8 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
   const { intro } = siteData;
   const currentVideoSrc = isMobile ? intro.mobileVideo : intro.desktopVideo;
 
-  // Single unified intro finish function (Requirements 13 & 14)
-  const handleExit = () => {
+  // Single unified intro finish function (Requirements 11, 12, 13, 14)
+  const handleExit = (source = 'ended') => {
     if (exitCalledRef.current) return;
     exitCalledRef.current = true;
 
@@ -40,7 +40,7 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
 
     // 2. Notify transition start (App keeps home hidden, resets scroll to 0, resets animations)
     if (onStartExit) {
-      onStartExit();
+      onStartExit(source);
     }
 
     // 3. Fade intro overlay smoothly (650ms)
@@ -49,11 +49,11 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
     // 4. Once overlay fade is complete, notify App to remove intro and reveal Home
     exitTimerRef.current = setTimeout(() => {
       if (onFinishExit) {
-        onFinishExit();
+        onFinishExit(source);
       } else if (onFinishIntro) {
-        onFinishIntro();
+        onFinishIntro(source);
       } else if (onComplete) {
-        onComplete();
+        onComplete(source);
       }
     }, 650);
   };
@@ -205,7 +205,7 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
         autoPlay
         muted
         playsInline
-        onEnded={handleExit}
+        onEnded={() => handleExit('ended')}
         style={{
           width: '100%',
           height: '100%',
@@ -222,7 +222,7 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
       <button
         type="button"
         id="intro-skip-button"
-        onClick={handleExit}
+        onClick={() => handleExit('skip')}
         className="intro-skip-btn"
         aria-label="Skip Intro Video"
       >
