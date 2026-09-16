@@ -8,6 +8,9 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "allowScripts": {
+    "esbuild@0.25.12": true
+  },
   "dependencies": {
     "framer-motion": "^11.18.2",
     "gsap": "^3.15.0",
