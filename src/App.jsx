@@ -224,7 +224,7 @@ export function App() {
 
   return (
     <div
-      className={`relative min-h-screen ${introFinished ? 'home-ready' : 'home-waiting'}`}
+      className="relative min-h-screen"
       style={{
         backgroundColor: 'transparent',
         color: '#F5F5F7'
@@ -233,20 +233,8 @@ export function App() {
       {/* 0. Single Global Fixed Background Layer (Spec 2 & 3, Requirement 26 & 27) */}
       <SiteBackground currentView={currentView} />
 
-      {/* 1. Fullscreen Intro Video Overlay (Spec 6-12, Requirements 1-6) */}
-      <AnimatePresence>
-        {showIntroOverlay && (
-          <StarXIntro
-            onStartExit={handleIntroStartExit}
-            onFinishExit={finishIntro}
-            onFinishIntro={finishIntro}
-            onComplete={finishIntro}
-          />
-        )}
-      </AnimatePresence>
-
       {/* 
-        Controlled Website Content Wrapper (Requirements 25 & 30):
+        Controlled Website Content Wrapper (Requirements 23, 25 & 30):
         Holds both the Navbar, Main Content, and Footer in a unified layout.
         While intro is active: opacity is 0 and pointerEvents none, keeping full layout
         established with Hero at Y=0 and Footer at the bottom, eliminating layout jumps.
@@ -400,6 +388,21 @@ export function App() {
         {/* Compact Professional StarX Footer (Spec 38-46, inside controlled site-content) */}
         <Footer onNavigate={handleNavigate} />
       </div>
+
+      {/* 
+        Fullscreen Intro Video Overlay (Requirements 2, 3, 6, 8, 23):
+        Rendered as top-most direct sibling of site-content with z-index 1000.
+      */}
+      <AnimatePresence>
+        {showIntroOverlay && (
+          <StarXIntro
+            onStartExit={handleIntroStartExit}
+            onFinishExit={finishIntro}
+            onFinishIntro={finishIntro}
+            onComplete={finishIntro}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Floating WhatsApp Quick Contact Button (Spec 58) */}
       <FloatingWhatsApp />

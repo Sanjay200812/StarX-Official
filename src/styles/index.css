@@ -649,4 +649,45 @@ html.intro-active {
   pointer-events: auto;
 }
 
+/* Fullscreen Cinematic Intro Overlay (Requirements 2, 3, 6, 8, 25) */
+#starx-intro-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  background-color: #000000 !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  touch-action: none !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+#starx-intro-overlay.intro-fading {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+#starx-intro-video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  display: block !important;
+  background-color: #000000 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#intro-skip-button {
+  z-index: 1010 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+
 
