@@ -1,127 +1,139 @@
 import React, { useEffect, useRef } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import gsap from 'gsap';
 import { Play, ArrowRight } from 'lucide-react';
 import { siteData, DEMO_PERFORMANCE_URL } from '../data/siteData';
 import BrandLogo from '../components/BrandLogo';
 
 /**
  * Hero Section
- * Refined, clean editorial landing with orchestrated entrance animations.
+ * Refined, clean editorial landing with orchestrated GSAP & Framer Motion entrance animations.
  *
  * Sequence specs (Spec 3, 4, 5, 12, 15):
  * 0ms   - Navbar starts appearing
  * 100ms - Hero main title starts (y: 24 -> 0, opacity: 0 -> 1)
- * 150ms - Authentic circular logo starts
+ * 100ms - Star crest background motif starts (opacity: 0 -> 0.03, scale: 0.94 -> 1)
+ * 150ms - Authentic circular logo starts (y: 18 -> 0, scale: 0.94 -> 1)
  * 250ms - ROCK BAND pill & sub-label start (y: 16 -> 0)
  * 400ms - Tagline starts (y: 16 -> 0)
  * 550ms - CTA buttons start (y: 14 -> 0)
  * 700ms - Genres / languages / location start (y: 12 -> 0)
- * Total duration: ~1.4s (well within 1.2 - 1.8s)
+ * Total duration: ~1.4s
+ *
+ * Requirements (9, 10, 11, 12, 13, 21-25):
+ * - Main timeline created with paused: true
+ * - resetHomeAnimation() resets every element to starting coordinates & opacity 0
+ * - playHomeAnimationFromStart() restarts the timeline cleanly from 0 (restart(true))
+ * - Holds all elements at 0 while isReady is false
  */
-
-const easePremium = [0.22, 1, 0.36, 1];
-
-const crestVariants = {
-  hidden: { opacity: 0, scale: 0.94 },
-  visible: {
-    opacity: 0.03,
-    scale: 1,
-    transition: { duration: 1.0, delay: 0.10, ease: easePremium }
-  }
-};
-
-const logoVariants = {
-  hidden: { opacity: 0, y: 18, scale: 0.94 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.65, delay: 0.15, ease: easePremium }
-  }
-};
-
-const pillVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, delay: 0.25, ease: easePremium }
-  }
-};
-
-const titleVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.75, delay: 0.10, ease: easePremium }
-  }
-};
-
-const subLabelVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, delay: 0.25, ease: easePremium }
-  }
-};
-
-const taglineVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.70, delay: 0.40, ease: easePremium }
-  }
-};
-
-const buttonsVariants = {
-  hidden: { opacity: 0, y: 14 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, delay: 0.55, ease: easePremium }
-  }
-};
-
-const metaVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, delay: 0.70, ease: easePremium }
-  }
-};
 
 export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
   const { brand } = siteData;
-  const controls = useAnimation();
+
+  // DOM element refs for GSAP orchestration
+  const sectionRef = useRef(null);
+  const crestRef = useRef(null);
+  const logoRef = useRef(null);
+  const pillRef = useRef(null);
+  const titleRef = useRef(null);
+  const subLabelRef = useRef(null);
+  const taglineRef = useRef(null);
+  const buttonsRef = useRef(null);
+  const metaRef = useRef(null);
+  const timelineRef = useRef(null);
   const isMountedRef = useRef(true);
 
+  // Helper to reset all Hero elements to exact start state (Requirement 10)
+  const resetHomeAnimation = () => {
+    if (timelineRef.current) {
+      timelineRef.current.pause(0);
+    }
+
+    const targets = [
+      crestRef.current,
+      logoRef.current,
+      pillRef.current,
+      titleRef.current,
+      subLabelRef.current,
+      taglineRef.current,
+      buttonsRef.current,
+      metaRef.current
+    ].filter(Boolean);
+
+    if (targets.length > 0) {
+      gsap.killTweensOf(targets);
+    }
+
+    if (crestRef.current) gsap.set(crestRef.current, { opacity: 0, scale: 0.94 });
+    if (logoRef.current) gsap.set(logoRef.current, { opacity: 0, y: 18, scale: 0.94 });
+    if (pillRef.current) gsap.set(pillRef.current, { opacity: 0, y: 16 });
+    if (titleRef.current) gsap.set(titleRef.current, { opacity: 0, y: 24 });
+    if (subLabelRef.current) gsap.set(subLabelRef.current, { opacity: 0, y: 16 });
+    if (taglineRef.current) gsap.set(taglineRef.current, { opacity: 0, y: 16 });
+    if (buttonsRef.current) gsap.set(buttonsRef.current, { opacity: 0, y: 14 });
+    if (metaRef.current) gsap.set(metaRef.current, { opacity: 0, y: 12 });
+  };
+
+  // Build the GSAP timeline (paused: true, Requirement 9)
   useEffect(() => {
     isMountedRef.current = true;
+
+    // Build timeline
+    const tl = gsap.timeline({
+      paused: true
+    });
+
+    if (crestRef.current) {
+      tl.to(crestRef.current, { opacity: 0.03, scale: 1, duration: 1.0, ease: 'power2.out' }, 0.10);
+    }
+    if (titleRef.current) {
+      tl.to(titleRef.current, { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, 0.10);
+    }
+    if (logoRef.current) {
+      tl.to(logoRef.current, { opacity: 1, y: 0, scale: 1, duration: 0.65, ease: 'power3.out' }, 0.15);
+    }
+    if (pillRef.current) {
+      tl.to(pillRef.current, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.25);
+    }
+    if (subLabelRef.current) {
+      tl.to(subLabelRef.current, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.25);
+    }
+    if (taglineRef.current) {
+      tl.to(taglineRef.current, { opacity: 1, y: 0, duration: 0.70, ease: 'power3.out' }, 0.40);
+    }
+    if (buttonsRef.current) {
+      tl.to(buttonsRef.current, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.55);
+    }
+    if (metaRef.current) {
+      tl.to(metaRef.current, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.70);
+    }
+
+    timelineRef.current = tl;
+
+    // Immediately reset to initial hidden state
+    resetHomeAnimation();
+
     return () => {
       isMountedRef.current = false;
+      tl.kill();
     };
   }, []);
 
-  // Control Home animation sequence (Spec 1, 3, 4, 12, 18, 19, 20)
+  // Orchestrate play / reset according to isReady & animationKey (Requirements 8, 10, 11)
   useEffect(() => {
     if (!isReady) {
-      // 1. While intro is playing or exiting, hold all elements in reset state
-      controls.set('hidden');
+      // While intro is active, hold all elements in reset state
+      resetHomeAnimation();
     } else {
-      // 2. Reset to hidden first to guarantee time 0, then start visible sequence
-      controls.set('hidden');
+      // When ready: reset first to guarantee time 0, then restart timeline from 0
+      resetHomeAnimation();
       const rafId = requestAnimationFrame(() => {
-        if (isMountedRef.current) {
-          controls.start('visible');
+        if (isMountedRef.current && timelineRef.current) {
+          timelineRef.current.restart(true);
         }
       });
       return () => cancelAnimationFrame(rafId);
     }
-  }, [isReady, animationKey, controls]);
+  }, [isReady, animationKey]);
 
   const handleWatchPerformance = () => {
     if (DEMO_PERFORMANCE_URL) {
@@ -137,7 +149,9 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
 
   return (
     <section
+      ref={sectionRef}
       id="home"
+      className={isReady ? 'home-ready' : 'home-waiting'}
       style={{
         position: 'relative',
         minHeight: '80vh',
@@ -151,10 +165,8 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
       }}
     >
       {/* Subtle Star Crest Background Motif */}
-      <motion.div
-        variants={crestVariants}
-        initial="hidden"
-        animate={controls}
+      <div
+        ref={crestRef}
         style={{
           position: 'absolute',
           top: '48%',
@@ -163,14 +175,15 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
           width: 'min(80vw, 620px)',
           height: 'min(80vw, 620px)',
           pointerEvents: 'none',
-          zIndex: 1
+          zIndex: 1,
+          opacity: 0
         }}
         aria-hidden="true"
       >
         <svg viewBox="0 0 100 100" fill="none" stroke="#B3131B" strokeWidth="1">
           <polygon points="50,4 62,35 95,35 68,55 78,88 50,68 22,88 32,55 5,35 38,35" />
         </svg>
-      </motion.div>
+      </div>
 
       <div
         style={{
@@ -183,11 +196,14 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
         }}
       >
         {/* Authentic StarX Circular Logo */}
-        <motion.div
-          variants={logoVariants}
-          initial="hidden"
-          animate={controls}
-          style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.15rem' }}
+        <div
+          ref={logoRef}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '1.15rem',
+            opacity: 0
+          }}
         >
           <BrandLogo
             size="md"
@@ -195,13 +211,11 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)'
             }}
           />
-        </motion.div>
+        </div>
 
         {/* Pill: • ROCK BAND • HYDERABAD */}
-        <motion.div
-          variants={pillVariants}
-          initial="hidden"
-          animate={controls}
+        <div
+          ref={pillRef}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -215,7 +229,8 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             color: '#A1A1A6',
             letterSpacing: '0.1em',
             marginBottom: '1.25rem',
-            textTransform: 'uppercase'
+            textTransform: 'uppercase',
+            opacity: 0
           }}
         >
           <span
@@ -227,53 +242,49 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             }}
           />
           ROCK BAND • HYDERABAD
-        </motion.div>
+        </div>
 
         {/* Main Headline: STARX LIVE (48px-58px desktop, 34px-42px mobile) */}
         <div style={{ marginBottom: '0.75rem' }}>
-          <motion.h1
-            variants={titleVariants}
-            initial="hidden"
-            animate={controls}
+          <h1
+            ref={titleRef}
             style={{
-              fontFamily: "var(--font-editorial)",
+              fontFamily: 'var(--font-editorial)',
               fontSize: 'clamp(34px, 5.2vw, 54px)',
               fontWeight: 650,
               letterSpacing: '-0.02em',
               lineHeight: 1.05,
               color: '#F5F5F7',
               margin: '0 auto',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              opacity: 0
             }}
           >
             STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
-          </motion.h1>
+          </h1>
 
-          <motion.div
-            variants={subLabelVariants}
-            initial="hidden"
-            animate={controls}
+          <div
+            ref={subLabelRef}
             style={{
-              fontFamily: "var(--font-body)",
+              fontFamily: 'var(--font-body)',
               fontSize: 'clamp(12px, 1.2vw, 15px)',
               fontWeight: 600,
               letterSpacing: '0.18em',
               color: '#8E8E93',
               textTransform: 'uppercase',
-              marginTop: '0.35rem'
+              marginTop: '0.35rem',
+              opacity: 0
             }}
           >
             ROCK BAND
-          </motion.div>
+          </div>
         </div>
 
         {/* Tagline: 15px-17px desktop, 14px-15px mobile */}
-        <motion.p
-          variants={taglineVariants}
-          initial="hidden"
-          animate={controls}
+        <p
+          ref={taglineRef}
           style={{
-            fontFamily: "var(--font-editorial)",
+            fontFamily: 'var(--font-editorial)',
             fontStyle: 'italic',
             fontSize: 'clamp(14px, 1.6vw, 16.5px)',
             fontWeight: 400,
@@ -281,24 +292,24 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             color: '#D1D1D6',
             lineHeight: 1.45,
             maxWidth: '620px',
-            margin: '0 auto 1.75rem auto'
+            margin: '0 auto 1.75rem auto',
+            opacity: 0
           }}
         >
           “{brand.tagline}”
-        </motion.p>
+        </p>
 
         {/* Hero CTAs */}
-        <motion.div
-          variants={buttonsVariants}
-          initial="hidden"
-          animate={controls}
+        <div
+          ref={buttonsRef}
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '0.75rem',
             flexWrap: 'wrap',
-            marginBottom: '2.5rem'
+            marginBottom: '2.5rem',
+            opacity: 0
           }}
         >
           {/* Watch Performance Button */}
@@ -334,13 +345,11 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             <span>Contact StarX</span>
             <ArrowRight size={13} />
           </button>
-        </motion.div>
+        </div>
 
         {/* Bottom Metadata: 12px-13px desktop, 11px-12px mobile */}
-        <motion.div
-          variants={metaVariants}
-          initial="hidden"
-          animate={controls}
+        <div
+          ref={metaRef}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -350,7 +359,8 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             fontWeight: 500,
             color: '#8E8E93',
             letterSpacing: '0.08em',
-            textTransform: 'uppercase'
+            textTransform: 'uppercase',
+            opacity: 0
           }}
         >
           <div style={{ color: '#A1A1A6' }}>{brand.genresDisplay}</div>
@@ -359,7 +369,7 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             <span>•</span>
             <span>HYDERABAD</span>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

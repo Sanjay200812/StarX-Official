@@ -624,3 +624,29 @@ img, video {
   }
 }
 
+/* Scroll locking and scroll restoration management (Requirements 2, 4, 13, 25) */
+html.intro-active,
+body.intro-active {
+  overflow: hidden !important;
+  height: 100% !important;
+  touch-action: none !important;
+}
+
+html.home-waiting,
+html.no-smooth-scroll,
+html.intro-active {
+  scroll-behavior: auto !important;
+}
+
+/* Controlled Home Visibility States (Requirement 13 & 25) */
+.home-waiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.home-ready {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+

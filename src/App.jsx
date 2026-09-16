@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import StarXIntro from './components/StarXIntro';
 import SiteBackground from './components/SiteBackground';
 import Navbar from './components/Navbar';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
 import ImageLightbox from './components/ImageLightbox';
+import useScrollToTop from './hooks/useScrollToTop';
 
 // 5 Core Homepage Components (Spec 16 & 71)
 import Hero from './sections/Hero';
@@ -24,7 +25,7 @@ import CrewView from './views/CrewView';
 import ContactView from './views/ContactView';
 
 export function App() {
-  // Intro State backed by sessionStorage (Spec 2, 6, 8, 17, 18)
+  // Intro State backed by sessionStorage (Requirements 1, 8, 21, 22)
   const hasIntroPlayed = () => {
     try {
       if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
@@ -40,6 +41,7 @@ export function App() {
   const [introFinished, setIntroFinished] = useState(hasIntroPlayed);
   const [showIntroOverlay, setShowIntroOverlay] = useState(() => !hasIntroPlayed());
   const [homeAnimationKey, setHomeAnimationKey] = useState(0);
+  const isFinishingIntroRef = useRef(false);
 
   // Dedicated Route / View State (Spec 13 & 68)
   const [currentView, setCurrentView] = useState(() => {
@@ -55,6 +57,9 @@ export function App() {
     return 'home';
   });
 
+  // Reusable routing scroll reset and hash clearing hook (Requirements 18, 19, 20)
+  useScrollToTop(currentView);
+
   // Photo Lightbox State (for MediaView)
   const [lightboxItems, setLightboxItems] = useState([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -66,13 +71,57 @@ export function App() {
     setIsLightboxOpen(true);
   };
 
-  // Unified intro exit sequence (Spec 6, 7 & 8)
+  // Lock scroll while intro is visible (Requirement 2 & 3)
+  useEffect(() => {
+    if (showIntroOverlay) {
+      // 1. Force top scroll position immediately before intro starts (Requirement 3)
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'auto'
+      });
+
+      // 2. Lock page scroll (Requirement 2)
+      document.documentElement.classList.add('intro-active');
+      document.body.classList.add('intro-active');
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Unlock page scroll when intro is not active
+      document.documentElement.classList.remove('intro-active');
+      document.body.classList.remove('intro-active');
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.documentElement.classList.remove('intro-active');
+      document.body.classList.remove('intro-active');
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+    };
+  }, [showIntroOverlay]);
+
+  // Unified intro exit sequence (Requirements 4, 5, 6, 14, 21-25)
   const finishIntro = useCallback(() => {
-    // 1. Hide intro overlay
+    if (isFinishingIntroRef.current) return;
+    isFinishingIntroRef.current = true;
+
+    // 1. Force top scroll position immediately before removing overlay (Requirement 4)
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+    });
+
+    // 2. Hide intro overlay
     setShowIntroOverlay(false);
 
-    // 2. Mark intro as finished
-    setIntroFinished(true);
+    // 3. Unlock page scroll
+    document.documentElement.classList.remove('intro-active');
+    document.body.classList.remove('intro-active');
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
 
     try {
       sessionStorage.setItem('starxIntroPlayed', 'true');
@@ -80,8 +129,51 @@ export function App() {
       // ignore
     }
 
-    // 3. Trigger Home entrance animation from time 0
-    setHomeAnimationKey((prev) => prev + 1);
+    // 4. Force top again after overlay removal (Requirement 4)
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+    });
+
+    // 5. Nested requestAnimationFrame guarantees layout is fully calculated and top is maintained
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'auto'
+      });
+
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: 'auto'
+        });
+
+        // Refresh GSAP ScrollTrigger if available (Requirement 14)
+        if (typeof window !== 'undefined' && window.ScrollTrigger) {
+          try {
+            window.ScrollTrigger.refresh();
+          } catch (e) {}
+        }
+
+        // 6. Reveal Home content (Requirement 6 & 25)
+        setIntroFinished(true);
+
+        // 7. Trigger Home entrance animation from time 0 (Requirement 11)
+        setHomeAnimationKey((prev) => prev + 1);
+      });
+    });
+  }, []);
+
+  // While intro overlay is fading out, keep home top position stable
+  const handleIntroStartExit = useCallback(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto'
+    });
   }, []);
 
   // Listen to browser Back/Forward navigation (Spec 68 & 19)
@@ -99,19 +191,19 @@ export function App() {
       } catch (e) {
         setCurrentView('home');
       }
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Central Direct Navigation Handler (Spec 14, 19, 60, 69)
+  // Central Direct Navigation Handler (Spec 14, 19, 60, 69, Requirements 19 & 20)
   const handleNavigate = (target) => {
     const route = target === 'home' ? '' : target;
     setCurrentView(target);
 
-    // When returning to Home, restart Home animation cleanly from 0 (Spec 19 & 20)
+    // When returning to Home, restart Home animation cleanly from 0 (Requirements 19 & 20)
     if (target === 'home') {
       setHomeAnimationKey((prev) => prev + 1);
     }
@@ -122,8 +214,8 @@ export function App() {
       // ignore
     }
 
-    // Scroll restoration: always start at the top on navigation (Spec 69)
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Scroll restoration: always start at the top on navigation (Requirement 19)
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   };
 
   const isHomeReady = introFinished && currentView === 'home';
@@ -132,171 +224,182 @@ export function App() {
 
   return (
     <div
-      className={`relative min-h-screen ${introFinished ? 'home-ready' : ''}`}
+      className={`relative min-h-screen ${introFinished ? 'home-ready' : 'home-waiting'}`}
       style={{
         backgroundColor: 'transparent',
         color: '#F5F5F7'
       }}
     >
-      {/* 0. Single Global Fixed Background Layer (Spec 2 & 3) */}
+      {/* 0. Single Global Fixed Background Layer (Spec 2 & 3, Requirement 26 & 27) */}
       <SiteBackground currentView={currentView} />
 
-      {/* 1. Fullscreen Intro Video Overlay (Spec 6-12) */}
+      {/* 1. Fullscreen Intro Video Overlay (Spec 6-12, Requirements 1-6) */}
       <AnimatePresence>
         {showIntroOverlay && (
           <StarXIntro
+            onStartExit={handleIntroStartExit}
+            onFinishExit={finishIntro}
             onFinishIntro={finishIntro}
             onComplete={finishIntro}
           />
         )}
       </AnimatePresence>
 
-      {/* 2. Floating Smoked-Glass Top Navbar (Spec 14 & 15) */}
-      <Navbar
-        isReady={isNavbarReady}
-        isIntroActive={isIntroActive}
-        currentView={currentView}
-        onNavigate={handleNavigate}
-      />
-
-      <main
-        id="main-content"
+      {/* 
+        Controlled Website Content Wrapper (Requirements 25 & 30):
+        Holds both the Navbar, Main Content, and Footer in a unified layout.
+        While intro is active: opacity is 0 and pointerEvents none, keeping full layout
+        established with Hero at Y=0 and Footer at the bottom, eliminating layout jumps.
+      */}
+      <div
+        id="site-content"
+        className={introFinished ? 'home-ready' : 'home-waiting'}
         style={{
           position: 'relative',
           zIndex: 1,
           opacity: introFinished ? 1 : 0,
           pointerEvents: introFinished ? 'auto' : 'none',
-          transition: 'opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1)'
+          transition: 'opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1)'
         }}
       >
-        <AnimatePresence mode="wait">
-          {/* =======================================================
-              HOME PAGE: ONLY Hero, About Preview, Best Performance,
-              Meet StarX, Behind StarX, and Footer (Spec 16 & 71)
-             ======================================================= */}
-          {introFinished && currentView === 'home' && (
-            <motion.div
-              key={`homepage-flow-${homeAnimationKey}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {/* 1. Hero / Home */}
-              <Hero
-                onNavigate={handleNavigate}
-                isReady={isHomeReady}
-                animationKey={homeAnimationKey}
-              />
+        {/* 2. Floating Smoked-Glass Top Navbar (Spec 14 & 15) */}
+        <Navbar
+          isReady={isNavbarReady}
+          isIntroActive={isIntroActive}
+          currentView={currentView}
+          onNavigate={handleNavigate}
+        />
 
-              {/* 2. About StarX Preview */}
-              <AboutPreview onNavigate={handleNavigate} />
+        <main id="main-content">
+          <AnimatePresence mode="wait">
+            {/* =======================================================
+                HOME PAGE: ONLY Hero, About Preview, Best Performance,
+                Meet StarX, Behind StarX, and Footer (Spec 16 & 71)
+               ======================================================= */}
+            {currentView === 'home' && (
+              <motion.div
+                key={`homepage-flow-${homeAnimationKey}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {/* 1. Hero / Home */}
+                <Hero
+                  onNavigate={handleNavigate}
+                  isReady={isHomeReady}
+                  animationKey={homeAnimationKey}
+                />
 
-              {/* 3. Best Performance Preview */}
-              <FeaturedPerformances onNavigate={handleNavigate} />
+                {/* 2. About StarX Preview */}
+                <AboutPreview onNavigate={handleNavigate} />
 
-              {/* 4. Artists Preview (Meet StarX) */}
-              <BandMembers onNavigate={handleNavigate} />
+                {/* 3. Best Performance Preview */}
+                <FeaturedPerformances onNavigate={handleNavigate} />
 
-              {/* 5. Crew Preview (Behind StarX) */}
-              <CrewPreview onNavigate={handleNavigate} />
-            </motion.div>
-          )}
+                {/* 4. Artists Preview (Meet StarX) */}
+                <BandMembers onNavigate={handleNavigate} />
 
-          {/* =======================================================
-              DEDICATED VIEWS: Direct navigation targets (Spec 13, 14, 26, 60)
-             ======================================================= */}
-          {currentView === 'about' && (
-            <motion.div
-              key="about-view"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <AboutView onBackHome={() => handleNavigate('home')} />
-            </motion.div>
-          )}
+                {/* 5. Crew Preview (Behind StarX) */}
+                <CrewPreview onNavigate={handleNavigate} />
+              </motion.div>
+            )}
 
-          {currentView === 'artists' && (
-            <motion.div
-              key="artists-view"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <ArtistsView onBackHome={() => handleNavigate('home')} />
-            </motion.div>
-          )}
+            {/* =======================================================
+                DEDICATED VIEWS: Direct navigation targets (Spec 13, 14, 26, 60)
+               ======================================================= */}
+            {currentView === 'about' && (
+              <motion.div
+                key="about-view"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <AboutView onBackHome={() => handleNavigate('home')} />
+              </motion.div>
+            )}
 
-          {currentView === 'performances' && (
-            <motion.div
-              key="performances-view"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <PerformancesView onBackHome={() => handleNavigate('home')} />
-            </motion.div>
-          )}
+            {currentView === 'artists' && (
+              <motion.div
+                key="artists-view"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <ArtistsView onBackHome={() => handleNavigate('home')} />
+              </motion.div>
+            )}
 
-          {currentView === 'media' && (
-            <motion.div
-              key="media-view"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <MediaView
-                onBackHome={() => handleNavigate('home')}
-                onOpenPhoto={handleOpenPhoto}
-              />
-            </motion.div>
-          )}
+            {currentView === 'performances' && (
+              <motion.div
+                key="performances-view"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <PerformancesView onBackHome={() => handleNavigate('home')} />
+              </motion.div>
+            )}
 
-          {currentView === 'events' && (
-            <motion.div
-              key="events-view"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <EventsView onBackHome={() => handleNavigate('home')} />
-            </motion.div>
-          )}
+            {currentView === 'media' && (
+              <motion.div
+                key="media-view"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <MediaView
+                  onBackHome={() => handleNavigate('home')}
+                  onOpenPhoto={handleOpenPhoto}
+                />
+              </motion.div>
+            )}
 
-          {currentView === 'crew' && (
-            <motion.div
-              key="crew-view"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <CrewView onBackHome={() => handleNavigate('home')} />
-            </motion.div>
-          )}
+            {currentView === 'events' && (
+              <motion.div
+                key="events-view"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <EventsView onBackHome={() => handleNavigate('home')} />
+              </motion.div>
+            )}
 
-          {currentView === 'contact' && (
-            <motion.div
-              key="contact-view"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <ContactView onBackHome={() => handleNavigate('home')} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+            {currentView === 'crew' && (
+              <motion.div
+                key="crew-view"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <CrewView onBackHome={() => handleNavigate('home')} />
+              </motion.div>
+            )}
 
-      {/* Compact Professional StarX Footer (Spec 38-46) */}
-      <Footer onNavigate={handleNavigate} />
+            {currentView === 'contact' && (
+              <motion.div
+                key="contact-view"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <ContactView onBackHome={() => handleNavigate('home')} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
+
+        {/* Compact Professional StarX Footer (Spec 38-46, inside controlled site-content) */}
+        <Footer onNavigate={handleNavigate} />
+      </div>
 
       {/* Floating WhatsApp Quick Contact Button (Spec 58) */}
       <FloatingWhatsApp />
