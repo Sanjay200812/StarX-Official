@@ -1,29 +1,127 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { motion, useAnimation } from 'framer-motion';
 import { Play, ArrowRight } from 'lucide-react';
 import { siteData, DEMO_PERFORMANCE_URL } from '../data/siteData';
 import BrandLogo from '../components/BrandLogo';
 
 /**
  * Hero Section
- * Refined, clean editorial landing.
+ * Refined, clean editorial landing with orchestrated entrance animations.
  *
- * Requirements:
- * - Logo at top/center
- * - Small pill: • ROCK BAND • HYDERABAD
- * - STARX LIVE (desktop: 48px-58px max, mobile: 34px-42px)
- * - ROCK BAND (desktop: 14px-16px, mobile: 12px-14px)
- * - "Lost in the Noise. Found in the Sound." (desktop: 15px-17px, mobile: 14px-15px)
- * - Buttons:
- *     1. "Watch Performance" -> opens DEMO_PERFORMANCE_URL in new tab (target="_blank" rel="noopener noreferrer")
- *     2. "Contact StarX" -> navigates directly to /contact view
- * - Bottom metadata:
- *     CLASSIC • ROCK • WESTERN
- *     TELUGU • HINDI
- *     HYDERABAD
+ * Sequence specs (Spec 3, 4, 5, 12, 15):
+ * 0ms   - Navbar starts appearing
+ * 100ms - Hero main title starts (y: 24 -> 0, opacity: 0 -> 1)
+ * 150ms - Authentic circular logo starts
+ * 250ms - ROCK BAND pill & sub-label start (y: 16 -> 0)
+ * 400ms - Tagline starts (y: 16 -> 0)
+ * 550ms - CTA buttons start (y: 14 -> 0)
+ * 700ms - Genres / languages / location start (y: 12 -> 0)
+ * Total duration: ~1.4s (well within 1.2 - 1.8s)
  */
-export const Hero = ({ onNavigate, isIntroActive = false }) => {
+
+const easePremium = [0.22, 1, 0.36, 1];
+
+const crestVariants = {
+  hidden: { opacity: 0, scale: 0.94 },
+  visible: {
+    opacity: 0.03,
+    scale: 1,
+    transition: { duration: 1.0, delay: 0.10, ease: easePremium }
+  }
+};
+
+const logoVariants = {
+  hidden: { opacity: 0, y: 18, scale: 0.94 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.65, delay: 0.15, ease: easePremium }
+  }
+};
+
+const pillVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, delay: 0.25, ease: easePremium }
+  }
+};
+
+const titleVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.75, delay: 0.10, ease: easePremium }
+  }
+};
+
+const subLabelVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, delay: 0.25, ease: easePremium }
+  }
+};
+
+const taglineVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.70, delay: 0.40, ease: easePremium }
+  }
+};
+
+const buttonsVariants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, delay: 0.55, ease: easePremium }
+  }
+};
+
+const metaVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, delay: 0.70, ease: easePremium }
+  }
+};
+
+export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
   const { brand } = siteData;
+  const controls = useAnimation();
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Control Home animation sequence (Spec 1, 3, 4, 12, 18, 19, 20)
+  useEffect(() => {
+    if (!isReady) {
+      // 1. While intro is playing or exiting, hold all elements in reset state
+      controls.set('hidden');
+    } else {
+      // 2. Reset to hidden first to guarantee time 0, then start visible sequence
+      controls.set('hidden');
+      const rafId = requestAnimationFrame(() => {
+        if (isMountedRef.current) {
+          controls.start('visible');
+        }
+      });
+      return () => cancelAnimationFrame(rafId);
+    }
+  }, [isReady, animationKey, controls]);
 
   const handleWatchPerformance = () => {
     if (DEMO_PERFORMANCE_URL) {
@@ -38,11 +136,8 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
   };
 
   return (
-    <motion.section
+    <section
       id="home"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       style={{
         position: 'relative',
         minHeight: '80vh',
@@ -56,7 +151,10 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
       }}
     >
       {/* Subtle Star Crest Background Motif */}
-      <div
+      <motion.div
+        variants={crestVariants}
+        initial="hidden"
+        animate={controls}
         style={{
           position: 'absolute',
           top: '48%',
@@ -64,7 +162,6 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
           transform: 'translate(-50%, -50%)',
           width: 'min(80vw, 620px)',
           height: 'min(80vw, 620px)',
-          opacity: 0.03,
           pointerEvents: 'none',
           zIndex: 1
         }}
@@ -73,7 +170,7 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
         <svg viewBox="0 0 100 100" fill="none" stroke="#B3131B" strokeWidth="1">
           <polygon points="50,4 62,35 95,35 68,55 78,88 50,68 22,88 32,55 5,35 38,35" />
         </svg>
-      </div>
+      </motion.div>
 
       <div
         style={{
@@ -86,17 +183,25 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
         }}
       >
         {/* Authentic StarX Circular Logo */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.15rem' }}>
+        <motion.div
+          variants={logoVariants}
+          initial="hidden"
+          animate={controls}
+          style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.15rem' }}
+        >
           <BrandLogo
             size="md"
             style={{
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)'
             }}
           />
-        </div>
+        </motion.div>
 
         {/* Pill: • ROCK BAND • HYDERABAD */}
-        <div
+        <motion.div
+          variants={pillVariants}
+          initial="hidden"
+          animate={controls}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -122,11 +227,14 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
             }}
           />
           ROCK BAND • HYDERABAD
-        </div>
+        </motion.div>
 
         {/* Main Headline: STARX LIVE (48px-58px desktop, 34px-42px mobile) */}
         <div style={{ marginBottom: '0.75rem' }}>
-          <h1
+          <motion.h1
+            variants={titleVariants}
+            initial="hidden"
+            animate={controls}
             style={{
               fontFamily: "var(--font-editorial)",
               fontSize: 'clamp(34px, 5.2vw, 54px)',
@@ -139,8 +247,12 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
             }}
           >
             STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
-          </h1>
-          <div
+          </motion.h1>
+
+          <motion.div
+            variants={subLabelVariants}
+            initial="hidden"
+            animate={controls}
             style={{
               fontFamily: "var(--font-body)",
               fontSize: 'clamp(12px, 1.2vw, 15px)',
@@ -152,11 +264,14 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
             }}
           >
             ROCK BAND
-          </div>
+          </motion.div>
         </div>
 
         {/* Tagline: 15px-17px desktop, 14px-15px mobile */}
-        <p
+        <motion.p
+          variants={taglineVariants}
+          initial="hidden"
+          animate={controls}
           style={{
             fontFamily: "var(--font-editorial)",
             fontStyle: 'italic',
@@ -170,10 +285,13 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
           }}
         >
           “{brand.tagline}”
-        </p>
+        </motion.p>
 
         {/* Hero CTAs */}
-        <div
+        <motion.div
+          variants={buttonsVariants}
+          initial="hidden"
+          animate={controls}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -216,10 +334,13 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
             <span>Contact StarX</span>
             <ArrowRight size={13} />
           </button>
-        </div>
+        </motion.div>
 
         {/* Bottom Metadata: 12px-13px desktop, 11px-12px mobile */}
-        <div
+        <motion.div
+          variants={metaVariants}
+          initial="hidden"
+          animate={controls}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -238,9 +359,9 @@ export const Hero = ({ onNavigate, isIntroActive = false }) => {
             <span>•</span>
             <span>HYDERABAD</span>
           </div>
-        </div>
+        </motion.div>
       </div>
-    </motion.section>
+    </section>
   );
 };
 

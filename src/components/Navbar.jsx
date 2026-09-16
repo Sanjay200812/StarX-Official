@@ -24,10 +24,12 @@ import { siteData } from '../data/siteData';
  * - Contact StarX (Quick Contact Popup)
  */
 export const Navbar = ({
+  isReady = true,
   isIntroActive = false,
   currentView = 'home',
   onNavigate
 }) => {
+  const isVisible = isReady && !isIntroActive;
   const { brand } = siteData;
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -107,9 +109,9 @@ export const Navbar = ({
           top: '12px',
           zIndex: 50,
           margin: '0 auto',
-          opacity: isIntroActive ? 0 : 1,
-          transform: isIntroActive ? 'translateY(-14px)' : 'translateY(0)',
-          pointerEvents: isIntroActive ? 'none' : 'auto',
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? 'translateY(0)' : 'translateY(-14px)',
+          pointerEvents: isVisible ? 'auto' : 'none',
           height: isScrolled ? '60px' : '64px',
           borderRadius: '16px',
           backgroundColor: isScrolled ? 'rgba(10, 10, 12, 0.90)' : 'rgba(10, 10, 12, 0.75)',
@@ -120,7 +122,7 @@ export const Navbar = ({
             ? '0 16px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06)'
             : '0 8px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
           transition:
-            'opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), height 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+            'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), height 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
           display: 'flex',
           alignItems: 'center'
         }}

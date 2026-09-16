@@ -24,8 +24,8 @@ import CrewView from './views/CrewView';
 import ContactView from './views/ContactView';
 
 export function App() {
-  // Intro State backed by sessionStorage (Spec 11 & 67)
-  const [isIntroComplete, setIsIntroComplete] = useState(() => {
+  // Intro State backed by sessionStorage (Spec 2, 6, 8, 17, 18)
+  const hasIntroPlayed = () => {
     try {
       if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
         sessionStorage.removeItem('starxIntroPlayed');
@@ -35,18 +35,11 @@ export function App() {
     } catch (e) {
       return false;
     }
-  });
+  };
 
-  const [isIntroTransitioning, setIsIntroTransitioning] = useState(() => {
-    try {
-      if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
-        return false;
-      }
-      return sessionStorage.getItem('starxIntroPlayed') === 'true';
-    } catch (e) {
-      return false;
-    }
-  });
+  const [introFinished, setIntroFinished] = useState(hasIntroPlayed);
+  const [showIntroOverlay, setShowIntroOverlay] = useState(() => !hasIntroPlayed());
+  const [homeAnimationKey, setHomeAnimationKey] = useState(0);
 
   // Dedicated Route / View State (Spec 13 & 68)
   const [currentView, setCurrentView] = useState(() => {
@@ -73,21 +66,25 @@ export function App() {
     setIsLightboxOpen(true);
   };
 
-  const handleStartTransition = useCallback(() => {
-    setIsIntroTransitioning(true);
-  }, []);
+  // Unified intro exit sequence (Spec 6, 7 & 8)
+  const finishIntro = useCallback(() => {
+    // 1. Hide intro overlay
+    setShowIntroOverlay(false);
 
-  const handleComplete = useCallback(() => {
-    setIsIntroTransitioning(true);
-    setIsIntroComplete(true);
+    // 2. Mark intro as finished
+    setIntroFinished(true);
+
     try {
       sessionStorage.setItem('starxIntroPlayed', 'true');
     } catch (e) {
       // ignore
     }
+
+    // 3. Trigger Home entrance animation from time 0
+    setHomeAnimationKey((prev) => prev + 1);
   }, []);
 
-  // Listen to browser Back/Forward navigation (Spec 68)
+  // Listen to browser Back/Forward navigation (Spec 68 & 19)
   useEffect(() => {
     const handlePopState = () => {
       try {
@@ -97,6 +94,7 @@ export function App() {
           setCurrentView(path);
         } else {
           setCurrentView('home');
+          setHomeAnimationKey((prev) => prev + 1);
         }
       } catch (e) {
         setCurrentView('home');
@@ -108,10 +106,15 @@ export function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Central Direct Navigation Handler (Spec 14, 60, 69)
+  // Central Direct Navigation Handler (Spec 14, 19, 60, 69)
   const handleNavigate = (target) => {
     const route = target === 'home' ? '' : target;
     setCurrentView(target);
+
+    // When returning to Home, restart Home animation cleanly from 0 (Spec 19 & 20)
+    if (target === 'home') {
+      setHomeAnimationKey((prev) => prev + 1);
+    }
 
     try {
       window.history.pushState(null, '', `/${route}`);
@@ -123,11 +126,13 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
-  const isIntroActive = !isIntroTransitioning && !isIntroComplete;
+  const isHomeReady = introFinished && currentView === 'home';
+  const isNavbarReady = introFinished;
+  const isIntroActive = !introFinished;
 
   return (
     <div
-      className="relative min-h-screen"
+      className={`relative min-h-screen ${introFinished ? 'home-ready' : ''}`}
       style={{
         backgroundColor: 'transparent',
         color: '#F5F5F7'
@@ -138,31 +143,31 @@ export function App() {
 
       {/* 1. Fullscreen Intro Video Overlay (Spec 6-12) */}
       <AnimatePresence>
-        {!isIntroComplete && (
+        {showIntroOverlay && (
           <StarXIntro
-            onStartTransition={handleStartTransition}
-            onComplete={handleComplete}
+            onFinishIntro={finishIntro}
+            onComplete={finishIntro}
           />
         )}
       </AnimatePresence>
 
       {/* 2. Floating Smoked-Glass Top Navbar (Spec 14 & 15) */}
       <Navbar
+        isReady={isNavbarReady}
         isIntroActive={isIntroActive}
         currentView={currentView}
         onNavigate={handleNavigate}
       />
 
-      <motion.main
+      <main
+        id="main-content"
         style={{
           position: 'relative',
-          zIndex: 1
+          zIndex: 1,
+          opacity: introFinished ? 1 : 0,
+          pointerEvents: introFinished ? 'auto' : 'none',
+          transition: 'opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1)'
         }}
-        animate={{
-          opacity: isIntroActive ? 0 : 1,
-          y: isIntroActive ? 8 : 0
-        }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
         <AnimatePresence mode="wait">
           {/* =======================================================
@@ -171,14 +176,18 @@ export function App() {
              ======================================================= */}
           {currentView === 'home' && (
             <motion.div
-              key="homepage-flow"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              key={`homepage-flow-${homeAnimationKey}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             >
               {/* 1. Hero / Home */}
-              <Hero onNavigate={handleNavigate} isIntroActive={isIntroActive} />
+              <Hero
+                onNavigate={handleNavigate}
+                isReady={isHomeReady}
+                animationKey={homeAnimationKey}
+              />
 
               {/* 2. About StarX Preview */}
               <AboutPreview onNavigate={handleNavigate} />
@@ -284,7 +293,7 @@ export function App() {
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.main>
+      </main>
 
       {/* Compact Professional StarX Footer (Spec 38-46) */}
       <Footer onNavigate={handleNavigate} />

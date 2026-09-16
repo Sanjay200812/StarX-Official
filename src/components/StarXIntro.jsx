@@ -18,7 +18,7 @@ import { siteData } from '../data/siteData';
  * - Smooth 750ms crossfade into the pre-running background video and website content
  * - Graceful fallback on load error / playback failure
  */
-export const StarXIntro = ({ onComplete, onStartTransition }) => {
+export const StarXIntro = ({ onFinishIntro, onComplete, onStartTransition }) => {
   const isMobile = useIsMobile();
   const [isExiting, setIsExiting] = useState(false);
   const videoRef = useRef(null);
@@ -27,23 +27,19 @@ export const StarXIntro = ({ onComplete, onStartTransition }) => {
   const { intro } = siteData;
   const currentVideoSrc = isMobile ? intro.mobileVideo : intro.desktopVideo;
 
+  // Single unified intro finish function (Spec 6, 7 & 8)
   const handleExit = () => {
     if (exitCalledRef.current) return;
     exitCalledRef.current = true;
 
+    // 1. Mark intro as played in session storage immediately
     try {
       sessionStorage.setItem('starxIntroPlayed', 'true');
     } catch (e) {
       // ignore
     }
 
-    if (onStartTransition) {
-      onStartTransition();
-    }
-
-    setIsExiting(true);
-
-    // Pause intro video cleanly on exit
+    // 2. Pause intro video cleanly on exit
     if (videoRef.current) {
       try {
         videoRef.current.pause();
@@ -52,12 +48,23 @@ export const StarXIntro = ({ onComplete, onStartTransition }) => {
       }
     }
 
-    // 750ms smooth exit transition (Spec 12 & 13)
+    // 3. Notify transition start if listener provided
+    if (onStartTransition) {
+      onStartTransition();
+    }
+
+    // 4. Fade intro overlay smoothly (600ms)
+    setIsExiting(true);
+
+    // 5. Once overlay fade is complete, hide intro and start Home animation from 0
     setTimeout(() => {
+      if (onFinishIntro) {
+        onFinishIntro();
+      }
       if (onComplete) {
         onComplete();
       }
-    }, 750);
+    }, 600);
   };
 
   // Autoplay attempt, fallback timer, and error handling
