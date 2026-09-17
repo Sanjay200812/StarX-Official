@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import StarXIntro from './components/StarXIntro';
 import SiteBackground from './components/SiteBackground';
@@ -8,7 +8,7 @@ import ImageLightbox from './components/ImageLightbox';
 import MemberDetailModal from './components/MemberDetailModal';
 import useScrollToTop from './hooks/useScrollToTop';
 
-// 5 Core Homepage Components (Spec 16 & 71)
+// 5 Core Homepage Components (Direct synchronous load for instant Hero render - Spec 39)
 import Hero from './sections/Hero';
 import AboutPreview from './sections/AboutPreview';
 import FeaturedPerformances from './sections/FeaturedPerformances';
@@ -16,14 +16,40 @@ import BandMembers from './sections/BandMembers';
 import CrewPreview from './sections/CrewPreview';
 import Footer from './sections/Footer';
 
-// Dedicated Direct Views (Spec 13, 14, 60)
-import AboutView from './views/AboutView';
-import ArtistsView from './views/ArtistsView';
-import PerformancesView from './views/PerformancesView';
-import MediaView from './views/MediaView';
-import EventsView from './views/EventsView';
-import CrewView from './views/CrewView';
-import ContactView from './views/ContactView';
+// Code-Split Dedicated Views with React.lazy (Spec 38)
+const AboutView = lazy(() => import('./views/AboutView'));
+const ArtistsView = lazy(() => import('./views/ArtistsView'));
+const PerformancesView = lazy(() => import('./views/PerformancesView'));
+const MediaView = lazy(() => import('./views/MediaView'));
+const EventsView = lazy(() => import('./views/EventsView'));
+const CrewView = lazy(() => import('./views/CrewView'));
+const ContactView = lazy(() => import('./views/ContactView'));
+
+// Lightweight view skeleton loader for seamless suspense transitions (Spec 38)
+function ViewLoader() {
+  return (
+    <div
+      style={{
+        minHeight: '75vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '6rem 1rem'
+      }}
+    >
+      <div
+        style={{
+          width: '28px',
+          height: '28px',
+          borderRadius: '50%',
+          border: '2px solid rgba(255, 255, 255, 0.08)',
+          borderTopColor: '#B3131B',
+          animation: 'starxSpin 0.8s linear infinite'
+        }}
+      />
+    </div>
+  );
+}
 
 export function App() {
   // Intro State backed by sessionStorage (Sections 21-29)
@@ -57,11 +83,6 @@ export function App() {
     }
   };
 
-  const [introFinished, setIntroFinished] = useState(hasIntroPlayed);
-  const [showIntroOverlay, setShowIntroOverlay] = useState(() => !hasIntroPlayed());
-  const [heroEntryPlayed, setHeroEntryPlayed] = useState(hasHeroEntryPlayed);
-  const isFinishingIntroRef = useRef(false);
-
   // Dedicated Route / View State (Sections 1-4)
   const [currentView, setCurrentView] = useState(() => {
     try {
@@ -75,6 +96,24 @@ export function App() {
     }
     return 'home';
   });
+
+  // Direct visit to non-home route (/artists, /crew, etc.) should never be blocked by intro (Specs 46-48)
+  const isDirectNonHome = typeof window !== 'undefined' && (() => {
+    const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+    const validViews = ['about', 'artists', 'performances', 'media', 'events', 'crew', 'contact'];
+    return validViews.includes(path);
+  })();
+
+  const [introFinished, setIntroFinished] = useState(() => {
+    if (isDirectNonHome) return true;
+    return hasIntroPlayed();
+  });
+  const [showIntroOverlay, setShowIntroOverlay] = useState(() => {
+    if (isDirectNonHome) return false;
+    return !hasIntroPlayed();
+  });
+  const [heroEntryPlayed, setHeroEntryPlayed] = useState(hasHeroEntryPlayed);
+  const isFinishingIntroRef = useRef(false);
 
   // Reusable routing scroll reset hook (Sections 52-54)
   useScrollToTop(currentView);
@@ -342,8 +381,8 @@ export function App() {
         color: '#F5F5F7'
       }}
     >
-      {/* 0. Single Global Fixed Background Layer */}
-      <SiteBackground currentView={currentView} />
+      {/* 0. Single Global Fixed Background Layer (Spec 29-32) */}
+      <SiteBackground currentView={currentView} isIntroActive={isIntroActive} />
 
       {/* 
         Controlled Website Content Wrapper:
@@ -378,37 +417,45 @@ export function App() {
                 Meet StarX, Behind StarX, and Footer
                ======================================================= */}
             {currentView === 'home' && (
-              <div id="homepage-flow">
-                {/* 1. Hero / Home */}
-                <Hero
-                  onNavigate={handleNavigate}
-                  isReady={isHomeReady}
-                  firstEntry={!heroEntryPlayed}
-                  onEntryComplete={handleHeroEntryComplete}
-                />
+              <motion.div
+                key="home-view"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div id="homepage-flow">
+                  {/* 1. Hero / Home */}
+                  <Hero
+                    onNavigate={handleNavigate}
+                    isReady={isHomeReady}
+                    firstEntry={!heroEntryPlayed}
+                    onEntryComplete={handleHeroEntryComplete}
+                  />
 
-                {/* 2. About StarX Preview */}
-                <AboutPreview onNavigate={handleNavigate} />
+                  {/* 2. About StarX Preview */}
+                  <AboutPreview onNavigate={handleNavigate} />
 
-                {/* 3. Best Performance Preview */}
-                <FeaturedPerformances onNavigate={handleNavigate} />
+                  {/* 3. Best Performance Preview */}
+                  <FeaturedPerformances onNavigate={handleNavigate} />
 
-                {/* 4. Artists Preview (Meet StarX) */}
-                <BandMembers
-                  onNavigate={handleNavigate}
-                  onOpenModal={openMemberModal}
-                />
+                  {/* 4. Artists Preview (Meet StarX) */}
+                  <BandMembers
+                    onNavigate={handleNavigate}
+                    onOpenModal={openMemberModal}
+                  />
 
-                {/* 5. Crew Preview (Behind StarX) */}
-                <CrewPreview
-                  onNavigate={handleNavigate}
-                  onOpenModal={openMemberModal}
-                />
-              </div>
+                  {/* 5. Crew Preview (Behind StarX) */}
+                  <CrewPreview
+                    onNavigate={handleNavigate}
+                    onOpenModal={openMemberModal}
+                  />
+                </div>
+              </motion.div>
             )}
 
             {/* =======================================================
-                DEDICATED VIEWS: Direct navigation targets
+                DEDICATED VIEWS: Direct navigation targets (Code-split with Suspense, Spec 38)
                ======================================================= */}
             {currentView === 'about' && (
               <motion.div
@@ -418,7 +465,9 @@ export function App() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                <AboutView onBackHome={() => handleNavigate('home')} />
+                <Suspense fallback={<ViewLoader />}>
+                  <AboutView onBackHome={() => handleNavigate('home')} />
+                </Suspense>
               </motion.div>
             )}
 
@@ -430,10 +479,12 @@ export function App() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                <ArtistsView
-                  onBackHome={() => handleNavigate('home')}
-                  onOpenModal={openMemberModal}
-                />
+                <Suspense fallback={<ViewLoader />}>
+                  <ArtistsView
+                    onBackHome={() => handleNavigate('home')}
+                    onOpenModal={openMemberModal}
+                  />
+                </Suspense>
               </motion.div>
             )}
 
@@ -445,7 +496,9 @@ export function App() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                <PerformancesView onBackHome={() => handleNavigate('home')} />
+                <Suspense fallback={<ViewLoader />}>
+                  <PerformancesView onBackHome={() => handleNavigate('home')} />
+                </Suspense>
               </motion.div>
             )}
 
@@ -457,10 +510,12 @@ export function App() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                <MediaView
-                  onBackHome={() => handleNavigate('home')}
-                  onOpenPhoto={handleOpenPhoto}
-                />
+                <Suspense fallback={<ViewLoader />}>
+                  <MediaView
+                    onBackHome={() => handleNavigate('home')}
+                    onOpenPhoto={handleOpenPhoto}
+                  />
+                </Suspense>
               </motion.div>
             )}
 
@@ -472,7 +527,9 @@ export function App() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                <EventsView onBackHome={() => handleNavigate('home')} />
+                <Suspense fallback={<ViewLoader />}>
+                  <EventsView onBackHome={() => handleNavigate('home')} />
+                </Suspense>
               </motion.div>
             )}
 
@@ -484,10 +541,12 @@ export function App() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                <CrewView
-                  onBackHome={() => handleNavigate('home')}
-                  onOpenModal={openMemberModal}
-                />
+                <Suspense fallback={<ViewLoader />}>
+                  <CrewView
+                    onBackHome={() => handleNavigate('home')}
+                    onOpenModal={openMemberModal}
+                  />
+                </Suspense>
               </motion.div>
             )}
 
@@ -499,7 +558,9 @@ export function App() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                <ContactView onBackHome={() => handleNavigate('home')} />
+                <Suspense fallback={<ViewLoader />}>
+                  <ContactView onBackHome={() => handleNavigate('home')} />
+                </Suspense>
               </motion.div>
             )}
           </AnimatePresence>

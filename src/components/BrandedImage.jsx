@@ -24,35 +24,27 @@ export const BrandedImage = ({
   const [currentSrc, setCurrentSrc] = useState(src);
   const [hasError, setHasError] = useState(!src);
   const [isLoaded, setIsLoaded] = useState(false);
-  const attemptsRef = React.useRef(new Set());
+  const imgRef = React.useRef(null);
 
   React.useEffect(() => {
     setCurrentSrc(src);
     setHasError(!src);
-    setIsLoaded(false);
-    attemptsRef.current = new Set(src ? [src] : []);
+
+    if (!src) {
+      setIsLoaded(false);
+      return;
+    }
+
+    // Check if image is already cached/complete in DOM
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
+      setIsLoaded(true);
+    } else {
+      setIsLoaded(false);
+    }
   }, [src]);
 
   const handleImageError = () => {
-    if (!currentSrc) {
-      setHasError(true);
-      return;
-    }
-    let nextSrc = null;
-    if (currentSrc.endsWith('.jpg')) {
-      nextSrc = currentSrc.replace(/\.jpg$/, '.png');
-    } else if (currentSrc.endsWith('.png')) {
-      nextSrc = currentSrc.replace(/\.png$/, '.jpeg');
-    } else if (currentSrc.endsWith('.jpeg')) {
-      nextSrc = currentSrc.replace(/\.jpeg$/, '.jpg');
-    }
-
-    if (nextSrc && !attemptsRef.current.has(nextSrc)) {
-      attemptsRef.current.add(nextSrc);
-      setCurrentSrc(nextSrc);
-    } else {
-      setHasError(true);
-    }
+    setHasError(true);
   };
 
   return (
@@ -242,8 +234,11 @@ export const BrandedImage = ({
       {/* Real Image Layer */}
       {!hasError && currentSrc ? (
         <img
+          ref={imgRef}
           src={currentSrc}
           alt={alt}
+          decoding="async"
+          loading={priority ? 'eager' : 'lazy'}
           onLoad={() => setIsLoaded(true)}
           onError={handleImageError}
           style={{
@@ -256,9 +251,8 @@ export const BrandedImage = ({
             display: 'block',
             zIndex: 2,
             opacity: isLoaded ? 1 : 0,
-            transition: 'opacity 0.4s ease'
+            transition: 'opacity 0.3s ease'
           }}
-          loading={priority ? 'eager' : 'lazy'}
         />
       ) : null}
     </div>

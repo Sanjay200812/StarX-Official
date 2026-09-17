@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Instagram } from 'lucide-react';
-import { siteData } from '../data/siteData';
+import { crew } from '../data/crew';
 import BrandedImage from '../components/BrandedImage';
 import MemberDetailModal from '../components/MemberDetailModal';
 
@@ -12,7 +12,6 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * Link "View full crew →" navigates to /crew.
  */
 export const CrewPreview = ({ onNavigate, onOpenModal }) => {
-  const { crew } = siteData;
   const [localModalMember, setLocalModalMember] = useState(null);
   const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 

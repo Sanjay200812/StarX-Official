@@ -7,6 +7,9 @@
  * ====================================================================
  */
 
+import { artists } from './artists';
+import { crew } from './crew';
+
 export const DEMO_PERFORMANCE_URL = "https://www.youtube.com/@starxliveband";
 
 export const WHATSAPP_PREFILLED_MESSAGE =
@@ -106,106 +109,15 @@ export const siteData = {
   },
 
   // ==========================================
-  // 4. MEMBERS (ARTISTS) - REAL STARX LINEUP
+  // 4. MEMBERS (ARTISTS) - REAL STARX LINEUP (From central artists.js)
   // ==========================================
-  members: [
-    {
-      id: 1,
-      name: "B. Prasad",
-      role: "Rhythm Pad",
-      image: "/assets/artists/b-prasad.png",
-      bio: "Profile details will be updated soon.",
-      instagram: ""
-    },
-    {
-      id: 2,
-      name: "B. Joseph",
-      role: "Drum Kit",
-      image: "/assets/artists/b-joseph.png",
-      bio: "Profile details will be updated soon.",
-      instagram: ""
-    },
-    {
-      id: 3,
-      name: "G. Perumalla Rao",
-      role: "Piano 1",
-      image: "/assets/artists/g-perumalla-rao.png",
-      bio: "Profile details will be updated soon.",
-      instagram: ""
-    },
-    {
-      id: 4,
-      name: "N. Thirapatiyya",
-      role: "Lead Guitar",
-      image: null,
-      bio: "Profile details will be updated soon.",
-      instagram: ""
-    },
-    {
-      id: 5,
-      name: "E. Chandra Mohan",
-      role: "Bass Guitar",
-      image: null,
-      bio: "Profile details will be updated soon.",
-      instagram: ""
-    },
-    {
-      id: 6,
-      name: "K. Sudhakar",
-      role: "Singer",
-      image: "/assets/artists/k-sudhakar.jpg",
-      bio: "Profile details will be updated soon.",
-      instagram: ""
-    },
-    {
-      id: 7,
-      name: "G. Vijay",
-      role: "Singer",
-      image: "/assets/artists/g-vijay.jpg",
-      bio: "Profile details will be updated soon.",
-      instagram: ""
-    }
-  ],
+  members: artists,
+  artists: artists,
 
   // ==========================================
-  // 4.1 BEHIND STARX (CREW & PRODUCTION)
+  // 4.1 BEHIND STARX (CREW & PRODUCTION) (From central crew.js)
   // ==========================================
-  crew: [
-    {
-      id: 1,
-      name: "B. Josh",
-      role: "Manager & Event Organizer | Primary Contact",
-      image: "/assets/crew/b-josh.jpeg",
-      bio: `Josh is the Manager and Event Organizer of StarX Live, handling programs, bookings, and event coordination. He manages communication with clients and organizers and coordinates the team for every performance.
-
-He is the Primary Contact for StarX Live, handling event inquiries, bookings, and program-related communication to ensure everything runs smoothly.`,
-      instagramLabel: "@starxliveband",
-      instagramUrl: "https://www.instagram.com/starxliveband",
-      isCrew: true
-    },
-    {
-      id: 2,
-      name: "B. Sanjay",
-      role: "Digital Media & Creative Director",
-      image: "/assets/crew/b-sanjay.jpg",
-      bio: `B. Sanjay is the Digital Media & Creative Director of StarX Live, handling the band’s digital presence and creative work. He manages video editing, social media content, and digital branding across Instagram, Facebook, and YouTube.
-
-He also manages and maintains the StarX Live website and online platforms, helping present the band’s music, performances, and events in a modern and engaging way.`,
-      instagramLabel: "@s_a_n_j_u_7__",
-      instagramUrl: "https://www.instagram.com/s_a_n_j_u_7__/",
-      isCrew: true
-    },
-    {
-      id: 3,
-      name: "B. Balu",
-      role: "Producer",
-      image: "/assets/crew/b-balu.jpg",
-      bio: `B. Balu is a Producer at StarX Live, supporting the planning and production of the band’s programs and events. He works with the team to manage production activities and helps ensure every performance is well organized and delivered smoothly.`,
-      instagramLabel: "",
-      instagramUrl: "",
-      isCrew: true
-    }
-  ],
+  crew: crew,
 
   // ==========================================
   // 5. LIVE PERFORMANCES
@@ -405,4 +317,5 @@ He also manages and maintains the StarX Live website and online platforms, helpi
   }
 };
 
+export { artists, crew };
 export default siteData;

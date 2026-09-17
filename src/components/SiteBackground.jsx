@@ -22,25 +22,25 @@ import { siteData } from '../data/siteData';
  *    - Respects prefers-reduced-motion
  *    - Visibilitychange handling (pause when tab hidden, resume when visible on Home)
  */
-export const SiteBackground = ({ currentView = 'home' }) => {
+export const SiteBackground = ({ currentView = 'home', isIntroActive = false }) => {
   const isMobile = useIsMobile();
   const isHome = currentView === 'home' || currentView === '' || currentView === '/';
 
   const videoRef = useRef(null);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [hasVisitedHome, setHasVisitedHome] = useState(isHome);
+  const [hasVisitedHome, setHasVisitedHome] = useState(isHome && !isIntroActive);
   const [isPrefersReducedMotion, setIsPrefersReducedMotion] = useState(false);
 
   const { background } = siteData;
   const currentVideoSrc = isMobile ? background.mobileVideo : background.desktopVideo;
   const staticImageSrc = isMobile ? background.mobileFallback : background.desktopFallback;
 
-  // Once user opens Home, we know video can be mounted
+  // Mount video only after intro has completed or if user is genuinely on Home without intro blocking
   useEffect(() => {
-    if (isHome) {
+    if (isHome && !isIntroActive) {
       setHasVisitedHome(true);
     }
-  }, [isHome]);
+  }, [isHome, isIntroActive]);
 
   // Check prefers-reduced-motion (Spec 30)
   useEffect(() => {
@@ -58,12 +58,12 @@ export const SiteBackground = ({ currentView = 'home' }) => {
     }
   }, []);
 
-  // Manage Home Video Playback (Spec 11, 12, 15, 16)
+  // Manage Home Video Playback (Spec 11, 12, 15, 16, 29-32)
   useEffect(() => {
     const video = videoRef.current;
     if (!video || isPrefersReducedMotion) return;
 
-    if (isHome) {
+    if (isHome && !isIntroActive) {
       video.muted = true;
       video.currentTime = 0; // Restart cleanly on return to Home (Spec 16)
       const playPromise = video.play();
@@ -73,10 +73,10 @@ export const SiteBackground = ({ currentView = 'home' }) => {
           .catch(() => {});
       }
     } else {
-      // Pause immediately when leaving Home to save GPU/CPU/bandwidth (Spec 11 & 15)
+      // Pause immediately when leaving Home or during intro to save GPU/CPU/bandwidth (Spec 11, 15, 29)
       video.pause();
     }
-  }, [isHome, currentVideoSrc, isPrefersReducedMotion]);
+  }, [isHome, isIntroActive, currentVideoSrc, isPrefersReducedMotion]);
 
   // Tab visibility: pause when tab is hidden, resume when tab is visible IF on Home (Spec 15 & 29)
   useEffect(() => {
@@ -136,12 +136,13 @@ export const SiteBackground = ({ currentView = 'home' }) => {
         loading="eager"
       />
 
-      {/* 2. Home Video Layer (Only mounts when Home is visited; fades in/out cleanly; Spec 6, 7, 11, 12, 17, 18) */}
-      {!isPrefersReducedMotion && hasVisitedHome && (
+      {/* 2. Home Video Layer (Only mounts when Home is visited; fades in/out cleanly; Spec 6, 7, 11, 12, 17, 18, 29-32) */}
+      {!isPrefersReducedMotion && hasVisitedHome && isHome && (
         <video
           ref={videoRef}
           key={currentVideoSrc}
           src={currentVideoSrc}
+          preload="metadata"
           autoPlay
           muted
           loop
@@ -156,8 +157,8 @@ export const SiteBackground = ({ currentView = 'home' }) => {
             objectPosition: 'center',
             display: 'block',
             zIndex: 2,
-            opacity: isHome && isVideoLoaded ? 1 : 0,
-            transition: 'opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1)'
+            opacity: isHome && isVideoLoaded && !isIntroActive ? 1 : 0,
+            transition: 'opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1)'
           }}
         />
       )}

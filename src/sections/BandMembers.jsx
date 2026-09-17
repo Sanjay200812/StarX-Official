@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { siteData } from '../data/siteData';
+import { artists } from '../data/artists';
 import BrandedImage from '../components/BrandedImage';
 import MemberDetailModal from '../components/MemberDetailModal';
 
@@ -23,7 +23,7 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * - Link "View artist profiles →" navigates to /artists
  */
 export const BandMembers = ({ onNavigate, onOpenModal }) => {
-  const { members } = siteData;
+  const members = artists;
   const [localModalMember, setLocalModalMember] = useState(null);
   const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 

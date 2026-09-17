@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Instagram } from 'lucide-react';
-import { siteData } from '../data/siteData';
+import { crew } from '../data/crew';
 import BrandedImage from '../components/BrandedImage';
 import MemberDetailModal from '../components/MemberDetailModal';
 
@@ -18,7 +18,6 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * - Real bios, Instagram links, and single-click modal.
  */
 export const CrewView = ({ onBackHome, onOpenModal }) => {
-  const { crew } = siteData;
   const [localModalMember, setLocalModalMember] = useState(null);
   const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 

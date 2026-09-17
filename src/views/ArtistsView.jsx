@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
-import { siteData } from '../data/siteData';
+import { artists } from '../data/artists';
 import BrandedImage from '../components/BrandedImage';
 import MemberDetailModal from '../components/MemberDetailModal';
 
@@ -11,12 +11,12 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * Displays all 7 StarX live musicians in a clean, spacious layout.
  *
  * Rules:
- * - Preloads first-row visible images (priority={index < 3}).
+ * - Preloads first-row visible images (priority={index < 4}).
  * - Safe top padding clearance from sticky navbar.
  * - Central modal opening coordination for mobile back gesture.
  */
 export const ArtistsView = ({ onBackHome, onOpenModal }) => {
-  const { members } = siteData;
+  const members = artists;
   const [localModalMember, setLocalModalMember] = useState(null);
   const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 
@@ -168,7 +168,7 @@ export const ArtistsView = ({ onBackHome, onOpenModal }) => {
                     fallbackSubtitle={member.role}
                     variant="member"
                     objectFit="cover"
-                    priority={index < 3}
+                    priority={index < 4}
                     style={{ width: '100%', height: '100%' }}
                   />
 
