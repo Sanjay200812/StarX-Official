@@ -27,14 +27,21 @@ export const Navbar = ({
   isReady = true,
   isIntroActive = false,
   currentView = 'home',
-  onNavigate
+  onNavigate,
+  isMobileMenuOpen: isMobileMenuOpenProp,
+  onOpenMobileMenu,
+  onCloseMobileMenu
 }) => {
   const isVisible = isReady && !isIntroActive;
   const { brand } = siteData;
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [localMobileMenuOpen, setLocalMobileMenuOpen] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const popoverWrapperRef = useRef(null);
+
+  const isMobileMenuOpen = isMobileMenuOpenProp !== undefined ? isMobileMenuOpenProp : localMobileMenuOpen;
+  const handleOpenMobileMenu = onOpenMobileMenu || (() => setLocalMobileMenuOpen(true));
+  const handleCloseMobileMenu = onCloseMobileMenu || (() => setLocalMobileMenuOpen(false));
 
   const navLinks = [
     { name: 'Home', target: 'home' },
@@ -138,6 +145,8 @@ export const Navbar = ({
         >
           {/* LEFT: STARX LIVE Logo & Wordmark */}
           <a
+            id="navbar-brand"
+            className="navbar-brand"
             href="/"
             onClick={(e) => handleItemClick(e, 'home')}
             style={{
@@ -193,6 +202,8 @@ export const Navbar = ({
                 return (
                   <a
                     key={link.name}
+                    id={`nav-link-${link.target}`}
+                    className={`navbar-nav-link ${isActive ? 'active' : ''}`}
                     href={`/${link.target === 'home' ? '' : link.target}`}
                     onClick={(e) => handleItemClick(e, link.target)}
                     style={{
@@ -268,7 +279,8 @@ export const Navbar = ({
 
             {/* Mobile Menu Hamburger Trigger */}
             <button
-              onClick={() => setIsMobileMenuOpen(true)}
+              id="mobile-menu-button"
+              onClick={handleOpenMobileMenu}
               aria-label="Open menu"
               className="mobile-hamburger-btn"
               style={{
@@ -296,7 +308,7 @@ export const Navbar = ({
             width: calc(100% - 48px);
           }
         }
-        @media (max-width: 480px) {
+        @media (max-width: 640px) {
           .glass-navbar-header {
             width: calc(100% - 24px);
           }
@@ -322,7 +334,7 @@ export const Navbar = ({
 
       <MobileMenu
         isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
+        onClose={handleCloseMobileMenu}
         navLinks={navLinks}
         currentView={currentView}
         onNavigate={onNavigate}

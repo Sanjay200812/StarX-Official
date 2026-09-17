@@ -41,11 +41,11 @@ export const siteData = {
 
     // Real Brand Asset Paths
     logo: "/assets/brand/starx-logo.png",
-    wordmark: "/assets/brand/starx-wordmark.png",
-    banner: "/assets/brand/starx-banner.png",
+    wordmark: "/assets/brand/starx-logo.png",
+    banner: "/assets/brand/starx-long-banner.png",
     longBanner: "/assets/brand/starx-long-banner.png",
-    post: "/assets/brand/starx-post.png",
-    visitingCard: "/assets/brand/starx-visiting-card.png",
+    post: "/assets/brand/starx-long-banner.png",
+    visitingCard: null,
 
     genres: [
       "CLASSIC",
@@ -113,7 +113,7 @@ export const siteData = {
       id: 1,
       name: "B. Prasad",
       role: "Rhythm Pad",
-      image: "/assets/artists/b-prasad.jpg",
+      image: "/assets/artists/b-prasad.png",
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -121,7 +121,7 @@ export const siteData = {
       id: 2,
       name: "B. Joseph",
       role: "Drum Kit",
-      image: "/assets/artists/b-joseph.jpg",
+      image: "/assets/artists/b-joseph.png",
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -129,7 +129,7 @@ export const siteData = {
       id: 3,
       name: "G. Perumalla Rao",
       role: "Piano 1",
-      image: "/assets/artists/g-perumalla-rao.jpg",
+      image: "/assets/artists/g-perumalla-rao.png",
       bio: "Profile details will be updated soon.",
       instagram: ""
     },
@@ -288,14 +288,14 @@ He also manages and maintains the StarX Live website and online platforms, helpi
       id: "art-1",
       title: "STARX LIVE OFFICIAL BANNER",
       subtitle: "Stage Identity & Rock Band Crest",
-      image: "/assets/brand/starx-banner.png",
+      image: "/assets/brand/starx-long-banner.png",
       alt: "StarX Live Official Banner"
     },
     {
       id: "art-2",
       title: "STARX PROMOTIONAL POST",
       subtitle: "Tour & Gig Promotional Artwork",
-      image: "/assets/brand/starx-post.png",
+      image: "/assets/brand/starx-long-banner.png",
       alt: "StarX Promotional Poster"
     },
     {
@@ -367,7 +367,7 @@ He also manages and maintains the StarX Live website and online platforms, helpi
 
     location: "HYDERABAD, TS, AP - INDIA",
     availabilityNote: "Available for Live Concerts, Festivals, Corporate Galas, College Fests & Private Showcases across India.",
-    visitingCard: "/assets/brand/starx-visiting-card.png"
+    visitingCard: null
   },
 
   // ==========================================

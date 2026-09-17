@@ -5,6 +5,7 @@ import SiteBackground from './components/SiteBackground';
 import Navbar from './components/Navbar';
 import FloatingWhatsApp from './components/FloatingWhatsApp';
 import ImageLightbox from './components/ImageLightbox';
+import MemberDetailModal from './components/MemberDetailModal';
 import useScrollToTop from './hooks/useScrollToTop';
 
 // 5 Core Homepage Components (Spec 16 & 71)
@@ -25,11 +26,15 @@ import CrewView from './views/CrewView';
 import ContactView from './views/ContactView';
 
 export function App() {
-  // Intro State backed by sessionStorage (Requirements 1, 8, 21, 22)
+  // Intro State backed by sessionStorage (Sections 21-29)
   const hasIntroPlayed = () => {
     try {
+      if (typeof window !== 'undefined' && window.location.search.includes('nointro')) {
+        return true;
+      }
       if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
         sessionStorage.removeItem('starxIntroPlayed');
+        sessionStorage.removeItem('starxHeroEntryPlayed');
         return false;
       }
       return sessionStorage.getItem('starxIntroPlayed') === 'true';
@@ -38,12 +43,26 @@ export function App() {
     }
   };
 
+  const hasHeroEntryPlayed = () => {
+    try {
+      if (typeof window !== 'undefined' && window.location.search.includes('nointro')) {
+        return true;
+      }
+      if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
+        return false;
+      }
+      return sessionStorage.getItem('starxHeroEntryPlayed') === 'true';
+    } catch (e) {
+      return false;
+    }
+  };
+
   const [introFinished, setIntroFinished] = useState(hasIntroPlayed);
   const [showIntroOverlay, setShowIntroOverlay] = useState(() => !hasIntroPlayed());
-  const [homeAnimationKey, setHomeAnimationKey] = useState(0);
+  const [heroEntryPlayed, setHeroEntryPlayed] = useState(hasHeroEntryPlayed);
   const isFinishingIntroRef = useRef(false);
 
-  // Dedicated Route / View State (Spec 13 & 68)
+  // Dedicated Route / View State (Sections 1-4)
   const [currentView, setCurrentView] = useState(() => {
     try {
       const path = window.location.pathname.replace(/^\//, '').toLowerCase();
@@ -57,7 +76,7 @@ export function App() {
     return 'home';
   });
 
-  // Reusable routing scroll reset and hash clearing hook (Requirements 18, 19, 20)
+  // Reusable routing scroll reset hook (Sections 52-54)
   useScrollToTop(currentView);
 
   // Photo Lightbox State (for MediaView)
@@ -65,29 +84,89 @@ export function App() {
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
+  // Modal & Mobile Menu History State (Sections 5-11, 47, 48)
+  const [activeMemberModal, setActiveMemberModal] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const activeMemberModalRef = useRef(null);
+  const isMobileMenuOpenRef = useRef(false);
+  const isLightboxOpenRef = useRef(false);
+  const isClosingViaUiRef = useRef(false);
+  const hasModalHistoryRef = useRef(false);
+  const hasMenuHistoryRef = useRef(false);
+
+  // Keep refs synchronized for immediate synchronous access in popstate
+  useEffect(() => {
+    activeMemberModalRef.current = activeMemberModal;
+  }, [activeMemberModal]);
+
+  useEffect(() => {
+    isMobileMenuOpenRef.current = isMobileMenuOpen;
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    isLightboxOpenRef.current = isLightboxOpen;
+  }, [isLightboxOpen]);
+
   const handleOpenPhoto = (items, index = 0) => {
     setLightboxItems(items);
     setLightboxIndex(index);
     setIsLightboxOpen(true);
   };
 
-  // Lock scroll while intro is visible (Requirement 2 & 3)
+  // Coordinated Member Modal Handlers (Sections 5-10, 48)
+  const openMemberModal = useCallback((member) => {
+    setActiveMemberModal(member);
+    try {
+      window.history.pushState({ starxModal: true }, '', window.location.href);
+      hasModalHistoryRef.current = true;
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  const closeMemberModal = useCallback(() => {
+    if (hasModalHistoryRef.current) {
+      hasModalHistoryRef.current = false;
+      isClosingViaUiRef.current = true;
+      window.history.back();
+    }
+    setActiveMemberModal(null);
+  }, []);
+
+  // Coordinated Mobile Menu Handlers (Section 47, 48)
+  const openMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(true);
+    try {
+      window.history.pushState({ starxMenu: true }, '', window.location.href);
+      hasMenuHistoryRef.current = true;
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  const closeMobileMenu = useCallback(() => {
+    if (hasMenuHistoryRef.current) {
+      hasMenuHistoryRef.current = false;
+      isClosingViaUiRef.current = true;
+      window.history.back();
+    }
+    setIsMobileMenuOpen(false);
+  }, []);
+
+  // Lock scroll while intro is visible
   useEffect(() => {
     if (showIntroOverlay) {
-      // 1. Force top scroll position immediately before intro starts (Requirement 3)
       window.scrollTo({
         top: 0,
         left: 0,
         behavior: 'auto'
       });
-
-      // 2. Lock page scroll (Requirement 2)
       document.documentElement.classList.add('intro-active');
       document.body.classList.add('intro-active');
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
     } else {
-      // Unlock page scroll when intro is not active
       document.documentElement.classList.remove('intro-active');
       document.body.classList.remove('intro-active');
       document.documentElement.style.overflow = '';
@@ -102,22 +181,18 @@ export function App() {
     };
   }, [showIntroOverlay]);
 
-  // Unified intro exit sequence (Requirements 4, 5, 6, 14, 21-25)
+  // Unified intro exit sequence (Sections 20, 27, 28)
   const finishIntro = useCallback(() => {
     if (isFinishingIntroRef.current) return;
     isFinishingIntroRef.current = true;
 
-    // 1. Force top scroll position immediately before removing overlay (Requirement 4)
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: 'auto'
     });
 
-    // 2. Hide intro overlay
     setShowIntroOverlay(false);
-
-    // 3. Unlock page scroll
     document.documentElement.classList.remove('intro-active');
     document.body.classList.remove('intro-active');
     document.documentElement.style.overflow = '';
@@ -129,14 +204,12 @@ export function App() {
       // ignore
     }
 
-    // 4. Force top again after overlay removal (Requirement 4)
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: 'auto'
     });
 
-    // 5. Nested requestAnimationFrame guarantees layout is fully calculated and top is maintained
     requestAnimationFrame(() => {
       window.scrollTo({
         top: 0,
@@ -151,23 +224,12 @@ export function App() {
           behavior: 'auto'
         });
 
-        // Refresh GSAP ScrollTrigger if available (Requirement 14)
-        if (typeof window !== 'undefined' && window.ScrollTrigger) {
-          try {
-            window.ScrollTrigger.refresh();
-          } catch (e) {}
-        }
-
-        // 6. Reveal Home content (Requirement 6 & 25)
+        // Reveal Home content
         setIntroFinished(true);
-
-        // 7. Trigger Home entrance animation from time 0 (Requirement 11)
-        setHomeAnimationKey((prev) => prev + 1);
       });
     });
   }, []);
 
-  // While intro overlay is fading out, keep home top position stable
   const handleIntroStartExit = useCallback(() => {
     window.scrollTo({
       top: 0,
@@ -176,9 +238,46 @@ export function App() {
     });
   }, []);
 
-  // Listen to browser Back/Forward navigation (Spec 68 & 19)
+  // Hero entrance completion callback (Section 27)
+  const handleHeroEntryComplete = useCallback(() => {
+    try {
+      sessionStorage.setItem('starxHeroEntryPlayed', 'true');
+    } catch (e) {
+      // ignore
+    }
+    setHeroEntryPlayed(true);
+  }, []);
+
+  // Central Single popstate Listener (Priority: Modal > Menu > Lightbox > Route; Sections 47, 48, 53, 54)
   useEffect(() => {
     const handlePopState = () => {
+      // 1. If programmatic close via UI button ("X", ESC, backdrop) triggered this back, consume and exit
+      if (isClosingViaUiRef.current) {
+        isClosingViaUiRef.current = false;
+        return;
+      }
+
+      // 2. Priority 1: Open Member Modal -> Close it, stay on page, do NOT scroll!
+      if (activeMemberModalRef.current) {
+        hasModalHistoryRef.current = false;
+        setActiveMemberModal(null);
+        return;
+      }
+
+      // 3. Priority 2: Open Mobile Menu -> Close it, stay on page, do NOT scroll!
+      if (isMobileMenuOpenRef.current) {
+        hasMenuHistoryRef.current = false;
+        setIsMobileMenuOpen(false);
+        return;
+      }
+
+      // 4. Priority 3: Open Lightbox -> Close it, stay on page
+      if (isLightboxOpenRef.current) {
+        setIsLightboxOpen(false);
+        return;
+      }
+
+      // 5. Otherwise: Normal Route Navigation!
       try {
         const path = window.location.pathname.replace(/^\//, '').toLowerCase();
         const validViews = ['about', 'artists', 'performances', 'media', 'events', 'crew', 'contact'];
@@ -186,7 +285,6 @@ export function App() {
           setCurrentView(path);
         } else {
           setCurrentView('home');
-          setHomeAnimationKey((prev) => prev + 1);
         }
       } catch (e) {
         setCurrentView('home');
@@ -198,25 +296,39 @@ export function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Central Direct Navigation Handler (Spec 14, 19, 60, 69, Requirements 19 & 20)
-  const handleNavigate = (target) => {
-    const route = target === 'home' ? '' : target;
-    setCurrentView(target);
-
-    // When returning to Home, restart Home animation cleanly from 0 (Requirements 19 & 20)
-    if (target === 'home') {
-      setHomeAnimationKey((prev) => prev + 1);
+  // Central Direct Navigation Handler (Sections 1-4)
+  const handleNavigate = useCallback((target) => {
+    // If mobile menu was open when navigating, close it cleanly
+    if (isMobileMenuOpenRef.current) {
+      setIsMobileMenuOpen(false);
+      hasMenuHistoryRef.current = false;
+    }
+    // If modal was open, close it
+    if (activeMemberModalRef.current) {
+      setActiveMemberModal(null);
+      hasModalHistoryRef.current = false;
     }
 
+    const currentPath = window.location.pathname.replace(/^\//, '').toLowerCase();
+    const targetPath = target === 'home' ? '' : target;
+
+    // If already on the requested route, don't push duplicate history entry
+    if (currentPath === targetPath) {
+      setCurrentView(target);
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      return;
+    }
+
+    setCurrentView(target);
     try {
-      window.history.pushState(null, '', `/${route}`);
+      window.history.pushState(null, '', `/${targetPath}`);
     } catch (e) {
       // ignore
     }
 
-    // Scroll restoration: always start at the top on navigation (Requirement 19)
+    // Scroll restoration: always start at the top on navigation
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  };
+  }, []);
 
   const isHomeReady = introFinished && currentView === 'home';
   const isNavbarReady = introFinished;
@@ -230,14 +342,12 @@ export function App() {
         color: '#F5F5F7'
       }}
     >
-      {/* 0. Single Global Fixed Background Layer (Spec 2 & 3, Requirement 26 & 27) */}
+      {/* 0. Single Global Fixed Background Layer */}
       <SiteBackground currentView={currentView} />
 
       {/* 
-        Controlled Website Content Wrapper (Requirements 23, 25 & 30):
-        Holds both the Navbar, Main Content, and Footer in a unified layout.
-        While intro is active: opacity is 0 and pointerEvents none, keeping full layout
-        established with Hero at Y=0 and Footer at the bottom, eliminating layout jumps.
+        Controlled Website Content Wrapper:
+        Hero is mounted and measured underneath intro (Section 20).
       */}
       <div
         id="site-content"
@@ -250,19 +360,22 @@ export function App() {
           transition: 'opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1)'
         }}
       >
-        {/* 2. Floating Smoked-Glass Top Navbar (Spec 14 & 15) */}
+        {/* 2. Floating Smoked-Glass Top Navbar */}
         <Navbar
           isReady={isNavbarReady}
           isIntroActive={isIntroActive}
           currentView={currentView}
           onNavigate={handleNavigate}
+          isMobileMenuOpen={isMobileMenuOpen}
+          onOpenMobileMenu={openMobileMenu}
+          onCloseMobileMenu={closeMobileMenu}
         />
 
         <main id="main-content">
           <AnimatePresence mode="wait">
             {/* =======================================================
                 HOME PAGE: ONLY Hero, About Preview, Best Performance,
-                Meet StarX, Behind StarX, and Footer (Spec 16 & 71)
+                Meet StarX, Behind StarX, and Footer
                ======================================================= */}
             {currentView === 'home' && (
               <div id="homepage-flow">
@@ -270,7 +383,8 @@ export function App() {
                 <Hero
                   onNavigate={handleNavigate}
                   isReady={isHomeReady}
-                  animationKey={homeAnimationKey}
+                  firstEntry={!heroEntryPlayed}
+                  onEntryComplete={handleHeroEntryComplete}
                 />
 
                 {/* 2. About StarX Preview */}
@@ -280,15 +394,21 @@ export function App() {
                 <FeaturedPerformances onNavigate={handleNavigate} />
 
                 {/* 4. Artists Preview (Meet StarX) */}
-                <BandMembers onNavigate={handleNavigate} />
+                <BandMembers
+                  onNavigate={handleNavigate}
+                  onOpenModal={openMemberModal}
+                />
 
                 {/* 5. Crew Preview (Behind StarX) */}
-                <CrewPreview onNavigate={handleNavigate} />
+                <CrewPreview
+                  onNavigate={handleNavigate}
+                  onOpenModal={openMemberModal}
+                />
               </div>
             )}
 
             {/* =======================================================
-                DEDICATED VIEWS: Direct navigation targets (Spec 13, 14, 26, 60)
+                DEDICATED VIEWS: Direct navigation targets
                ======================================================= */}
             {currentView === 'about' && (
               <motion.div
@@ -310,7 +430,10 @@ export function App() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                <ArtistsView onBackHome={() => handleNavigate('home')} />
+                <ArtistsView
+                  onBackHome={() => handleNavigate('home')}
+                  onOpenModal={openMemberModal}
+                />
               </motion.div>
             )}
 
@@ -361,7 +484,10 @@ export function App() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
-                <CrewView onBackHome={() => handleNavigate('home')} />
+                <CrewView
+                  onBackHome={() => handleNavigate('home')}
+                  onOpenModal={openMemberModal}
+                />
               </motion.div>
             )}
 
@@ -379,14 +505,18 @@ export function App() {
           </AnimatePresence>
         </main>
 
-        {/* Compact Professional StarX Footer (Spec 38-46, inside controlled site-content) */}
+        {/* Compact Professional StarX Footer */}
         <Footer onNavigate={handleNavigate} />
       </div>
 
-      {/* 
-        Fullscreen Intro Video Overlay (Requirements 2, 3, 6, 8, 23):
-        Rendered as top-most direct sibling of site-content with z-index 1000.
-      */}
+      {/* Central Root Member Detail Modal (Sections 5-11, 48, 53) */}
+      <MemberDetailModal
+        isOpen={Boolean(activeMemberModal)}
+        onClose={closeMemberModal}
+        member={activeMemberModal}
+      />
+
+      {/* Fullscreen Intro Video Overlay */}
       <AnimatePresence>
         {showIntroOverlay && (
           <StarXIntro
@@ -398,10 +528,10 @@ export function App() {
         )}
       </AnimatePresence>
 
-      {/* Floating WhatsApp Quick Contact Button (Spec 58) */}
+      {/* Floating WhatsApp Quick Contact Button (Section 49) */}
       <FloatingWhatsApp />
 
-      {/* Deep Black Photo Lightbox (Spec 51) */}
+      {/* Deep Black Photo Lightbox */}
       <ImageLightbox
         isOpen={isLightboxOpen}
         onClose={() => setIsLightboxOpen(false)}

@@ -79,7 +79,7 @@ export const MediaView = ({ onBackHome, onOpenPhoto }) => {
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        padding: 'clamp(5rem, 8vw, 7rem) 1.5rem clamp(4rem, 6vw, 6rem) 1.5rem',
+        padding: 'clamp(6.5rem, 10vw, 8.5rem) 1.25rem clamp(4rem, 6vw, 6rem) 1.25rem',
         minHeight: '85vh'
       }}
     >

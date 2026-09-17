@@ -61,7 +61,21 @@ export const MobileMenu = ({
               paddingBottom: '0.85rem'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <button
+              type="button"
+              onClick={() => handleItemClick('home')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.65rem',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                textAlign: 'left'
+              }}
+              aria-label="StarX Live Home"
+            >
               <BrandLogo size={28} />
               <span
                 style={{
@@ -74,9 +88,10 @@ export const MobileMenu = ({
               >
                 STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
               </span>
-            </div>
+            </button>
 
             <button
+              id="mobile-menu-close-button"
               onClick={onClose}
               aria-label="Close navigation"
               style={{
@@ -110,6 +125,7 @@ export const MobileMenu = ({
               return (
                 <button
                   key={link.name}
+                  id={`mobile-nav-link-${link.target}`}
                   onClick={() => handleItemClick(link.target)}
                   style={{
                     fontFamily: "var(--font-body)",

@@ -18,23 +18,38 @@ export const BrandedImage = ({
   style = {},
   objectFit = 'cover',
   objectPosition = 'center center',
-  variant = 'default' // 'default' | 'member'
+  variant = 'default', // 'default' | 'member'
+  priority = false
 }) => {
   const [currentSrc, setCurrentSrc] = useState(src);
   const [hasError, setHasError] = useState(!src);
   const [isLoaded, setIsLoaded] = useState(false);
+  const attemptsRef = React.useRef(new Set());
 
   React.useEffect(() => {
     setCurrentSrc(src);
     setHasError(!src);
     setIsLoaded(false);
+    attemptsRef.current = new Set(src ? [src] : []);
   }, [src]);
 
   const handleImageError = () => {
-    if (currentSrc && currentSrc.endsWith('.jpg')) {
-      setCurrentSrc(currentSrc.replace(/\.jpg$/, '.jpeg'));
-    } else if (currentSrc && currentSrc.endsWith('.jpeg')) {
-      setCurrentSrc(currentSrc.replace(/\.jpeg$/, '.png'));
+    if (!currentSrc) {
+      setHasError(true);
+      return;
+    }
+    let nextSrc = null;
+    if (currentSrc.endsWith('.jpg')) {
+      nextSrc = currentSrc.replace(/\.jpg$/, '.png');
+    } else if (currentSrc.endsWith('.png')) {
+      nextSrc = currentSrc.replace(/\.png$/, '.jpeg');
+    } else if (currentSrc.endsWith('.jpeg')) {
+      nextSrc = currentSrc.replace(/\.jpeg$/, '.jpg');
+    }
+
+    if (nextSrc && !attemptsRef.current.has(nextSrc)) {
+      attemptsRef.current.add(nextSrc);
+      setCurrentSrc(nextSrc);
     } else {
       setHasError(true);
     }
@@ -243,7 +258,7 @@ export const BrandedImage = ({
             opacity: isLoaded ? 1 : 0,
             transition: 'opacity 0.4s ease'
           }}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
         />
       ) : null}
     </div>

@@ -41,6 +41,8 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
       {isOpen && member && (
         <motion.div
           key="member-detail-modal"
+          id="member-detail-modal"
+          className="member-detail-modal-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -83,8 +85,10 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
           >
             {/* Close Button */}
             <button
+              id="modal-close-button"
+              className="member-detail-modal-close"
               onClick={onClose}
-              aria-label="Close details"
+              aria-label="Close modal"
               style={{
                 position: 'absolute',
                 top: '1.15rem',
@@ -149,6 +153,7 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
                 <div>
                   {/* 1. Member Name: Inter (24px to 28px desktop, 20px to 23px mobile) */}
                   <h3
+                    className="member-detail-modal-title"
                     style={{
                       fontFamily: "var(--font-body)",
                       fontSize: 'clamp(20px, 2.2vw, 26px)',

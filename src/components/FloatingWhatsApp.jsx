@@ -15,8 +15,8 @@ export const FloatingWhatsApp = () => {
     <div
       style={{
         position: 'fixed',
-        bottom: '24px',
-        right: '24px',
+        bottom: 'max(20px, calc(env(safe-area-inset-bottom) + 12px))',
+        right: '18px',
         zIndex: 70,
         display: 'flex',
         flexDirection: 'column',

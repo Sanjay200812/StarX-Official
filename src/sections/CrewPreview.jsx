@@ -11,14 +11,18 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * Single click opens member detail modal.
  * Link "View full crew →" navigates to /crew.
  */
-export const CrewPreview = ({ onNavigate }) => {
+export const CrewPreview = ({ onNavigate, onOpenModal }) => {
   const { crew } = siteData;
-  const [modalMember, setModalMember] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localModalMember, setLocalModalMember] = useState(null);
+  const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 
   const handleOpenModal = (person) => {
-    setModalMember(person);
-    setIsModalOpen(true);
+    if (onOpenModal) {
+      onOpenModal(person);
+    } else {
+      setLocalModalMember(person);
+      setIsLocalModalOpen(true);
+    }
   };
 
   const handleViewFullCrew = (e) => {
@@ -134,10 +138,11 @@ export const CrewPreview = ({ onNavigate }) => {
                   src={person.image}
                   alt={`${person.name} - ${person.role}`}
                   aspectRatio="4/5"
-                  fallbackTitle=""
-                  fallbackSubtitle=""
+                  fallbackTitle={person.name}
+                  fallbackSubtitle={person.role}
                   variant="member"
                   objectFit="cover"
+                  priority={true}
                 />
               </div>
 
@@ -247,12 +252,14 @@ export const CrewPreview = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Member Detail Modal */}
-      <MemberDetailModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        member={modalMember}
-      />
+      {/* Fallback local modal if onOpenModal is not provided */}
+      {!onOpenModal && (
+        <MemberDetailModal
+          isOpen={isLocalModalOpen}
+          onClose={() => setIsLocalModalOpen(false)}
+          member={localModalMember}
+        />
+      )}
     </section>
   );
 };

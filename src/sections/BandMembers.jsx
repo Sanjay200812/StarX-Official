@@ -22,14 +22,18 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * - Single click opens artist modal directly
  * - Link "View artist profiles →" navigates to /artists
  */
-export const BandMembers = ({ onNavigate }) => {
+export const BandMembers = ({ onNavigate, onOpenModal }) => {
   const { members } = siteData;
-  const [modalMember, setModalMember] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localModalMember, setLocalModalMember] = useState(null);
+  const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 
   const handleOpenModal = (member) => {
-    setModalMember(member);
-    setIsModalOpen(true);
+    if (onOpenModal) {
+      onOpenModal(member);
+    } else {
+      setLocalModalMember(member);
+      setIsLocalModalOpen(true);
+    }
   };
 
   const handleViewAllArtists = (e) => {
@@ -162,10 +166,11 @@ export const BandMembers = ({ onNavigate }) => {
                   src={member.image}
                   alt={`${member.name} - ${member.role}`}
                   aspectRatio="4/5"
-                  fallbackTitle=""
-                  fallbackSubtitle=""
+                  fallbackTitle={member.name}
+                  fallbackSubtitle={member.role}
                   variant="member"
                   objectFit="cover"
+                  priority={index < 3}
                   style={{
                     width: '100%',
                     height: '100%'
@@ -274,12 +279,14 @@ export const BandMembers = ({ onNavigate }) => {
         </a>
       </div>
 
-      {/* Member Profile Modal */}
-      <MemberDetailModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        member={modalMember}
-      />
+      {/* Fallback local modal if onOpenModal is not provided */}
+      {!onOpenModal && (
+        <MemberDetailModal
+          isOpen={isLocalModalOpen}
+          onClose={() => setIsLocalModalOpen(false)}
+          member={localModalMember}
+        />
+      )}
     </section>
   );
 };

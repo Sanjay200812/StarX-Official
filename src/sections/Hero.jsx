@@ -8,27 +8,33 @@ import BrandLogo from '../components/BrandLogo';
  * Hero Section
  * Fully restored editorial landing for StarX Live with clean GSAP timeline sequencing.
  *
- * Requirements:
- * 1. Restored full Hero content:
- *    - Top small StarX circular logo
- *    - Small glass pill: • ROCK BAND • HYDERABAD
- *    - Main title: STARX LIVE (STAR white, X red #B3131B, LIVE white)
- *    - Subtitle below: ROCK BAND
- *    - Tagline: Lost in the Noise. Found in the Sound.
- *    - Buttons: Watch Performance & Contact StarX →
- *    - Bottom metadata: CLASSIC • ROCK • WESTERN / TELUGU • HINDI / HYDERABAD
- * 2. Hero container is ALWAYS opacity: 1, visibility: visible (no permanent hiding)
- * 3. Individual child elements start at opacity: 0 and specific offsets
- * 4. Zero ScrollTrigger conflicts (Hero is above the fold)
- * 5. Single GSAP timeline (paused: true)
- * 6. Explicit resetHeroAnimation() and playHeroFromStart() using restart(true)
- * 7. Debug logging: "Hero reset", "Hero play from 0"
+ * Rules (Sections 19-33):
+ * 1. Mounted and laid out before intro ends (zero layout pop).
+ * 2. FIRST ENTRY ONLY:
+ *    - Starting offsets:
+ *      logo: opacity 0, y -10
+ *      pill: opacity 0, y 10
+ *      title: opacity 0, y 20
+ *      subtitle: opacity 0, y 12
+ *      tagline: opacity 0, y 12
+ *      buttons: opacity 0, y 14
+ *      metadata: opacity 0, y 10
+ *    - Plays GSAP timeline from 0 once intro finishes or skip is pressed.
+ *    - On complete: triggers onEntryComplete() which marks starxHeroEntryPlayed = true.
+ * 3. RETURN VISITS (starxHeroEntryPlayed === true):
+ *    - Immediately renders all elements in final state (opacity: 1, transform: none).
+ *    - ZERO GSAP timeline is created or played. Instant display.
+ * 4. Refined mobile typography & compact button styling.
  */
-
-export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
+export const Hero = ({
+  onNavigate,
+  isReady = false,
+  firstEntry = false,
+  onEntryComplete
+}) => {
   const { brand } = siteData;
 
-  // Element refs for GSAP orchestration
+  // Element refs
   const sectionRef = useRef(null);
   const logoRef = useRef(null);
   const pillRef = useRef(null);
@@ -38,98 +44,87 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
   const buttonsRef = useRef(null);
   const metadataRef = useRef(null);
   const timelineRef = useRef(null);
-  const isMountedRef = useRef(true);
 
-  // Helper to reset Hero to exact initial state (Requirement 8)
-  const resetHeroAnimation = () => {
-    if (timelineRef.current) {
-      timelineRef.current.pause(0);
+  // If returning to home (not first entry), elements are immediately final
+  const isFinalState = !firstEntry;
+
+  useEffect(() => {
+    // If not first entry, do NOT build or run timeline
+    if (isFinalState) {
+      const elements = [
+        logoRef.current,
+        pillRef.current,
+        titleRef.current,
+        subtitleRef.current,
+        taglineRef.current,
+        buttonsRef.current,
+        metadataRef.current
+      ];
+      elements.forEach((el) => {
+        if (el) {
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+        }
+      });
+      return;
     }
 
-    // Explicit initial positions (Requirement 3 & 8)
-    if (logoRef.current) gsap.set(logoRef.current, { opacity: 0, y: -12 });
-    if (pillRef.current) gsap.set(pillRef.current, { opacity: 0, y: 12 });
-    if (titleRef.current) gsap.set(titleRef.current, { opacity: 0, y: 24, scale: 0.985 });
-    if (subtitleRef.current) gsap.set(subtitleRef.current, { opacity: 0, y: 14 });
-    if (taglineRef.current) gsap.set(taglineRef.current, { opacity: 0, y: 14 });
-    if (buttonsRef.current) gsap.set(buttonsRef.current, { opacity: 0, y: 16 });
-    if (metadataRef.current) gsap.set(metadataRef.current, { opacity: 0, y: 12 });
-  };
+    // FIRST ENTRY:
+    // Set explicit starting state
+    if (logoRef.current) gsap.set(logoRef.current, { opacity: 0, y: -10 });
+    if (pillRef.current) gsap.set(pillRef.current, { opacity: 0, y: 10 });
+    if (titleRef.current) gsap.set(titleRef.current, { opacity: 0, y: 20 });
+    if (subtitleRef.current) gsap.set(subtitleRef.current, { opacity: 0, y: 12 });
+    if (taglineRef.current) gsap.set(taglineRef.current, { opacity: 0, y: 12 });
+    if (buttonsRef.current) gsap.set(buttonsRef.current, { opacity: 0, y: 14 });
+    if (metadataRef.current) gsap.set(metadataRef.current, { opacity: 0, y: 10 });
 
-  // Helper to play Hero animation from zero (Requirement 9)
-  const playHeroFromStart = () => {
-    resetHeroAnimation();
+    // Only start timeline once intro has finished/skipped
+    if (!isReady) return;
 
-    requestAnimationFrame(() => {
-      if (timelineRef.current && isMountedRef.current) {
-        timelineRef.current.restart(true);
+    const tl = gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        if (onEntryComplete) {
+          onEntryComplete();
+        }
       }
     });
-  };
 
-  // Build the GSAP timeline on mount (Requirements 5, 6, 7)
-  useEffect(() => {
-    isMountedRef.current = true;
-
-    // Build timeline with paused: true (Requirement 5)
-    const tl = gsap.timeline({
-      paused: true
-    });
-
-    // Sequence (Requirements 6 & 7):
-    // 0.00s: logo starts (opacity 0 -> 1, y -12 -> 0)
-    // 0.10s: small pill starts (opacity 0 -> 1, y 12 -> 0)
-    // 0.20s: STARX LIVE starts (opacity 0 -> 1, y 24 -> 0, scale 0.985 -> 1)
-    // 0.35s: ROCK BAND starts (opacity 0 -> 1, y 14 -> 0)
-    // 0.48s: tagline starts (opacity 0 -> 1, y 14 -> 0)
-    // 0.62s: buttons start (opacity 0 -> 1, y 16 -> 0)
-    // 0.78s: metadata starts (opacity 0 -> 1, y 12 -> 0)
     if (logoRef.current) {
-      tl.fromTo(logoRef.current, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.00);
+      tl.to(logoRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.00);
     }
     if (pillRef.current) {
-      tl.fromTo(pillRef.current, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.10);
+      tl.to(pillRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.10);
     }
     if (titleRef.current) {
-      tl.fromTo(titleRef.current, { opacity: 0, y: 24, scale: 0.985 }, { opacity: 1, y: 0, scale: 1, duration: 0.75, ease: 'power3.out' }, 0.20);
+      tl.to(titleRef.current, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.20);
     }
     if (subtitleRef.current) {
-      tl.fromTo(subtitleRef.current, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.35);
+      tl.to(subtitleRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.32);
     }
     if (taglineRef.current) {
-      tl.fromTo(taglineRef.current, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.70, ease: 'power3.out' }, 0.48);
+      tl.to(taglineRef.current, { opacity: 1, y: 0, duration: 0.60, ease: 'power3.out' }, 0.44);
     }
     if (buttonsRef.current) {
-      tl.fromTo(buttonsRef.current, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.62);
+      tl.to(buttonsRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.58);
     }
     if (metadataRef.current) {
-      tl.fromTo(metadataRef.current, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.78);
+      tl.to(metadataRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.72);
     }
 
     timelineRef.current = tl;
 
-    // Reset to start values immediately
-    resetHeroAnimation();
-
-    // If already ready on mount (e.g. session without intro), play immediately
-    if (isReady) {
-      playHeroFromStart();
-    }
+    // Small delay to ensure intro fade starts smoothly
+    const frameId = requestAnimationFrame(() => {
+      tl.restart(true);
+    });
 
     return () => {
-      isMountedRef.current = false;
+      cancelAnimationFrame(frameId);
       tl.kill();
     };
-  }, []);
-
-  // React to isReady or animationKey changes (Requirements 9, 10, 21, 22)
-  useEffect(() => {
-    if (!isReady) {
-      resetHeroAnimation();
-    } else {
-      playHeroFromStart();
-    }
-  }, [isReady, animationKey]);
+  }, [firstEntry, isReady, isFinalState, onEntryComplete]);
 
   const handleWatchPerformance = () => {
     if (DEMO_PERFORMANCE_URL) {
@@ -143,6 +138,13 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
     }
   };
 
+  // Base style for initial state vs final state
+  const getInitialStyle = () => ({
+    opacity: isFinalState ? 1 : 0,
+    transform: isFinalState ? 'none' : undefined,
+    willChange: isFinalState ? 'auto' : 'transform, opacity'
+  });
+
   return (
     <section
       ref={sectionRef}
@@ -155,7 +157,7 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 'clamp(4rem, 7vw, 6rem) 1.5rem clamp(3rem, 4vw, 4.5rem) 1.5rem',
+        padding: 'clamp(4.5rem, 8vw, 6.5rem) 1.25rem clamp(2.5rem, 4vw, 4rem) 1.25rem',
         overflow: 'hidden',
         opacity: 1,
         visibility: 'visible'
@@ -177,7 +179,8 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
           style={{
             display: 'flex',
             justifyContent: 'center',
-            marginBottom: '1.25rem'
+            marginBottom: '1rem',
+            ...getInitialStyle()
           }}
         >
           <BrandLogo
@@ -203,8 +206,9 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             fontWeight: 600,
             color: '#A1A1A6',
             letterSpacing: '0.1em',
-            marginBottom: '1.25rem',
-            textTransform: 'uppercase'
+            marginBottom: '1.15rem',
+            textTransform: 'uppercase',
+            ...getInitialStyle()
           }}
         >
           <span
@@ -224,13 +228,14 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             ref={titleRef}
             style={{
               fontFamily: 'var(--font-editorial)',
-              fontSize: 'clamp(34px, 5.2vw, 54px)',
+              fontSize: 'clamp(38px, 10vw, 52px)',
               fontWeight: 650,
               letterSpacing: '-0.02em',
               lineHeight: 1.05,
               color: '#F5F5F7',
               margin: '0 auto',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
+              ...getInitialStyle()
             }}
           >
             STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
@@ -240,12 +245,13 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             ref={subtitleRef}
             style={{
               fontFamily: 'var(--font-body)',
-              fontSize: 'clamp(12px, 1.2vw, 15px)',
+              fontSize: 'clamp(12px, 1.2vw, 13px)',
               fontWeight: 600,
               letterSpacing: '0.18em',
               color: '#8E8E93',
               textTransform: 'uppercase',
-              marginTop: '0.35rem'
+              marginTop: '0.35rem',
+              ...getInitialStyle()
             }}
           >
             ROCK BAND
@@ -258,13 +264,14 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
           style={{
             fontFamily: 'var(--font-editorial)',
             fontStyle: 'italic',
-            fontSize: 'clamp(14px, 1.6vw, 16.5px)',
+            fontSize: 'clamp(14px, 1.6vw, 16px)',
             fontWeight: 400,
             letterSpacing: '-0.01em',
             color: '#D1D1D6',
             lineHeight: 1.45,
-            maxWidth: '620px',
-            margin: '0 auto 1.75rem auto'
+            maxWidth: '600px',
+            margin: '0 auto 1.65rem auto',
+            ...getInitialStyle()
           }}
         >
           “{brand.tagline || 'Lost in the Noise. Found in the Sound.'}”
@@ -279,7 +286,8 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             justifyContent: 'center',
             gap: '0.75rem',
             flexWrap: 'wrap',
-            marginBottom: '2.5rem'
+            marginBottom: '2.25rem',
+            ...getInitialStyle()
           }}
         >
           {/* Watch Performance Button */}
@@ -287,16 +295,16 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             type="button"
             id="hero-watch-performance-btn"
             onClick={handleWatchPerformance}
-            className="btn btn-primary"
+            className="btn btn-primary hero-action-btn"
             style={{
-              height: '40px',
-              padding: '0 20px',
-              fontSize: '13px',
+              padding: '14px 20px',
+              fontSize: 'clamp(14px, 1vw, 15px)',
               fontWeight: 500,
-              gap: '0.45rem'
+              gap: '0.5rem',
+              borderRadius: '999px'
             }}
           >
-            <Play size={13} fill="#FFFFFF" />
+            <Play size={14} fill="#FFFFFF" />
             <span>Watch Performance</span>
           </button>
 
@@ -305,17 +313,17 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             type="button"
             id="hero-contact-starx-btn"
             onClick={handleContactStarX}
-            className="btn btn-glass"
+            className="btn btn-glass hero-action-btn"
             style={{
-              height: '40px',
-              padding: '0 20px',
-              fontSize: '13px',
+              padding: '14px 18px',
+              fontSize: 'clamp(14px, 1vw, 15px)',
               fontWeight: 500,
-              gap: '0.45rem'
+              gap: '0.5rem',
+              borderRadius: '999px'
             }}
           >
             <span>Contact StarX</span>
-            <ArrowRight size={13} />
+            <ArrowRight size={14} />
           </button>
         </div>
 
@@ -327,11 +335,12 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
             flexDirection: 'column',
             alignItems: 'center',
             gap: '0.35rem',
-            fontSize: 'clamp(11px, 1vw, 12.5px)',
+            fontSize: 'clamp(11px, 1vw, 12px)',
             fontWeight: 500,
             color: '#8E8E93',
             letterSpacing: '0.08em',
-            textTransform: 'uppercase'
+            textTransform: 'uppercase',
+            ...getInitialStyle()
           }}
         >
           <div style={{ color: '#A1A1A6' }}>{brand.genresDisplay || 'CLASSIC • ROCK • WESTERN'}</div>
@@ -342,6 +351,16 @@ export const Hero = ({ onNavigate, isReady = false, animationKey = 0 }) => {
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 420px) {
+          .hero-action-btn {
+            width: 100%;
+            max-width: 280px;
+            justify-content: center;
+          }
+        }
+      `}</style>
     </section>
   );
 };

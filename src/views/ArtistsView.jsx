@@ -9,15 +9,24 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * ArtistsView Component
  * Dedicated "/artists" page view.
  * Displays all 7 StarX live musicians in a clean, spacious layout.
+ *
+ * Rules:
+ * - Preloads first-row visible images (priority={index < 3}).
+ * - Safe top padding clearance from sticky navbar.
+ * - Central modal opening coordination for mobile back gesture.
  */
-export const ArtistsView = ({ onBackHome }) => {
+export const ArtistsView = ({ onBackHome, onOpenModal }) => {
   const { members } = siteData;
-  const [modalMember, setModalMember] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localModalMember, setLocalModalMember] = useState(null);
+  const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 
   const handleOpenModal = (member) => {
-    setModalMember(member);
-    setIsModalOpen(true);
+    if (onOpenModal) {
+      onOpenModal(member);
+    } else {
+      setLocalModalMember(member);
+      setIsLocalModalOpen(true);
+    }
   };
 
   return (
@@ -27,11 +36,11 @@ export const ArtistsView = ({ onBackHome }) => {
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        padding: 'clamp(5rem, 8vw, 7rem) 1.5rem clamp(4rem, 6vw, 6rem) 1.5rem',
+        padding: 'clamp(6.5rem, 10vw, 8.5rem) 1.25rem clamp(4rem, 6vw, 6rem) 1.25rem',
         minHeight: '85vh'
       }}
     >
-      <div className="container" style={{ maxWidth: '1180px' }}>
+      <div className="container" style={{ maxWidth: '1180px', margin: '0 auto' }}>
         {/* Back to Home Button */}
         <button
           onClick={onBackHome}
@@ -42,7 +51,8 @@ export const ArtistsView = ({ onBackHome }) => {
             fontSize: '12.5px',
             fontWeight: 500,
             marginBottom: '2rem',
-            gap: '0.4rem'
+            gap: '0.4rem',
+            cursor: 'pointer'
           }}
         >
           <ArrowLeft size={14} />
@@ -50,7 +60,7 @@ export const ArtistsView = ({ onBackHome }) => {
         </button>
 
         {/* View Header */}
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'clamp(2.5rem, 5vw, 3.5rem)' }}>
           <div className="label-accent" style={{ marginBottom: '0.65rem', fontSize: '12px' }}>
             <span className="label-accent-dot" />
             CORE LIVE LINEUP
@@ -59,11 +69,11 @@ export const ArtistsView = ({ onBackHome }) => {
           <h1
             className="editorial-heading"
             style={{
-              fontSize: 'clamp(32px, 4vw, 46px)',
+              fontSize: 'clamp(28px, 6vw, 42px)',
               fontWeight: 600,
               letterSpacing: '-0.015em',
               color: '#F5F5F7',
-              lineHeight: 1.1,
+              lineHeight: 1.08,
               margin: '0 0 0.65rem 0'
             }}
           >
@@ -73,7 +83,7 @@ export const ArtistsView = ({ onBackHome }) => {
           <p
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: 'clamp(14px, 1.1vw, 15.5px)',
+              fontSize: 'clamp(13.5px, 1.1vw, 15px)',
               color: '#A1A1A6',
               maxWidth: '540px',
               margin: '0 auto',
@@ -101,6 +111,8 @@ export const ArtistsView = ({ onBackHome }) => {
             return (
               <div
                 key={member.id}
+                id={`artist-card-${member.id}`}
+                className="artist-card"
                 onClick={() => handleOpenModal(member)}
                 role="button"
                 tabIndex={0}
@@ -152,10 +164,11 @@ export const ArtistsView = ({ onBackHome }) => {
                     src={member.image}
                     alt={`${member.name} - ${member.role}`}
                     aspectRatio="4/5"
-                    fallbackTitle=""
-                    fallbackSubtitle=""
+                    fallbackTitle={member.name}
+                    fallbackSubtitle={member.role}
                     variant="member"
                     objectFit="cover"
+                    priority={index < 3}
                     style={{ width: '100%', height: '100%' }}
                   />
 
@@ -231,12 +244,14 @@ export const ArtistsView = ({ onBackHome }) => {
         </div>
       </div>
 
-      {/* Member Profile Modal */}
-      <MemberDetailModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        member={modalMember}
-      />
+      {/* Fallback local modal if onOpenModal is not passed */}
+      {!onOpenModal && (
+        <MemberDetailModal
+          isOpen={isLocalModalOpen}
+          onClose={() => setIsLocalModalOpen(false)}
+          member={localModalMember}
+        />
+      )}
     </motion.div>
   );
 };

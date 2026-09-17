@@ -17,14 +17,18 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * - B. Balu (Producer)
  * - Real bios, Instagram links, and single-click modal.
  */
-export const CrewView = ({ onBackHome }) => {
+export const CrewView = ({ onBackHome, onOpenModal }) => {
   const { crew } = siteData;
-  const [modalMember, setModalMember] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localModalMember, setLocalModalMember] = useState(null);
+  const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 
   const handleOpenModal = (person) => {
-    setModalMember(person);
-    setIsModalOpen(true);
+    if (onOpenModal) {
+      onOpenModal(person);
+    } else {
+      setLocalModalMember(person);
+      setIsLocalModalOpen(true);
+    }
   };
 
   return (
@@ -34,7 +38,7 @@ export const CrewView = ({ onBackHome }) => {
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        padding: 'clamp(5rem, 8vw, 7rem) 1.5rem clamp(4rem, 6vw, 6rem) 1.5rem',
+        padding: 'clamp(6.5rem, 10vw, 8.5rem) 1.25rem clamp(4rem, 6vw, 6rem) 1.25rem',
         minHeight: '85vh'
       }}
     >
@@ -103,6 +107,8 @@ export const CrewView = ({ onBackHome }) => {
           {crew.map((person) => (
             <div
               key={person.id}
+              id={`crew-card-${person.id}`}
+              className="crew-card"
               onClick={() => handleOpenModal(person)}
               role="button"
               tabIndex={0}
@@ -150,10 +156,11 @@ export const CrewView = ({ onBackHome }) => {
                   src={person.image}
                   alt={`${person.name} - ${person.role}`}
                   aspectRatio="4/5"
-                  fallbackTitle=""
-                  fallbackSubtitle=""
+                  fallbackTitle={person.name}
+                  fallbackSubtitle={person.role}
                   variant="member"
                   objectFit="cover"
+                  priority={true}
                 />
               </div>
 
@@ -232,12 +239,14 @@ export const CrewView = ({ onBackHome }) => {
         </div>
       </div>
 
-      {/* Member Profile Modal */}
-      <MemberDetailModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        member={modalMember}
-      />
+      {/* Fallback local modal if onOpenModal is not provided */}
+      {!onOpenModal && (
+        <MemberDetailModal
+          isOpen={isLocalModalOpen}
+          onClose={() => setIsLocalModalOpen(false)}
+          member={localModalMember}
+        />
+      )}
     </motion.div>
   );
 };
