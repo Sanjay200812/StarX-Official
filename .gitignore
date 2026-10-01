@@ -26,3 +26,4 @@ dist-ssr
 # Temporary and preview artifacts
 scratch/
 preview*.png
+public/assets/videos/originals_backup/
