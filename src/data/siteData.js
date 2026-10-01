@@ -13,7 +13,7 @@ import { crew } from './crew';
 export const DEMO_PERFORMANCE_URL = "https://www.youtube.com/@starxliveband";
 
 export const WHATSAPP_PREFILLED_MESSAGE =
-  "Hi StarX Live, I would like to enquire about booking the band for an event. Please share your availability and booking details.";
+  "Hello StarX Live,\n\nI would like to enquire about booking your band for an event.\n\nThank you.";
 
 const ENCODED_WA_MESSAGE = encodeURIComponent(WHATSAPP_PREFILLED_MESSAGE);
 
