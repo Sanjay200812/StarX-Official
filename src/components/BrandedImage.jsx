@@ -23,23 +23,18 @@ export const BrandedImage = ({
 }) => {
   const [currentSrc, setCurrentSrc] = useState(src);
   const [hasError, setHasError] = useState(!src);
-  const [isLoaded, setIsLoaded] = useState(false);
   const imgRef = React.useRef(null);
 
   React.useEffect(() => {
     setCurrentSrc(src);
     setHasError(!src);
 
-    if (!src) {
-      setIsLoaded(false);
-      return;
-    }
+    if (!src) return;
 
-    // Check if image is already cached/complete in DOM
-    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
-      setIsLoaded(true);
-    } else {
-      setIsLoaded(false);
+    // If the image is already cached, keep it visible immediately. The real
+    // image is never hidden behind an onLoad-dependent opacity gate.
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth === 0) {
+      setHasError(true);
     }
   }, [src]);
 
@@ -239,7 +234,7 @@ export const BrandedImage = ({
           alt={alt}
           decoding="async"
           loading={priority ? 'eager' : 'lazy'}
-          onLoad={() => setIsLoaded(true)}
+          fetchPriority={priority ? 'high' : 'auto'}
           onError={handleImageError}
           style={{
             position: 'absolute',
@@ -250,8 +245,7 @@ export const BrandedImage = ({
             objectPosition,
             display: 'block',
             zIndex: 2,
-            opacity: isLoaded ? 1 : 0,
-            transition: 'opacity 0.3s ease'
+            opacity: 1
           }}
         />
       ) : null}
