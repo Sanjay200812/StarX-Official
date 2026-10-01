@@ -12,7 +12,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
  * - Real media events: canplay, playing, ended, error
  * - Play failure / 4.5s load timeout: graceful fallback transition to Home (no 15s wait)
  * - Cancel load timeout as soon as 'playing' fires
- * - sessionStorage.starxIntroPlayed is set ONLY when ended or skipped
+ * - Runs on every full document load; SPA route changes do not remount it
  */
 export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplete }) => {
   // 1. Viewport-accurate source selection (Spec 17)
@@ -47,15 +47,6 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
     if (videoRef.current) {
       try {
         videoRef.current.pause();
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    // CRITICAL (Spec 14): Only set starxIntroPlayed if genuine play ended or user skipped
-    if (source === 'ended' || source === 'skip') {
-      try {
-        sessionStorage.setItem('starxIntroPlayed', 'true');
       } catch (e) {
         // ignore
       }
@@ -127,6 +118,13 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
     }, 4500);
 
     const onCanPlay = () => {
+      // Always begin the intro from frame zero.
+      try {
+        video.currentTime = 0;
+      } catch (e) {
+        // ignore
+      }
+
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
