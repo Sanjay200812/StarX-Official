@@ -41,7 +41,7 @@ export const Footer = ({ onNavigate }) => {
       style={{
         backgroundColor: '#050505',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        padding: 'clamp(2.5rem, 4.5vw, 3.75rem) 1.5rem 2rem 1.5rem',
+        padding: 'clamp(2rem, 3.5vw, 3rem) 1.5rem 1.5rem 1.5rem',
         position: 'relative',
         zIndex: 10
       }}
@@ -52,8 +52,8 @@ export const Footer = ({ onNavigate }) => {
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '2.5rem',
-            paddingBottom: '2.5rem',
+            gap: '2rem',
+            paddingBottom: '2rem',
             borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
           }}
         >
@@ -269,7 +269,7 @@ export const Footer = ({ onNavigate }) => {
         {/* Bottom Bar: Social Icons & Copyright */}
         <div
           style={{
-            paddingTop: '1.75rem',
+            paddingTop: '1.35rem',
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
