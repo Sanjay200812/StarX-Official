@@ -216,7 +216,7 @@ export const PerformancesView = ({ onBackHome }) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
             gap: 'clamp(1.5rem, 3vw, 2rem)'
           }}
         >
@@ -346,15 +346,12 @@ export const PerformancesView = ({ onBackHome }) => {
 
       <style>{`
         @media (max-width: 580px) {
-          .featured-performance-card {
-            width: calc(100% - 24px) !important;
-            max-width: 540px !important;
-            margin-inline: auto !important;
-          }
+          .featured-performance-card,
           .performance-grid-card {
-            width: calc(100% - 24px) !important;
-            max-width: 540px !important;
-            margin-inline: auto !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            margin-inline: 0 !important;
           }
           .performance-cta-btn {
             width: 100% !important;
