@@ -126,8 +126,9 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
               }}
               aria-label={`View profile for ${member.name} - ${member.role}`}
               style={{
-                flex: '0 0 240px',
+                flex: '1 1 220px',
                 maxWidth: '260px',
+                minWidth: 0,
                 width: '100%',
                 aspectRatio: '4 / 5',
                 position: 'relative',
