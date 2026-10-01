@@ -691,3 +691,40 @@ html.intro-active {
 
 
 
+
+
+/* ====================================================================
+   MASTER DEVELOPMENT PASS: RESPONSIVE SAFETY
+   Prevent card/CTA overflow without changing the visual design.
+   ==================================================================== */
+#root {
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+.artist-card,
+.crew-card,
+.performance-grid-card,
+.featured-performance-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 580px) {
+  .container {
+    width: calc(100% - 20px);
+    padding-inline: 0.25rem;
+  }
+
+  .btn {
+    max-width: 100%;
+  }
+
+  .artist-card,
+  .crew-card,
+  .performance-grid-card,
+  .featured-performance-card {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}

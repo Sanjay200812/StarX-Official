@@ -52,38 +52,8 @@ function ViewLoader() {
 }
 
 export function App() {
-  // Intro State backed by sessionStorage (Sections 21-29)
-  const hasIntroPlayed = () => {
-    try {
-      if (typeof window !== 'undefined' && window.location.search.includes('nointro')) {
-        return true;
-      }
-      if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
-        sessionStorage.removeItem('starxIntroPlayed');
-        sessionStorage.removeItem('starxHeroEntryPlayed');
-        return false;
-      }
-      return sessionStorage.getItem('starxIntroPlayed') === 'true';
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const hasHeroEntryPlayed = () => {
-    try {
-      if (typeof window !== 'undefined' && window.location.search.includes('nointro')) {
-        return true;
-      }
-      if (typeof window !== 'undefined' && window.location.search.includes('intro')) {
-        return false;
-      }
-      return sessionStorage.getItem('starxHeroEntryPlayed') === 'true';
-    } catch (e) {
-      return false;
-    }
-  };
-
-  // Dedicated Route / View State (Sections 1-4)
+  // Intro lifecycle is intentionally in-memory only:
+  // every full page load starts with the intro, while SPA navigation never replays it.
   const [currentView, setCurrentView] = useState(() => {
     try {
       const path = window.location.pathname.replace(/^\//, '').toLowerCase();
@@ -97,22 +67,9 @@ export function App() {
     return 'home';
   });
 
-  // Direct visit to non-home route (/artists, /crew, etc.) should never be blocked by intro (Specs 46-48)
-  const isDirectNonHome = typeof window !== 'undefined' && (() => {
-    const path = window.location.pathname.replace(/^\//, '').toLowerCase();
-    const validViews = ['about', 'artists', 'performances', 'media', 'events', 'crew', 'contact'];
-    return validViews.includes(path);
-  })();
-
-  const [introFinished, setIntroFinished] = useState(() => {
-    if (isDirectNonHome) return true;
-    return hasIntroPlayed();
-  });
-  const [showIntroOverlay, setShowIntroOverlay] = useState(() => {
-    if (isDirectNonHome) return false;
-    return !hasIntroPlayed();
-  });
-  const [heroEntryPlayed, setHeroEntryPlayed] = useState(hasHeroEntryPlayed);
+  const [introFinished, setIntroFinished] = useState(false);
+  const [showIntroOverlay, setShowIntroOverlay] = useState(true);
+  const [heroEntryPlayed, setHeroEntryPlayed] = useState(false);
   const isFinishingIntroRef = useRef(false);
 
   // Reusable routing scroll reset hook (Sections 52-54)
@@ -237,12 +194,6 @@ export function App() {
     document.documentElement.style.overflow = '';
     document.body.style.overflow = '';
 
-    try {
-      sessionStorage.setItem('starxIntroPlayed', 'true');
-    } catch (e) {
-      // ignore
-    }
-
     window.scrollTo({
       top: 0,
       left: 0,
@@ -279,11 +230,6 @@ export function App() {
 
   // Hero entrance completion callback (Section 27)
   const handleHeroEntryComplete = useCallback(() => {
-    try {
-      sessionStorage.setItem('starxHeroEntryPlayed', 'true');
-    } catch (e) {
-      // ignore
-    }
     setHeroEntryPlayed(true);
   }, []);
 
@@ -337,35 +283,54 @@ export function App() {
 
   // Central Direct Navigation Handler (Sections 1-4)
   const handleNavigate = useCallback((target) => {
-    // If mobile menu was open when navigating, close it cleanly
+    const hadMenuHistory = hasMenuHistoryRef.current;
+    const hadModalHistory = hasModalHistoryRef.current;
+    const hadOverlayHistory = hadMenuHistory || hadModalHistory;
+
     if (isMobileMenuOpenRef.current) {
       setIsMobileMenuOpen(false);
+      isMobileMenuOpenRef.current = false;
       hasMenuHistoryRef.current = false;
     }
-    // If modal was open, close it
+
     if (activeMemberModalRef.current) {
       setActiveMemberModal(null);
+      activeMemberModalRef.current = null;
       hasModalHistoryRef.current = false;
     }
 
     const currentPath = window.location.pathname.replace(/^\//, '').toLowerCase();
     const targetPath = target === 'home' ? '' : target;
 
-    // If already on the requested route, don't push duplicate history entry
+    // Selecting the current route from the mobile menu should consume the
+    // menu-only history entry instead of leaving a duplicate route behind.
     if (currentPath === targetPath) {
       setCurrentView(target);
+      if (hadMenuHistory) {
+        isClosingViaUiRef.current = true;
+        try {
+          window.history.back();
+        } catch (e) {
+          // ignore
+        }
+      }
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       return;
     }
 
     setCurrentView(target);
     try {
-      window.history.pushState(null, '', `/${targetPath}`);
+      // A menu/modal creates a temporary same-URL history entry. Replace that
+      // entry with the destination so Android back returns to the real prior page.
+      if (hadOverlayHistory) {
+        window.history.replaceState(null, '', `/${targetPath}`);
+      } else {
+        window.history.pushState(null, '', `/${targetPath}`);
+      }
     } catch (e) {
       // ignore
     }
 
-    // Scroll restoration: always start at the top on navigation
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
 

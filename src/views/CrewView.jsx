@@ -12,9 +12,10 @@ import MemberDetailModal from '../components/MemberDetailModal';
  *
  * Specifications:
  * - Bodoni Moda for "BEHIND STARX"
- * - B. Josh (Manager & Event Organizer | Primary Contact)
- * - B. Sanjay (Digital Media & Creative Director)
- * - B. Balu (Producer)
+ * - Josh (Manager & Event Organizer | Primary Contact)
+ * - Sanjay (Digital Media & Creative Director)
+ * - Balu (Producer)
+ * - Chandra Mohan (Bass Guitar)
  * - Real bios, Instagram links, and single-click modal.
  */
 export const CrewView = ({ onBackHome, onOpenModal }) => {
@@ -69,7 +70,7 @@ export const CrewView = ({ onBackHome, onOpenModal }) => {
           <h1
             className="editorial-heading"
             style={{
-              fontSize: 'clamp(32px, 4vw, 46px)',
+              fontSize: 'clamp(28px, 4vw, 40px)',
               fontWeight: 600,
               letterSpacing: '-0.015em',
               color: '#F5F5F7',
@@ -98,12 +99,12 @@ export const CrewView = ({ onBackHome, onOpenModal }) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))',
             gap: '1.75rem',
             justifyContent: 'center'
           }}
         >
-          {crew.map((person) => (
+          {crew.map((person, index) => (
             <div
               key={person.id}
               id={`crew-card-${person.id}`}
@@ -159,7 +160,7 @@ export const CrewView = ({ onBackHome, onOpenModal }) => {
                   fallbackSubtitle={person.role}
                   variant="member"
                   objectFit="cover"
-                  priority={true}
+                  priority={index < 2}
                 />
               </div>
 
