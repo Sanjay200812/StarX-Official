@@ -7,7 +7,7 @@ import MemberDetailModal from '../components/MemberDetailModal';
 /**
  * CrewPreview Section (Home)
  * "BEHIND STARX"
- * Compact 3-card preview: Josh, Sanjay, Balu.
+ * Compact crew preview sourced from the central roster.
  * Single click opens member detail modal.
  * Link "View full crew →" navigates to /crew.
  */
@@ -81,7 +81,7 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
             gap: '1.5rem',
             maxWidth: '960px',
             margin: '0 auto 2rem auto'
@@ -141,7 +141,7 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
                   fallbackSubtitle={person.role}
                   variant="member"
                   objectFit="cover"
-                  priority={true}
+                  priority={false}
                 />
               </div>
 

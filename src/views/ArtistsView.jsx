@@ -11,7 +11,7 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * Displays all 7 StarX live musicians in a clean, spacious layout.
  *
  * Rules:
- * - Preloads first-row visible images (priority={index < 4}).
+ * - Preloads first-row visible images (priority={index < 2}).
  * - Safe top padding clearance from sticky navbar.
  * - Central modal opening coordination for mobile back gesture.
  */
@@ -124,8 +124,9 @@ export const ArtistsView = ({ onBackHome, onOpenModal }) => {
                 }}
                 aria-label={`View profile for ${member.name} - ${member.role}`}
                 style={{
-                  flex: '0 0 260px',
+                  flex: '1 1 240px',
                   maxWidth: '270px',
+                  minWidth: 0,
                   width: '100%',
                   aspectRatio: '4 / 5',
                   position: 'relative',

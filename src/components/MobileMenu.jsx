@@ -23,9 +23,12 @@ export const MobileMenu = ({
   const [isContactPanelOpen, setIsContactPanelOpen] = useState(false);
 
   const handleItemClick = (target) => {
-    onClose();
+    // App owns route + history coordination. Calling onClose() first would
+    // trigger history.back() and race the destination navigation on Android.
     if (onNavigate) {
       onNavigate(target, 'view');
+    } else {
+      onClose();
     }
   };
 
