@@ -4,9 +4,10 @@ import { siteData } from '../data/siteData';
 
 /**
  * Global responsive background manager.
- * Home owns the looping video. Every other route owns the static band image.
- * The Home video is mounted during the intro only so it can preload; it is
- * explicitly paused at 0 until the intro has fully exited.
+ * Home displays the looping background video.
+ * Every route retains an underlying responsive stage photograph so there is ZERO black screen.
+ * The video starts seamlessly with native autoPlay, muted, and playsInline,
+ * fading in when ready and pausing when away from Home to conserve resources.
  */
 export const SiteBackground = ({ currentView = 'home', isIntroActive = false }) => {
   const isMobile = useIsMobile();
@@ -35,60 +36,41 @@ export const SiteBackground = ({ currentView = 'home', isIntroActive = false }) 
     return () => mediaQuery.removeListener(handler);
   }, []);
 
-  const playHomeFromStart = useCallback(() => {
+  const playHomeVideo = useCallback(() => {
     const video = videoRef.current;
     if (!video || !isHome || isIntroActive || isPrefersReducedMotion) return;
 
+    video.defaultMuted = true;
     video.muted = true;
     video.playsInline = true;
-
-    try {
-      video.pause();
-      video.currentTime = 0;
-    } catch (e) {
-      // Some browsers can briefly reject seeking before metadata is ready.
-    }
 
     const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise
         .then(() => setIsVideoLoaded(true))
-        .catch(() => {
-          // Muted inline autoplay should normally succeed; keep the black
-          // fallback if a browser policy still blocks playback.
+        .catch((err) => {
+          console.warn('[SiteBackground] Playback deferred or blocked:', err);
         });
     }
   }, [isHome, isIntroActive, isPrefersReducedMotion]);
 
+  // Handle video playback across intro state, routes, and motion preferences
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    setIsVideoLoaded(false);
+    video.defaultMuted = true;
     video.muted = true;
     video.playsInline = true;
 
-    if (isIntroActive || isPrefersReducedMotion) {
+    if (isIntroActive || isPrefersReducedMotion || !isHome) {
       video.pause();
-      try {
-        video.currentTime = 0;
-      } catch (e) {
-        // ignore until metadata exists
-      }
-      return;
-    }
-
-    if (video.readyState >= 2) {
-      playHomeFromStart();
     } else {
-      try {
-        video.load();
-      } catch (e) {
-        // ignore
-      }
+      playHomeVideo();
     }
-  }, [currentVideoSrc, isIntroActive, isPrefersReducedMotion, playHomeFromStart]);
+  }, [currentVideoSrc, isHome, isIntroActive, isPrefersReducedMotion, playHomeVideo]);
 
+  // Tab visibility: pause when hidden, resume when visible on Home
   useEffect(() => {
     const handleVisibilityChange = () => {
       const video = videoRef.current;
@@ -97,13 +79,13 @@ export const SiteBackground = ({ currentView = 'home', isIntroActive = false }) 
       if (document.hidden) {
         video.pause();
       } else if (isHome && !isIntroActive && !isPrefersReducedMotion) {
-        video.play().catch(() => {});
+        playHomeVideo();
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isHome, isIntroActive, isPrefersReducedMotion]);
+  }, [isHome, isIntroActive, isPrefersReducedMotion, playHomeVideo]);
 
   const overlayColor = isHome
     ? (isMobile ? 'rgba(0, 0, 0, 0.64)' : 'rgba(0, 0, 0, 0.58)')
@@ -124,53 +106,45 @@ export const SiteBackground = ({ currentView = 'home', isIntroActive = false }) 
         backgroundColor: '#050505'
       }}
     >
-      {!isHome && (
-        <img
-          src={staticImageSrc}
-          alt=""
-          width="1920"
-          height="1080"
-          decoding="async"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            display: 'block',
-            zIndex: 1
-          }}
-          loading="eager"
-        />
-      )}
+      {/* 1. Underlying Static Responsive Stage Image (Always present to eliminate any black screen) */}
+      <img
+        src={staticImageSrc}
+        alt=""
+        width="1920"
+        height="1080"
+        decoding="async"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center',
+          display: 'block',
+          zIndex: 1
+        }}
+        loading="eager"
+      />
 
-      {isHome && !isPrefersReducedMotion && (
+      {/* 2. Home Video Layer */}
+      {!isPrefersReducedMotion && (
         <video
           ref={videoRef}
           key={currentVideoSrc}
           src={currentVideoSrc}
-          preload="metadata"
+          autoPlay
           muted
           loop
           playsInline
-          onLoadedMetadata={() => {
-            const video = videoRef.current;
-            if (video && isIntroActive) {
-              video.pause();
-              try {
-                video.currentTime = 0;
-              } catch (e) {
-                // ignore
-              }
-            }
-          }}
+          preload="auto"
+          onPlaying={() => setIsVideoLoaded(true)}
           onCanPlay={() => {
             setIsVideoLoaded(true);
-            if (!isIntroActive) {
-              playHomeFromStart();
+            if (!isIntroActive && isHome) {
+              playHomeVideo();
             }
           }}
+          onLoadedData={() => setIsVideoLoaded(true)}
           style={{
             position: 'absolute',
             inset: 0,
@@ -180,12 +154,13 @@ export const SiteBackground = ({ currentView = 'home', isIntroActive = false }) 
             objectPosition: 'center',
             display: 'block',
             zIndex: 2,
-            opacity: isVideoLoaded && !isIntroActive ? 1 : 0,
+            opacity: isHome && isVideoLoaded && !isIntroActive ? 1 : 0,
             transition: 'opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1)'
           }}
         />
       )}
 
+      {/* 3. Dark Overlay for readability */}
       <div
         className="site-background-overlay"
         style={{
