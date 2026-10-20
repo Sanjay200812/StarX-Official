@@ -15,7 +15,6 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * - Josh (Manager & Event Organizer | Primary Contact)
  * - Sanjay (Digital Media & Creative Director)
  * - Balu (Producer)
- * - Chandra Mohan (Bass Guitar)
  * - Real bios, Instagram links, and single-click modal.
  */
 export const CrewView = ({ onBackHome, onOpenModal }) => {

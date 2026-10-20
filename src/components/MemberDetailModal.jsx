@@ -24,15 +24,15 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
 
     if (isOpen) {
       scrollPosRef.current = window.scrollY;
+      document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
     }
 
     return () => {
+      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
-      // Ensure scroll position is strictly preserved
-      if (scrollPosRef.current) {
-        window.scrollTo(0, scrollPosRef.current);
-      }
     };
   }, [isOpen, onClose]);
 

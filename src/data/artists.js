@@ -39,7 +39,7 @@ export const artists = [
     id: 4,
     name: "N. Thirapatiyya",
     role: "Lead Guitar",
-    image: null,
+    image: "/assets/artists/N. Thirapatiyya.png",
     bio: "Profile details will be updated soon.",
     instagram: ""
   },

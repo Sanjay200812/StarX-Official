@@ -44,16 +44,6 @@ He works with the team to manage production activities and helps ensure every pe
     instagramLabel: "",
     instagramUrl: "",
     isCrew: true
-  },
-  {
-    id: 4,
-    name: "Chandra Mohan",
-    role: "Bass Guitar",
-    image: "/assets/artists/e-chandra-mohan.png",
-    bio: "Profile details will be updated soon.",
-    instagramLabel: "",
-    instagramUrl: "",
-    isCrew: true
   }
 ];
 

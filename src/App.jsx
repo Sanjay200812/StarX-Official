@@ -56,7 +56,7 @@ export function App() {
   // every full page load starts with the intro, while SPA navigation never replays it.
   const [currentView, setCurrentView] = useState(() => {
     try {
-      const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
       const validViews = ['about', 'artists', 'performances', 'media', 'events', 'crew', 'contact'];
       if (validViews.includes(path)) {
         return path;
@@ -90,6 +90,7 @@ export function App() {
   const isClosingViaUiRef = useRef(false);
   const hasModalHistoryRef = useRef(false);
   const hasMenuHistoryRef = useRef(false);
+  const hasLightboxHistoryRef = useRef(false);
 
   // Keep refs synchronized for immediate synchronous access in popstate
   useEffect(() => {
@@ -108,7 +109,22 @@ export function App() {
     setLightboxItems(items);
     setLightboxIndex(index);
     setIsLightboxOpen(true);
+    try {
+      window.history.pushState({ starxLightbox: true }, '', window.location.href);
+      hasLightboxHistoryRef.current = true;
+    } catch (e) {
+      // ignore
+    }
   };
+
+  const closeLightbox = useCallback(() => {
+    if (hasLightboxHistoryRef.current) {
+      hasLightboxHistoryRef.current = false;
+      isClosingViaUiRef.current = true;
+      window.history.back();
+    }
+    setIsLightboxOpen(false);
+  }, []);
 
   // Coordinated Member Modal Handlers (Sections 5-10, 48)
   const openMemberModal = useCallback((member) => {
@@ -258,13 +274,14 @@ export function App() {
 
       // 4. Priority 3: Open Lightbox -> Close it, stay on page
       if (isLightboxOpenRef.current) {
+        hasLightboxHistoryRef.current = false;
         setIsLightboxOpen(false);
         return;
       }
 
       // 5. Otherwise: Normal Route Navigation!
       try {
-        const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+        const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
         const validViews = ['about', 'artists', 'performances', 'media', 'events', 'crew', 'contact'];
         if (validViews.includes(path)) {
           setCurrentView(path);
@@ -285,7 +302,8 @@ export function App() {
   const handleNavigate = useCallback((target) => {
     const hadMenuHistory = hasMenuHistoryRef.current;
     const hadModalHistory = hasModalHistoryRef.current;
-    const hadOverlayHistory = hadMenuHistory || hadModalHistory;
+    const hadLightboxHistory = hasLightboxHistoryRef.current;
+    const hadOverlayHistory = hadMenuHistory || hadModalHistory || hadLightboxHistory;
 
     if (isMobileMenuOpenRef.current) {
       setIsMobileMenuOpen(false);
@@ -299,14 +317,21 @@ export function App() {
       hasModalHistoryRef.current = false;
     }
 
-    const currentPath = window.location.pathname.replace(/^\//, '').toLowerCase();
+    if (isLightboxOpenRef.current) {
+      setIsLightboxOpen(false);
+      isLightboxOpenRef.current = false;
+      hasLightboxHistoryRef.current = false;
+    }
+
+    const currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    const cleanCurrentPath = currentPath === 'home' ? '' : currentPath;
     const targetPath = target === 'home' ? '' : target;
 
     // Selecting the current route from the mobile menu should consume the
     // menu-only history entry instead of leaving a duplicate route behind.
-    if (currentPath === targetPath) {
+    if (cleanCurrentPath === targetPath) {
       setCurrentView(target);
-      if (hadMenuHistory) {
+      if (hadMenuHistory || hadModalHistory || hadLightboxHistory) {
         isClosingViaUiRef.current = true;
         try {
           window.history.back();
@@ -560,7 +585,7 @@ export function App() {
       {/* Deep Black Photo Lightbox */}
       <ImageLightbox
         isOpen={isLightboxOpen}
-        onClose={() => setIsLightboxOpen(false)}
+        onClose={closeLightbox}
         items={lightboxItems}
         currentIndex={lightboxIndex}
         onNavigate={(newIdx) => setLightboxIndex(newIdx)}
