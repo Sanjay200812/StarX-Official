@@ -15,13 +15,6 @@ import {
   RockPageTransition,
   useRockScrollFX
 } from './components/rock/RockFX';
-import {
-  initSmoothScroll,
-  destroySmoothScroll,
-  stopSmoothScroll,
-  startSmoothScroll,
-  resetScroll
-} from './lib/smoothScroll';
 
 // 5 Core Homepage Components (Direct synchronous load for instant Hero render - Spec 39)
 import Hero from './sections/Hero';
@@ -245,7 +238,6 @@ export function App() {
           behavior: 'auto'
         });
 
-        resetScroll();
         // Reveal Home content
         setIntroFinished(true);
       });
@@ -381,22 +373,6 @@ export function App() {
 
   // Global rock scroll choreography (headings, images, cards) for the active view
   useRockScrollFX(currentView, introFinished);
-
-  // Lenis smooth scrolling, synced with GSAP ScrollTrigger
-  useEffect(() => {
-    initSmoothScroll();
-    return () => destroySmoothScroll();
-  }, []);
-
-  // Freeze page scroll while the intro or any overlay is open
-  const isOverlayOpen = showIntroOverlay || Boolean(activeMemberModal) || isMobileMenuOpen || isLightboxOpen;
-  useEffect(() => {
-    if (isOverlayOpen) {
-      stopSmoothScroll();
-    } else {
-      startSmoothScroll();
-    }
-  }, [isOverlayOpen]);
 
   return (
     <div
