@@ -73,7 +73,7 @@ export const BrandIdentity = ({ onOpenPhoto }) => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#B3131B',
+              color: '#E8141C',
               textTransform: 'uppercase',
               marginBottom: '0.75rem'
             }}
@@ -83,7 +83,7 @@ export const BrandIdentity = ({ onOpenPhoto }) => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#B3131B'
+                backgroundColor: '#E8141C'
               }}
             />
             BRAND SHOWCASE
@@ -169,7 +169,7 @@ export const BrandIdentity = ({ onOpenPhoto }) => {
               padding: '12px 24px'
             }}
           >
-            <CreditCard size={16} color="#B3131B" />
+            <CreditCard size={16} color="#E8141C" />
             <span>View Official Visiting Card</span>
             <Eye size={14} color="#737378" />
           </button>
@@ -219,7 +219,7 @@ const ArtworkPanel = ({ item, colSpan, aspectRatio, onClick }) => {
       <motion.div
         style={{
           position: 'relative',
-          borderRadius: '24px',
+          borderRadius: '4px',
           overflow: 'hidden',
           backgroundColor: '#0D0D0F',
           border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -273,7 +273,7 @@ const ArtworkPanel = ({ item, colSpan, aspectRatio, onClick }) => {
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
-                color: '#B3131B',
+                color: '#E8141C',
                 textTransform: 'uppercase',
                 marginBottom: '0.25rem'
               }}

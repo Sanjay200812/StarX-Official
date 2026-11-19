@@ -9,7 +9,7 @@ import { siteData } from '../data/siteData';
  * - Left CTA: "BRING STARX TO YOUR STAGE" with button to /contact
  * - Link Columns: EXPLORE, STARX, CONNECT, BOOKINGS
  * - Modest social icons (32px-38px)
- * - Premium StarX dark styling (#050505 bg, #B3131B accent)
+ * - Premium StarX dark styling (#050505 bg, #E8141C accent)
  */
 export const Footer = ({ onNavigate }) => {
   const { brand, social, contact } = siteData;
@@ -71,7 +71,7 @@ export const Footer = ({ onNavigate }) => {
                     color: '#F5F5F7'
                   }}
                 >
-                  STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
+                  STAR<span style={{ color: '#E8141C' }}>X</span> LIVE
                 </span>
                 <span
                   style={{
@@ -95,7 +95,7 @@ export const Footer = ({ onNavigate }) => {
                 fontWeight: 700,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: '#B3131B',
+                color: '#E8141C',
                 margin: '0 0 0.45rem 0'
               }}
             >
@@ -231,20 +231,20 @@ export const Footer = ({ onNavigate }) => {
               <a
                 href="tel:+917337253898"
                 style={{ color: '#F5F5F7', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8141C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#F5F5F7')}
               >
-                <Phone size={13} style={{ color: '#B3131B' }} />
+                <Phone size={13} style={{ color: '#E8141C' }} />
                 <span>7337253898</span>
               </a>
 
               <a
                 href="tel:+919390754569"
                 style={{ color: '#F5F5F7', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8141C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#F5F5F7')}
               >
-                <Phone size={13} style={{ color: '#B3131B' }} />
+                <Phone size={13} style={{ color: '#E8141C' }} />
                 <span>9390754569</span>
               </a>
 
@@ -254,12 +254,12 @@ export const Footer = ({ onNavigate }) => {
                 onMouseEnter={(e) => (e.currentTarget.style.color = '#F5F5F7')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#8F8F95')}
               >
-                <Mail size={13} style={{ color: '#B3131B' }} />
+                <Mail size={13} style={{ color: '#E8141C' }} />
                 <span>starxliveofficial@gmail.com</span>
               </a>
 
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem' }}>
-                <MapPin size={13} style={{ color: '#B3131B', flexShrink: 0 }} />
+                <MapPin size={13} style={{ color: '#E8141C', flexShrink: 0 }} />
                 <span>HYDERABAD, TS, AP - INDIA</span>
               </div>
             </div>

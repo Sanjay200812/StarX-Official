@@ -85,7 +85,7 @@ export const ContactView = ({ onBackHome }) => {
             backdropFilter: 'blur(18px)',
             WebkitBackdropFilter: 'blur(18px)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '20px',
+            borderRadius: '4px',
             padding: 'clamp(1.75rem, 3.5vw, 3rem)',
             boxShadow: '0 24px 60px rgba(0, 0, 0, 0.45)',
             marginBottom: '3rem'
@@ -99,7 +99,7 @@ export const ContactView = ({ onBackHome }) => {
                 fontSize: '11.5px',
                 fontWeight: 600,
                 letterSpacing: '0.1em',
-                color: '#B3131B',
+                color: '#E8141C',
                 textTransform: 'uppercase',
                 display: 'block',
                 marginBottom: '1.25rem'
@@ -121,7 +121,7 @@ export const ContactView = ({ onBackHome }) => {
                     padding: '1.25rem',
                     backgroundColor: 'rgba(255, 255, 255, 0.03)',
                     border: '1px solid rgba(255, 255, 255, 0.06)',
-                    borderRadius: '14px'
+                    borderRadius: '4px'
                   }}
                 >
                   <div>
@@ -230,10 +230,10 @@ export const ContactView = ({ onBackHome }) => {
                   gap: '0.5rem',
                   transition: 'color 0.2s ease'
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8141C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#F5F5F7')}
               >
-                <Mail size={16} style={{ color: '#B3131B' }} />
+                <Mail size={16} style={{ color: '#E8141C' }} />
                 <span>{contact.email}</span>
               </a>
             </div>
@@ -265,7 +265,7 @@ export const ContactView = ({ onBackHome }) => {
                   gap: '0.5rem'
                 }}
               >
-                <MapPin size={16} style={{ color: '#B3131B' }} />
+                <MapPin size={16} style={{ color: '#E8141C' }} />
                 <span>{contact.location}</span>
               </div>
             </div>
@@ -378,7 +378,7 @@ export const ContactView = ({ onBackHome }) => {
             style={{
               backgroundColor: 'rgba(14, 14, 18, 0.65)',
               border: '1px solid rgba(255, 255, 255, 0.06)',
-              borderRadius: '18px',
+              borderRadius: '4px',
               padding: 'clamp(1.5rem, 3vw, 2.25rem)',
               display: 'flex',
               flexWrap: 'wrap',
@@ -388,7 +388,7 @@ export const ContactView = ({ onBackHome }) => {
             }}
           >
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#B3131B', marginBottom: '0.35rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: '#E8141C', marginBottom: '0.35rem' }}>
                 <QrCode size={15} />
                 <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   INSTANT SCAN
@@ -407,7 +407,7 @@ export const ContactView = ({ onBackHome }) => {
                 width: '96px',
                 height: '96px',
                 backgroundColor: '#FFFFFF',
-                borderRadius: '12px',
+                borderRadius: '4px',
                 padding: '6px',
                 display: 'flex',
                 alignItems: 'center',

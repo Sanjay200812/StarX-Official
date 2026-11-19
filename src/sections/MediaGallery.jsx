@@ -151,7 +151,7 @@ export const MediaGallery = ({ onOpenPhoto }) => {
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
                 border: '1px solid rgba(255, 255, 255, 0.06)',
-                borderRadius: '18px',
+                borderRadius: '4px',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 width: '100%',

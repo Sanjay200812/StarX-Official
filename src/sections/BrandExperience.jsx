@@ -104,7 +104,7 @@ export const BrandExperience = () => {
                 style={{
                   width: '54px',
                   height: '54px',
-                  borderRadius: '12px',
+                  borderRadius: '4px',
                   background: 'rgba(255, 42, 53, 0.15)',
                   border: '1px solid rgba(255, 42, 53, 0.3)',
                   display: 'flex',

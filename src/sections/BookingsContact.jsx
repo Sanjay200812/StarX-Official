@@ -34,7 +34,7 @@ export const BookingsContact = () => {
             backdropFilter: 'blur(18px)',
             WebkitBackdropFilter: 'blur(18px)',
             border: '1px solid rgba(255, 255, 255, 0.07)',
-            borderRadius: '18px',
+            borderRadius: '4px',
             padding: 'clamp(1.75rem, 3.2vw, 2.75rem)',
             boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)'
           }}
@@ -202,10 +202,10 @@ export const BookingsContact = () => {
                   alignItems: 'center',
                   gap: '0.45rem'
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8141C')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = '#F5F5F7')}
               >
-                <Mail size={15} style={{ color: '#B3131B', flexShrink: 0 }} />
+                <Mail size={15} style={{ color: '#E8141C', flexShrink: 0 }} />
                 <span>{contact.email}</span>
               </a>
             </div>
@@ -237,7 +237,7 @@ export const BookingsContact = () => {
                   gap: '0.45rem'
                 }}
               >
-                <MapPin size={15} style={{ color: '#B3131B', flexShrink: 0 }} />
+                <MapPin size={15} style={{ color: '#E8141C', flexShrink: 0 }} />
                 <span>{contact.location}</span>
               </div>
             </div>

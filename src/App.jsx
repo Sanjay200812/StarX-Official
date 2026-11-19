@@ -7,6 +7,21 @@ import FloatingWhatsApp from './components/FloatingWhatsApp';
 import ImageLightbox from './components/ImageLightbox';
 import MemberDetailModal from './components/MemberDetailModal';
 import useScrollToTop from './hooks/useScrollToTop';
+import {
+  RockAtmosphere,
+  RockProgress,
+  RockMarquee,
+  RockStatement,
+  RockPageTransition,
+  useRockScrollFX
+} from './components/rock/RockFX';
+import {
+  initSmoothScroll,
+  destroySmoothScroll,
+  stopSmoothScroll,
+  startSmoothScroll,
+  resetScroll
+} from './lib/smoothScroll';
 
 // 5 Core Homepage Components (Direct synchronous load for instant Hero render - Spec 39)
 import Hero from './sections/Hero';
@@ -43,7 +58,7 @@ function ViewLoader() {
           height: '28px',
           borderRadius: '50%',
           border: '2px solid rgba(255, 255, 255, 0.08)',
-          borderTopColor: '#B3131B',
+          borderTopColor: '#E8141C',
           animation: 'starxSpin 0.8s linear infinite'
         }}
       />
@@ -230,6 +245,7 @@ export function App() {
           behavior: 'auto'
         });
 
+        resetScroll();
         // Reveal Home content
         setIntroFinished(true);
       });
@@ -363,6 +379,25 @@ export function App() {
   const isNavbarReady = introFinished;
   const isIntroActive = !introFinished;
 
+  // Global rock scroll choreography (headings, images, cards) for the active view
+  useRockScrollFX(currentView, introFinished);
+
+  // Lenis smooth scrolling, synced with GSAP ScrollTrigger
+  useEffect(() => {
+    initSmoothScroll();
+    return () => destroySmoothScroll();
+  }, []);
+
+  // Freeze page scroll while the intro or any overlay is open
+  const isOverlayOpen = showIntroOverlay || Boolean(activeMemberModal) || isMobileMenuOpen || isLightboxOpen;
+  useEffect(() => {
+    if (isOverlayOpen) {
+      stopSmoothScroll();
+    } else {
+      startSmoothScroll();
+    }
+  }, [isOverlayOpen]);
+
   return (
     <div
       className="relative min-h-screen"
@@ -373,6 +408,9 @@ export function App() {
     >
       {/* 0. Single Global Fixed Background Layer (Spec 29-32) */}
       <SiteBackground currentView={currentView} isIntroActive={isIntroActive} />
+      <RockAtmosphere />
+      {introFinished && <RockProgress />}
+      <RockPageTransition viewKey={currentView} />
 
       {/* 
         Controlled Website Content Wrapper:
@@ -426,8 +464,14 @@ export function App() {
                   {/* 2. About StarX Preview */}
                   <AboutPreview onNavigate={handleNavigate} />
 
+                  {/* Crossing tape marquee */}
+                  <RockMarquee />
+
                   {/* 3. Best Performance Preview */}
                   <FeaturedPerformances onNavigate={handleNavigate} />
+
+                  {/* Pinned manifesto */}
+                  <RockStatement />
 
                   {/* 4. Artists Preview (Meet StarX) */}
                   <BandMembers
@@ -436,6 +480,11 @@ export function App() {
                   />
 
                   {/* 5. Crew Preview (Behind StarX) */}
+                  <RockMarquee
+                    items={['Drums', 'Bass', 'Lead Guitar', 'Keys', 'Vocals', 'Rhythm']}
+                    altItems={['Real Musicians', 'Real Energy', 'No Playback', 'All Live']}
+                  />
+
                   <CrewPreview
                     onNavigate={handleNavigate}
                     onOpenModal={openMemberModal}

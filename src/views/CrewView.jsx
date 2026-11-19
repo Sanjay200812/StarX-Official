@@ -122,7 +122,7 @@ export const CrewView = ({ onBackHome, onOpenModal }) => {
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
                 border: '1px solid rgba(255, 255, 255, 0.07)',
-                borderRadius: '16px',
+                borderRadius: '4px',
                 padding: '1.25rem',
                 cursor: 'pointer',
                 transition: 'transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
@@ -146,7 +146,7 @@ export const CrewView = ({ onBackHome, onOpenModal }) => {
                   position: 'relative',
                   width: '100%',
                   aspectRatio: '4/5',
-                  borderRadius: '12px',
+                  borderRadius: '4px',
                   overflow: 'hidden',
                   marginBottom: '1.15rem'
                 }}
@@ -184,7 +184,7 @@ export const CrewView = ({ onBackHome, onOpenModal }) => {
                     fontFamily: "var(--font-body)",
                     fontSize: '12.5px',
                     fontWeight: 500,
-                    color: '#B3131B',
+                    color: '#E8141C',
                     lineHeight: 1.35,
                     marginBottom: '0.85rem'
                   }}

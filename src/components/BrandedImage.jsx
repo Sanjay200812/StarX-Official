@@ -87,7 +87,7 @@ export const BrandedImage = ({
               pointerEvents: 'none'
             }}
           >
-            <svg viewBox="0 0 100 100" fill="#B3131B">
+            <svg viewBox="0 0 100 100" fill="#E8141C">
               <polygon points="50,4 62,35 95,35 68,55 78,88 50,68 22,88 32,55 5,35 38,35" />
             </svg>
           </div>
@@ -153,7 +153,7 @@ export const BrandedImage = ({
                 fontSize: '0.78rem',
                 fontWeight: 600,
                 letterSpacing: '0.08em',
-                color: '#B3131B',
+                color: '#E8141C',
                 textTransform: 'uppercase'
               }}
             >
@@ -193,7 +193,7 @@ export const BrandedImage = ({
               marginBottom: '1rem'
             }}
           >
-            <svg viewBox="0 0 100 100" fill="#B3131B" style={{ width: '22px', height: '22px' }}>
+            <svg viewBox="0 0 100 100" fill="#E8141C" style={{ width: '22px', height: '22px' }}>
               <polygon points="50,5 63,35 95,36 69,57 78,89 50,70 22,89 31,57 5,36 37,35" />
             </svg>
           </div>

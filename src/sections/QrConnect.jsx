@@ -37,7 +37,7 @@ export const QrConnect = () => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#B3131B',
+              color: '#E8141C',
               textTransform: 'uppercase',
               marginBottom: '0.75rem'
             }}
@@ -47,7 +47,7 @@ export const QrConnect = () => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#B3131B'
+                backgroundColor: '#E8141C'
               }}
             />
             OFFICIAL CHANNELS
@@ -95,7 +95,7 @@ export const QrConnect = () => {
               style={{
                 backgroundColor: '#FFFFFF',
                 padding: '2rem',
-                borderRadius: '24px',
+                borderRadius: '4px',
                 display: 'inline-block',
                 boxShadow: '0 16px 45px rgba(0, 0, 0, 0.6)'
               }}
@@ -163,7 +163,7 @@ export const QrConnect = () => {
                 textDecoration: 'none',
                 transition: 'color 0.25s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#E8141C')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
             >
               <div>
@@ -209,7 +209,7 @@ export const QrConnect = () => {
                 textDecoration: 'none',
                 transition: 'color 0.25s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#E8141C')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
             >
               <div>
@@ -255,7 +255,7 @@ export const QrConnect = () => {
                 textDecoration: 'none',
                 transition: 'color 0.25s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#B3131B')}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#E8141C')}
               onMouseLeave={(e) => (e.currentTarget.style.color = 'inherit')}
             >
               <div>

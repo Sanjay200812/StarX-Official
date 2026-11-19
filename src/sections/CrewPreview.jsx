@@ -91,6 +91,7 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
             <div
               key={person.id}
               onClick={() => handleOpenModal(person)}
+              className="rock-card rock-card--panel"
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -104,7 +105,7 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
                 border: '1px solid rgba(255, 255, 255, 0.07)',
-                borderRadius: '16px',
+                borderRadius: '4px',
                 padding: '1.15rem',
                 cursor: 'pointer',
                 transition: 'transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
@@ -128,7 +129,7 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
                   position: 'relative',
                   width: '100%',
                   aspectRatio: '4 / 5',
-                  borderRadius: '12px',
+                  borderRadius: '4px',
                   overflow: 'hidden',
                   marginBottom: '1rem'
                 }}
@@ -148,6 +149,7 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
               {/* Information */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <h3
+                  className="rock-card-name"
                   style={{
                     fontFamily: "var(--font-body)",
                     fontSize: '18px',
@@ -162,11 +164,12 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
                 </h3>
 
                 <div
+                  className="rock-card-role"
                   style={{
                     fontFamily: "var(--font-body)",
                     fontSize: '12px',
                     fontWeight: 500,
-                    color: '#B3131B',
+                    color: '#E8141C',
                     lineHeight: 1.35,
                     marginBottom: '0.65rem'
                   }}
@@ -232,17 +235,17 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
               fontSize: '13.5px',
               fontWeight: 600,
               textDecoration: 'none',
-              borderBottom: '1px solid rgba(179, 19, 27, 0.8)',
+              borderBottom: '1px solid rgba(232, 20, 28, 0.8)',
               paddingBottom: '2px',
               transition: 'color 0.2s ease, border-color 0.2s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#B3131B';
+              e.currentTarget.style.color = '#E8141C';
               e.currentTarget.style.borderColor = '#FFFFFF';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.color = '#F5F5F7';
-              e.currentTarget.style.borderColor = 'rgba(179, 19, 27, 0.8)';
+              e.currentTarget.style.borderColor = 'rgba(232, 20, 28, 0.8)';
             }}
           >
             <span>View team details</span>

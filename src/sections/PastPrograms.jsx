@@ -37,7 +37,7 @@ export const PastPrograms = ({ onOpenMoment }) => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#B3131B',
+              color: '#E8141C',
               textTransform: 'uppercase',
               marginBottom: '0.75rem'
             }}
@@ -47,7 +47,7 @@ export const PastPrograms = ({ onOpenMoment }) => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#B3131B'
+                backgroundColor: '#E8141C'
               }}
             />
             PERFORMANCE ARCHIVE
@@ -126,7 +126,7 @@ const EventRow = ({ event, index, onOpenMoment }) => {
             fontFamily: "var(--font-body)",
             fontSize: '1rem',
             fontWeight: 700,
-            color: isHovered ? '#B3131B' : '#737378',
+            color: isHovered ? '#E8141C' : '#737378',
             width: '28px',
             transition: 'color 0.25s ease'
           }}
@@ -160,7 +160,7 @@ const EventRow = ({ event, index, onOpenMoment }) => {
                 fontSize: '0.92rem'
               }}
             >
-              <MapPin size={14} color={isHovered ? '#B3131B' : '#737378'} />
+              <MapPin size={14} color={isHovered ? '#E8141C' : '#737378'} />
               <span>
                 {event.venue}, {event.location}
               </span>
@@ -172,7 +172,7 @@ const EventRow = ({ event, index, onOpenMoment }) => {
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : -8 }}
             transition={{ duration: 0.25 }}
-            style={{ color: '#B3131B' }}
+            style={{ color: '#E8141C' }}
           >
             <ArrowRight size={18} />
           </motion.div>
@@ -191,7 +191,7 @@ const EventRow = ({ event, index, onOpenMoment }) => {
             fontWeight: 500
           }}
         >
-          <Calendar size={15} color={isHovered ? '#B3131B' : '#737378'} />
+          <Calendar size={15} color={isHovered ? '#E8141C' : '#737378'} />
           <span>{event.date}</span>
         </div>
 

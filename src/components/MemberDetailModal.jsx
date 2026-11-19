@@ -77,7 +77,7 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
               border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '24px',
+              borderRadius: '4px',
               boxShadow: '0 30px 80px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
               overflow: 'hidden',
               maxHeight: '90vh'
@@ -174,7 +174,7 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
                       fontSize: 'clamp(12.5px, 1.1vw, 14px)',
                       fontWeight: 500,
                       letterSpacing: '0.01em',
-                      color: '#B3131B',
+                      color: '#E8141C',
                       marginBottom: '1.25rem',
                       lineHeight: 1.4,
                       overflowWrap: 'break-word',
@@ -279,7 +279,7 @@ export const MemberDetailModal = ({ isOpen, onClose, member }) => {
                           aria-label={`Open Instagram profile for ${member.name}`}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                            <Instagram size={16} color="#B3131B" />
+                            <Instagram size={16} color="#E8141C" />
                             <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left', lineHeight: 1.2 }}>
                               <span
                                 style={{

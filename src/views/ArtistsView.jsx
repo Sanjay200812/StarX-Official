@@ -130,7 +130,7 @@ export const ArtistsView = ({ onBackHome, onOpenModal }) => {
                   width: '100%',
                   aspectRatio: '4 / 5',
                   position: 'relative',
-                  borderRadius: '16px',
+                  borderRadius: '4px',
                   overflow: 'hidden',
                   backgroundColor: 'rgba(14, 14, 17, 0.75)',
                   border: '1px solid rgba(255, 255, 255, 0.07)',
@@ -205,7 +205,7 @@ export const ArtistsView = ({ onBackHome, onOpenModal }) => {
                       fontSize: '11px',
                       fontWeight: 600,
                       letterSpacing: '0.12em',
-                      color: '#B3131B',
+                      color: '#E8141C',
                       marginBottom: '0.2rem',
                       textTransform: 'uppercase'
                     }}

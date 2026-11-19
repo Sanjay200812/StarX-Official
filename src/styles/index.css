@@ -7,7 +7,7 @@
 
 :root {
   /* Premium Dark Palette (80% black/dark, 15% white/grey, 5% red) */
-  --bg-main: #050505;
+  --bg-main: #0A0606;
   --bg-secondary: #0A0A0A;
   --bg-surface: rgba(16, 16, 18, 0.52);
   --bg-surface-elevated: #111113;
@@ -18,8 +18,10 @@
   --text-muted: #737378;
 
   /* StarX Accent Red - Controlled (5% Balance) */
-  --red-accent: #B3131B;
-  --red-hover: #C91620;
+  --red-accent: #E8141C;
+  --red-hover: #FF2A2F;
+  --red-deep: #7A0A0E;
+  --amber: #FFB547;
 
   /* Smoked Glass Defaults */
   --glass-bg: rgba(14, 14, 16, 0.44);
@@ -29,8 +31,9 @@
   --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
   /* Modern Editorial Typography (Headings: Bodoni Moda, Body: Inter) */
-  --font-editorial: 'Bodoni Moda', 'Times New Roman', serif;
-  --font-heading: 'Bodoni Moda', 'Times New Roman', serif;
+  --font-editorial: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+  --font-heading: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-system: var(--font-body);
 
@@ -157,7 +160,7 @@ body {
 }
 
 ::selection {
-  background-color: rgba(179, 19, 27, 0.35);
+  background-color: rgba(232, 20, 28, 0.35);
   color: #FFFFFF;
 }
 
@@ -512,8 +515,8 @@ img, video {
 }
 
 .stage-card:hover {
-  border-color: rgba(179, 19, 27, 0.35);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(179, 19, 27, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(232, 20, 28, 0.35);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(232, 20, 28, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* Red Concert Badge */
@@ -529,9 +532,9 @@ img, video {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #FFFFFF;
-  background: rgba(179, 19, 27, 0.22);
-  border: 1px solid rgba(179, 19, 27, 0.45);
-  box-shadow: 0 0 20px rgba(179, 19, 27, 0.25);
+  background: rgba(232, 20, 28, 0.22);
+  border: 1px solid rgba(232, 20, 28, 0.45);
+  box-shadow: 0 0 20px rgba(232, 20, 28, 0.25);
 }
 
 /* Rock Typography (SectionHeader) */

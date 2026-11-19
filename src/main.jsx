@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import './styles/index.css';
+import './styles/rock.css';
 
 // 1. Disable automatic browser scroll restoration at startup (Requirement 1)
 if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {

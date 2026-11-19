@@ -89,7 +89,7 @@ export const MobileMenu = ({
                   color: '#F5F5F7'
                 }}
               >
-                STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
+                STAR<span style={{ color: '#E8141C' }}>X</span> LIVE
               </span>
             </button>
 
@@ -155,7 +155,7 @@ export const MobileMenu = ({
                         width: '6px',
                         height: '6px',
                         borderRadius: '50%',
-                        backgroundColor: '#B3131B',
+                        backgroundColor: '#E8141C',
                         display: 'inline-block'
                       }}
                     />
@@ -177,7 +177,7 @@ export const MobileMenu = ({
               style={{
                 width: '100%',
                 height: '40px',
-                borderRadius: '12px',
+                borderRadius: '4px',
                 fontSize: '13px',
                 fontWeight: 500,
                 display: 'flex',

@@ -56,7 +56,7 @@ export const AboutStarX = () => {
                 fontSize: '0.8rem',
                 fontWeight: 700,
                 letterSpacing: '0.1em',
-                color: '#B3131B',
+                color: '#E8141C',
                 textTransform: 'uppercase',
                 marginBottom: '1rem'
               }}
@@ -66,7 +66,7 @@ export const AboutStarX = () => {
                   width: '6px',
                   height: '6px',
                   borderRadius: '50%',
-                  backgroundColor: '#B3131B'
+                  backgroundColor: '#E8141C'
                 }}
               />
               ABOUT US
@@ -166,7 +166,7 @@ export const AboutStarX = () => {
                   fontFamily: "var(--font-heading)",
                   fontSize: '1rem',
                   fontWeight: 600,
-                  color: '#B3131B',
+                  color: '#E8141C',
                   letterSpacing: '-0.015em'
                 }}
               >
@@ -219,7 +219,7 @@ export const AboutStarX = () => {
           <motion.div
             style={{
               position: 'relative',
-              borderRadius: '20px',
+              borderRadius: '4px',
               overflow: 'hidden',
               backgroundColor: '#0D0D0F',
               boxShadow: '0 25px 60px rgba(0, 0, 0, 0.55)',
@@ -279,7 +279,7 @@ export const AboutStarX = () => {
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    backgroundColor: '#B3131B'
+                    backgroundColor: '#E8141C'
                   }}
                 />
                 LIVE STAGE PERFORMANCE

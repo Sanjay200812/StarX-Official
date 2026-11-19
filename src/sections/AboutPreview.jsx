@@ -39,7 +39,7 @@ export const AboutPreview = ({ onNavigate }) => {
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
             border: '1px solid rgba(255, 255, 255, 0.07)',
-            borderRadius: '20px',
+            borderRadius: '4px',
             padding: 'clamp(1.75rem, 3.5vw, 2.75rem)',
             boxShadow: '0 20px 48px rgba(0, 0, 0, 0.4)'
           }}
@@ -50,7 +50,7 @@ export const AboutPreview = ({ onNavigate }) => {
               position: 'relative',
               width: '100%',
               aspectRatio: '16/11',
-              borderRadius: '14px',
+              borderRadius: '4px',
               overflow: 'hidden',
               boxShadow: '0 16px 36px rgba(0, 0, 0, 0.5)'
             }}
@@ -109,10 +109,10 @@ export const AboutPreview = ({ onNavigate }) => {
                 paddingTop: '0.5rem'
               }}
             >
-              <Music size={13} style={{ color: '#B3131B' }} />
+              <Music size={13} style={{ color: '#E8141C' }} />
               <span>{brand.genresDisplay}</span>
               <span>•</span>
-              <span style={{ color: '#B3131B', fontWeight: 600 }}>{brand.languagesDisplay}</span>
+              <span style={{ color: '#E8141C', fontWeight: 600 }}>{brand.languagesDisplay}</span>
             </div>
 
             <div style={{ paddingTop: '0.75rem' }}>
@@ -127,17 +127,17 @@ export const AboutPreview = ({ onNavigate }) => {
                   fontSize: '13.5px',
                   fontWeight: 600,
                   textDecoration: 'none',
-                  borderBottom: '1px solid rgba(179, 19, 27, 0.8)',
+                  borderBottom: '1px solid rgba(232, 20, 28, 0.8)',
                   paddingBottom: '2px',
                   transition: 'color 0.2s ease, border-color 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#B3131B';
+                  e.currentTarget.style.color = '#E8141C';
                   e.currentTarget.style.borderColor = '#FFFFFF';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.color = '#F5F5F7';
-                  e.currentTarget.style.borderColor = 'rgba(179, 19, 27, 0.8)';
+                  e.currentTarget.style.borderColor = 'rgba(232, 20, 28, 0.8)';
                 }}
               >
                 <span>Learn more</span>
