@@ -248,7 +248,7 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
           height: 22px;
           border-radius: 50%;
           border: 2px solid rgba(255, 255, 255, 0.08);
-          border-top-color: #B3131B;
+          border-top-color: #E8141C;
           animation: starxSpin 0.9s linear infinite;
         }
       `}</style>
@@ -304,7 +304,7 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
             overflow: 'hidden',
             backgroundColor: '#050505',
             border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 0 40px rgba(179, 19, 27, 0.28), 0 10px 30px rgba(0, 0, 0, 0.8)',
+            boxShadow: '0 0 40px rgba(232, 20, 28, 0.28), 0 10px 30px rgba(0, 0, 0, 0.8)',
             marginBottom: '1.25rem',
             animation: 'starxPulse 2.2s ease-in-out infinite',
             display: 'flex',
@@ -343,7 +343,7 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
               textTransform: 'uppercase'
             }}
           >
-            STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
+            STAR<span style={{ color: '#E8141C' }}>X</span> LIVE
           </span>
 
           <div className="starx-loader-ring" aria-label="Loading..." />

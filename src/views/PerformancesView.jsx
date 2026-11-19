@@ -100,7 +100,7 @@ export const PerformancesView = ({ onBackHome }) => {
             backdropFilter: 'blur(18px)',
             WebkitBackdropFilter: 'blur(18px)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '20px',
+            borderRadius: '4px',
             overflow: 'hidden',
             marginBottom: 'clamp(2.5rem, 5vw, 3.5rem)',
             boxShadow: '0 24px 60px rgba(0, 0, 0, 0.55)'
@@ -143,7 +143,7 @@ export const PerformancesView = ({ onBackHome }) => {
                   fontSize: '11px',
                   fontWeight: 600,
                   letterSpacing: '0.12em',
-                  color: '#B3131B',
+                  color: '#E8141C',
                   textTransform: 'uppercase'
                 }}
               >
@@ -195,12 +195,12 @@ export const PerformancesView = ({ onBackHome }) => {
                   gap: '0.65rem',
                   padding: '13px 22px',
                   borderRadius: '999px',
-                  backgroundColor: 'rgba(179, 19, 27, 0.95)',
+                  backgroundColor: 'rgba(232, 20, 28, 0.95)',
                   color: '#FFFFFF',
                   fontSize: '14px',
                   fontWeight: 600,
                   cursor: 'pointer',
-                  boxShadow: '0 10px 28px rgba(179, 19, 27, 0.35)',
+                  boxShadow: '0 10px 28px rgba(232, 20, 28, 0.35)',
                   transition: 'transform 0.2s ease, background-color 0.2s ease'
                 }}
               >
@@ -227,7 +227,7 @@ export const PerformancesView = ({ onBackHome }) => {
               style={{
                 backgroundColor: 'rgba(14, 14, 18, 0.68)',
                 border: '1px solid rgba(255, 255, 255, 0.07)',
-                borderRadius: '18px',
+                borderRadius: '4px',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
@@ -281,7 +281,7 @@ export const PerformancesView = ({ onBackHome }) => {
                       fontSize: '10.5px',
                       fontWeight: 600,
                       letterSpacing: '0.1em',
-                      color: '#B3131B',
+                      color: '#E8141C',
                       textTransform: 'uppercase',
                       display: 'block',
                       marginBottom: '0.25rem'
@@ -324,7 +324,7 @@ export const PerformancesView = ({ onBackHome }) => {
                   style={{
                     width: '100%',
                     height: '38px',
-                    borderRadius: '10px',
+                    borderRadius: '4px',
                     fontSize: '12.5px',
                     fontWeight: 500,
                     gap: '0.5rem',
@@ -334,7 +334,7 @@ export const PerformancesView = ({ onBackHome }) => {
                     justifyContent: 'center'
                   }}
                 >
-                  <Play size={13} fill="#B3131B" color="#B3131B" />
+                  <Play size={13} fill="#E8141C" color="#E8141C" />
                   <span>Watch Performance</span>
                   <ExternalLink size={12} style={{ color: '#8E8E93' }} />
                 </button>

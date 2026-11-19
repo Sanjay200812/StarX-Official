@@ -119,8 +119,8 @@ export const Navbar = ({
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? 'translateY(0)' : 'translateY(-14px)',
           pointerEvents: isVisible ? 'auto' : 'none',
-          height: isScrolled ? '60px' : '64px',
-          borderRadius: '16px',
+          height: isScrolled ? '58px' : '68px',
+          borderRadius: '4px',
           backgroundColor: isScrolled ? 'rgba(10, 10, 12, 0.90)' : 'rgba(10, 10, 12, 0.75)',
           backdropFilter: 'blur(20px) saturate(115%)',
           WebkitBackdropFilter: 'blur(20px) saturate(115%)',
@@ -157,6 +157,7 @@ export const Navbar = ({
             }}
           >
             <BrandLogo size={30} className="navbar-logo-wrapper" priority />
+            <span className="rock-eq" aria-hidden="true"><i /><i /><i /><i /></span>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem' }}>
               <span
                 className="navbar-brand-title"
@@ -168,7 +169,7 @@ export const Navbar = ({
                   color: '#F5F5F7'
                 }}
               >
-                STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
+                STAR<span style={{ color: '#E8141C' }}>X</span> LIVE
               </span>
               <span
                 className="navbar-brand-desc"
@@ -232,7 +233,7 @@ export const Navbar = ({
                           width: '14px',
                           height: '2px',
                           borderRadius: '1px',
-                          backgroundColor: '#B3131B'
+                          backgroundColor: '#E8141C'
                         }}
                       />
                     )}

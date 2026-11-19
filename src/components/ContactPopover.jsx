@@ -58,7 +58,7 @@ export const ContactPopover = ({ onClose, isMobile = false }) => {
         backdropFilter: 'blur(24px) saturate(115%)',
         WebkitBackdropFilter: 'blur(24px) saturate(115%)',
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '18px',
+        borderRadius: '4px',
         boxShadow: '0 18px 50px rgba(0, 0, 0, 0.45)',
         padding: '14px 14px 12px 14px',
         zIndex: 100,
@@ -81,7 +81,7 @@ export const ContactPopover = ({ onClose, isMobile = false }) => {
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              backgroundColor: '#B3131B',
+              backgroundColor: '#E8141C',
               display: 'inline-block'
             }}
           />
@@ -232,7 +232,7 @@ export const ContactPopover = ({ onClose, isMobile = false }) => {
                     <span style={{ color: '#F5F5F7', fontWeight: 500 }}>
                       +91 {phone.number}
                     </span>
-                    <ExternalLink size={11} style={{ color: '#B3131B' }} />
+                    <ExternalLink size={11} style={{ color: '#E8141C' }} />
                   </a>
                 ))}
               </motion.div>
@@ -297,7 +297,7 @@ export const ContactPopover = ({ onClose, isMobile = false }) => {
                     <span style={{ color: '#F5F5F7', fontWeight: 500 }}>
                       +91 {phone.number}
                     </span>
-                    <Phone size={11} style={{ color: '#B3131B' }} />
+                    <Phone size={11} style={{ color: '#E8141C' }} />
                   </a>
                 ))}
               </motion.div>
@@ -389,7 +389,7 @@ const rowStyle = {
   alignItems: 'center',
   gap: '10px',
   padding: '7px 9px',
-  borderRadius: '12px',
+  borderRadius: '4px',
   textDecoration: 'none',
   background: 'transparent',
   border: 'none',

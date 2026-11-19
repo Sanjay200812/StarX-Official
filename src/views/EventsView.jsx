@@ -88,7 +88,7 @@ export const EventsView = ({ onBackHome }) => {
             backgroundColor: 'rgba(14, 14, 18, 0.72)',
             backdropFilter: 'blur(18px)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '20px',
+            borderRadius: '4px',
             padding: 'clamp(2rem, 4vw, 3.25rem)',
             textAlign: 'center',
             marginBottom: '4rem',
@@ -102,8 +102,8 @@ export const EventsView = ({ onBackHome }) => {
               gap: '0.4rem',
               padding: '5px 14px',
               borderRadius: '999px',
-              backgroundColor: 'rgba(179, 19, 27, 0.15)',
-              border: '1px solid rgba(179, 19, 27, 0.35)',
+              backgroundColor: 'rgba(232, 20, 28, 0.15)',
+              border: '1px solid rgba(232, 20, 28, 0.35)',
               color: '#FFFFFF',
               fontSize: '11px',
               fontWeight: 600,
@@ -112,7 +112,7 @@ export const EventsView = ({ onBackHome }) => {
               marginBottom: '1.25rem'
             }}
           >
-            <Calendar size={12} style={{ color: '#B3131B' }} />
+            <Calendar size={12} style={{ color: '#E8141C' }} />
             <span>UPCOMING SHOWCASE</span>
           </div>
 
@@ -135,7 +135,7 @@ export const EventsView = ({ onBackHome }) => {
               fontFamily: "var(--font-body)",
               fontSize: 'clamp(14px, 1.4vw, 17px)',
               fontWeight: 600,
-              color: '#B3131B',
+              color: '#E8141C',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               marginBottom: '1rem'
@@ -197,7 +197,7 @@ export const EventsView = ({ onBackHome }) => {
                 style={{
                   backgroundColor: 'rgba(14, 14, 18, 0.65)',
                   border: '1px solid rgba(255, 255, 255, 0.06)',
-                  borderRadius: '16px',
+                  borderRadius: '4px',
                   overflow: 'hidden'
                 }}
               >
@@ -217,7 +217,7 @@ export const EventsView = ({ onBackHome }) => {
                       fontSize: '11px',
                       fontWeight: 600,
                       letterSpacing: '0.08em',
-                      color: '#B3131B',
+                      color: '#E8141C',
                       textTransform: 'uppercase',
                       marginBottom: '0.25rem'
                     }}

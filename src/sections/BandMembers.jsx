@@ -116,6 +116,7 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
             <div
               key={member.id}
               onClick={() => handleOpenModal(member)}
+              className="rock-card"
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -132,7 +133,7 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
                 width: '100%',
                 aspectRatio: '4 / 5',
                 position: 'relative',
-                borderRadius: '16px',
+                borderRadius: '4px',
                 overflow: 'hidden',
                 backgroundColor: 'rgba(14, 14, 17, 0.75)',
                 border: '1px solid rgba(255, 255, 255, 0.07)',
@@ -205,12 +206,13 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
                 }}
               >
                 <span
+                  className="rock-card-num"
                   style={{
                     fontFamily: "var(--font-body)",
                     fontSize: '10.5px',
                     fontWeight: 600,
                     letterSpacing: '0.12em',
-                    color: '#B3131B',
+                    color: '#E8141C',
                     marginBottom: '0.2rem',
                     textTransform: 'uppercase'
                   }}
@@ -219,6 +221,7 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
                 </span>
 
                 <div
+                  className="rock-card-name"
                   style={{
                     fontSize: 'clamp(17px, 3.5vw, 19px)',
                     fontWeight: 600,
@@ -232,6 +235,7 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
                 </div>
 
                 <div
+                  className="rock-card-role"
                   style={{
                     fontFamily: "var(--font-body)",
                     fontSize: '12px',
@@ -262,17 +266,17 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
             fontSize: '13.5px',
             fontWeight: 600,
             textDecoration: 'none',
-            borderBottom: '1px solid rgba(179, 19, 27, 0.8)',
+            borderBottom: '1px solid rgba(232, 20, 28, 0.8)',
             paddingBottom: '2px',
             transition: 'color 0.2s ease, border-color 0.2s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#B3131B';
+            e.currentTarget.style.color = '#E8141C';
             e.currentTarget.style.borderColor = '#FFFFFF';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.color = '#F5F5F7';
-            e.currentTarget.style.borderColor = 'rgba(179, 19, 27, 0.8)';
+            e.currentTarget.style.borderColor = 'rgba(232, 20, 28, 0.8)';
           }}
         >
           <span>View artist profiles</span>

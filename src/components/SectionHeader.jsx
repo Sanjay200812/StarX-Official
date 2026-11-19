@@ -84,7 +84,7 @@ export const SectionHeader = ({
         style={{
           width: '28px',
           height: '2px',
-          backgroundColor: '#B3131B',
+          backgroundColor: '#E8141C',
           marginTop: '1rem',
           borderRadius: '1px',
           transformOrigin: isCenter ? 'center' : 'left'

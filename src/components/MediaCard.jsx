@@ -25,7 +25,7 @@ export const MediaCard = ({ item, onClick }) => {
       style={{
         cursor: 'pointer',
         position: 'relative',
-        borderRadius: '12px',
+        borderRadius: '4px',
         overflow: 'hidden'
       }}
     >

@@ -76,7 +76,7 @@ export const VideoModal = ({ isOpen, onClose, video }) => {
             backdropFilter: 'blur(28px) saturate(120%)',
             WebkitBackdropFilter: 'blur(28px) saturate(120%)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '28px',
+            borderRadius: '4px',
             boxShadow: '0 30px 80px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
             overflow: 'hidden'
           }}
@@ -96,7 +96,7 @@ export const VideoModal = ({ isOpen, onClose, video }) => {
               <span
                 style={{
                   display: 'inline-block',
-                  color: '#B3131B',
+                  color: '#E8141C',
                   fontSize: '0.75rem',
                   fontWeight: 700,
                   letterSpacing: '0.08em',

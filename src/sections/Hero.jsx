@@ -1,364 +1,186 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Play, ArrowRight } from 'lucide-react';
 import { siteData, DEMO_PERFORMANCE_URL } from '../data/siteData';
-import BrandLogo from '../components/BrandLogo';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Hero Section
- * Fully restored editorial landing for StarX Live with clean GSAP timeline sequencing.
+ * Hero — the stage.
  *
- * Rules (Sections 19-33):
- * 1. Mounted and laid out before intro ends (zero layout pop).
- * 2. FIRST ENTRY ONLY:
- *    - Starting offsets:
- *      logo: opacity 0, y -10
- *      pill: opacity 0, y 10
- *      title: opacity 0, y 20
- *      subtitle: opacity 0, y 12
- *      tagline: opacity 0, y 12
- *      buttons: opacity 0, y 14
- *      metadata: opacity 0, y 10
- *    - Plays GSAP timeline from 0 once intro finishes or skip is pressed.
- *    - On complete: triggers onEntryComplete() which marks starxHeroEntryPlayed = true.
- * 3. RETURN VISITS (starxHeroEntryPlayed === true):
- *    - Immediately renders all elements in final state (opacity: 1, transform: none).
- *    - ZERO GSAP timeline is created or played. Instant display.
- * 4. Refined mobile typography & compact button styling.
+ * First visit (after the intro): lights come up, the kicker fades in, the
+ * STARX letters rise out of a mask one by one, the red X lands with a single
+ * flash of stage light, then the sub-line, copy, buttons and footer settle in.
+ * Return visits render the final state instantly.
+ *
+ * On scroll the title block eases back and fades while the lights drift up,
+ * scrubbed through Lenis so it stays perfectly smooth.
  */
-export const Hero = ({
-  onNavigate,
-  isReady = false,
-  firstEntry = false,
-  onEntryComplete
-}) => {
+export const Hero = ({ onNavigate, isReady = false, firstEntry = false, onEntryComplete }) => {
   const { brand } = siteData;
 
-  // Element refs
   const sectionRef = useRef(null);
-  const logoRef = useRef(null);
-  const pillRef = useRef(null);
+  const stageRef = useRef(null);
+  const beamsRef = useRef(null);
+  const glowRef = useRef(null);
+  const kickerRef = useRef(null);
   const titleRef = useRef(null);
-  const subtitleRef = useRef(null);
+  const subRef = useRef(null);
   const taglineRef = useRef(null);
-  const buttonsRef = useRef(null);
-  const metadataRef = useRef(null);
-  const timelineRef = useRef(null);
+  const actionsRef = useRef(null);
+  const footerRef = useRef(null);
 
-  // If returning to home (not first entry), elements are immediately final
   const isFinalState = !firstEntry;
+  const letters = ['S', 'T', 'A', 'R', 'X'];
 
   useEffect(() => {
-    // If not first entry, do NOT build or run timeline
+    const chars = titleRef.current ? titleRef.current.querySelectorAll('.ch') : [];
+    const rules = subRef.current ? subRef.current.querySelectorAll('.rule') : [];
+    const fades = [kickerRef.current, subRef.current, taglineRef.current, actionsRef.current, footerRef.current];
+
     if (isFinalState) {
-      const elements = [
-        logoRef.current,
-        pillRef.current,
-        titleRef.current,
-        subtitleRef.current,
-        taglineRef.current,
-        buttonsRef.current,
-        metadataRef.current
-      ];
-      elements.forEach((el) => {
-        if (el) {
-          el.style.opacity = '1';
-          el.style.transform = 'none';
-        }
+      gsap.set([...chars, ...rules, ...fades, beamsRef.current, glowRef.current], {
+        clearProps: 'opacity,transform,visibility'
       });
-      return;
+      return undefined;
     }
 
-    // FIRST ENTRY:
-    // Set explicit starting state
-    if (logoRef.current) gsap.set(logoRef.current, { opacity: 0, y: -10 });
-    if (pillRef.current) gsap.set(pillRef.current, { opacity: 0, y: 10 });
-    if (titleRef.current) gsap.set(titleRef.current, { opacity: 0, y: 20 });
-    if (subtitleRef.current) gsap.set(subtitleRef.current, { opacity: 0, y: 12 });
-    if (taglineRef.current) gsap.set(taglineRef.current, { opacity: 0, y: 12 });
-    if (buttonsRef.current) gsap.set(buttonsRef.current, { opacity: 0, y: 14 });
-    if (metadataRef.current) gsap.set(metadataRef.current, { opacity: 0, y: 10 });
+    gsap.set([beamsRef.current, glowRef.current], { opacity: 0 });
+    gsap.set(chars, { yPercent: 110 });
+    gsap.set(rules, { scaleX: 0 });
+    gsap.set(fades, { opacity: 0, y: 24 });
 
-    // Only start timeline once intro has finished/skipped
-    if (!isReady) return;
+    if (!isReady) return undefined;
 
     const tl = gsap.timeline({
       paused: true,
-      onComplete: () => {
-        if (onEntryComplete) {
-          onEntryComplete();
-        }
-      }
+      defaults: { ease: 'expo.out' },
+      onComplete: () => onEntryComplete && onEntryComplete()
     });
 
-    if (logoRef.current) {
-      tl.to(logoRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.00);
-    }
-    if (pillRef.current) {
-      tl.to(pillRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.10);
-    }
-    if (titleRef.current) {
-      tl.to(titleRef.current, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out' }, 0.20);
-    }
-    if (subtitleRef.current) {
-      tl.to(subtitleRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.32);
-    }
-    if (taglineRef.current) {
-      tl.to(taglineRef.current, { opacity: 1, y: 0, duration: 0.60, ease: 'power3.out' }, 0.44);
-    }
-    if (buttonsRef.current) {
-      tl.to(buttonsRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.58);
-    }
-    if (metadataRef.current) {
-      tl.to(metadataRef.current, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' }, 0.72);
-    }
+    tl.to(beamsRef.current, { opacity: 1, duration: 1.6, ease: 'power2.out' }, 0)
+      .to(kickerRef.current, { opacity: 1, y: 0, duration: 1 }, 0.15)
+      .to(chars, { yPercent: 0, duration: 1.3, stagger: 0.075 }, 0.25)
+      // the X lands: one warm flash of red light
+      .fromTo(glowRef.current, { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 1.4, ease: 'power3.out' }, 0.75)
+      .to(subRef.current, { opacity: 1, y: 0, duration: 1 }, 0.85)
+      .to(rules, { scaleX: 1, duration: 1.2, ease: 'power4.inOut' }, 0.85)
+      .to(taglineRef.current, { opacity: 1, y: 0, duration: 1 }, 1.0)
+      .to(actionsRef.current, { opacity: 1, y: 0, duration: 1 }, 1.12)
+      .to(footerRef.current, { opacity: 1, y: 0, duration: 1 }, 1.3);
 
-    timelineRef.current = tl;
-
-    // Small delay to ensure intro fade starts smoothly
-    const frameId = requestAnimationFrame(() => {
-      tl.restart(true);
-    });
-
+    const frameId = requestAnimationFrame(() => tl.restart(true));
     return () => {
       cancelAnimationFrame(frameId);
       tl.kill();
     };
   }, [firstEntry, isReady, isFinalState, onEntryComplete]);
 
+  // Scroll-scrubbed exit
+  useLayoutEffect(() => {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const ctx = gsap.context(() => {
+      gsap
+        .timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: { trigger: sectionRef.current, start: 'top top', end: 'bottom top', scrub: 1 }
+        })
+        .to(stageRef.current, { yPercent: 18, scale: 0.92, autoAlpha: 0.1 }, 0)
+        .to(titleRef.current, { letterSpacing: '0.06em' }, 0)
+        .to(beamsRef.current, { yPercent: -20 }, 0)
+        .to(footerRef.current, { autoAlpha: 0, y: 30 }, 0);
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
   const handleWatchPerformance = () => {
-    if (DEMO_PERFORMANCE_URL) {
-      window.open(DEMO_PERFORMANCE_URL, '_blank', 'noopener,noreferrer');
-    }
+    if (DEMO_PERFORMANCE_URL) window.open(DEMO_PERFORMANCE_URL, '_blank', 'noopener,noreferrer');
   };
 
   const handleContactStarX = () => {
-    if (onNavigate) {
-      onNavigate('contact', 'view');
-    }
+    if (onNavigate) onNavigate('contact', 'view');
   };
 
-  // Base style for initial state vs final state
-  const getInitialStyle = () => ({
-    opacity: isFinalState ? 1 : 0,
-    transform: isFinalState ? 'none' : undefined,
-    willChange: isFinalState ? 'auto' : 'transform, opacity'
-  });
-
   return (
-    <section
-      ref={sectionRef}
-      id="home"
-      style={{
-        position: 'relative',
-        minHeight: 'calc(100dvh - 72px)',
-        backgroundColor: 'transparent',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'clamp(4.5rem, 8vw, 6.5rem) 1.25rem clamp(2.5rem, 4vw, 4rem) 1.25rem',
-        overflow: 'hidden',
-        opacity: 1,
-        visibility: 'visible'
-      }}
-    >
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 2,
-          textAlign: 'center',
-          maxWidth: '860px',
-          width: '100%',
-          margin: '0 auto'
-        }}
-      >
-        {/* 1. Authentic StarX Circular Logo */}
-        <div
-          ref={logoRef}
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '1rem',
-            ...getInitialStyle()
-          }}
-        >
-          <BrandLogo
-            size="md"
-            style={{
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)'
-            }}
-          />
+    <section ref={sectionRef} id="home" className="rock-hero">
+      <div ref={beamsRef} className="rock-beams" aria-hidden="true">
+        <div className="rock-beam" />
+        <div className="rock-beam is-red" />
+        <div className="rock-beam" />
+      </div>
+      <div ref={glowRef} className="rock-hero-glow" aria-hidden="true" />
+
+      <div ref={stageRef} className="rock-hero-stage">
+        <div ref={kickerRef} className="rock-hero-kicker">
+          <span className="dot" aria-hidden="true" />
+          <span>Live rock band — Hyderabad</span>
         </div>
 
-        {/* 2. Glass Pill: • ROCK BAND • HYDERABAD */}
-        <div
-          ref={pillRef}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            padding: '4px 13px',
-            backgroundColor: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '999px',
-            fontSize: '11px',
-            fontWeight: 600,
-            color: '#A1A1A6',
-            letterSpacing: '0.1em',
-            marginBottom: '1.15rem',
-            textTransform: 'uppercase',
-            ...getInitialStyle()
-          }}
-        >
-          <span
-            style={{
-              width: '4px',
-              height: '4px',
-              borderRadius: '50%',
-              backgroundColor: '#B3131B'
-            }}
-          />
-          ROCK BAND • HYDERABAD
+        <h1 ref={titleRef} className="rock-hero-title" aria-label="StarX Live, rock band">
+          {letters.map((l, i) => (
+            <span className="mask" key={l + i} aria-hidden="true">
+              <span className={`ch ${l === 'X' ? 'is-x' : ''}`}>{l}</span>
+            </span>
+          ))}
+        </h1>
+
+        <div ref={subRef} className="rock-hero-sub" aria-hidden="true">
+          <span className="rule" style={{ transformOrigin: 'right' }} />
+          <span>Live · Rock Band</span>
+          <span className="rule" style={{ transformOrigin: 'left' }} />
         </div>
 
-        {/* 3. Main Headline: STARX LIVE & Subtitle: ROCK BAND */}
-        <div style={{ marginBottom: '0.75rem' }}>
-          <h1
-            ref={titleRef}
-            style={{
-              fontFamily: 'var(--font-editorial)',
-              fontSize: 'clamp(38px, 10vw, 52px)',
-              fontWeight: 650,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.05,
-              color: '#F5F5F7',
-              margin: '0 auto',
-              textTransform: 'uppercase',
-              ...getInitialStyle()
-            }}
-          >
-            STAR<span style={{ color: '#B3131B' }}>X</span> LIVE
-          </h1>
-
-          <div
-            ref={subtitleRef}
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 'clamp(12px, 1.2vw, 13px)',
-              fontWeight: 600,
-              letterSpacing: '0.18em',
-              color: '#8E8E93',
-              textTransform: 'uppercase',
-              marginTop: '0.35rem',
-              ...getInitialStyle()
-            }}
-          >
-            ROCK BAND
-          </div>
-        </div>
-
-        {/* 4. Tagline: Lost in the Noise. Found in the Sound. */}
-        <p
-          ref={taglineRef}
-          style={{
-            fontFamily: 'var(--font-editorial)',
-            fontStyle: 'italic',
-            fontSize: 'clamp(14px, 1.6vw, 16px)',
-            fontWeight: 400,
-            letterSpacing: '-0.01em',
-            color: '#D1D1D6',
-            lineHeight: 1.45,
-            maxWidth: '600px',
-            margin: '0 auto 1.65rem auto',
-            ...getInitialStyle()
-          }}
-        >
-          “{brand.tagline || 'Lost in the Noise. Found in the Sound.'}”
+        <p ref={taglineRef} className="rock-hero-tagline">
+          <em>{brand.tagline || 'Lost in the Noise. Found in the Sound.'}</em> Classic, rock and western
+          anthems played live, loud and by real musicians.
         </p>
 
-        {/* 5. Hero CTAs: Watch Performance & Contact StarX → */}
-        <div
-          ref={buttonsRef}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.75rem',
-            flexWrap: 'wrap',
-            marginBottom: '2.25rem',
-            ...getInitialStyle()
-          }}
-        >
-          {/* Watch Performance Button */}
+        <div ref={actionsRef} className="rock-hero-actions">
           <button
             type="button"
             id="hero-watch-performance-btn"
             onClick={handleWatchPerformance}
             className="btn btn-primary hero-action-btn"
-            style={{
-              padding: '14px 20px',
-              fontSize: 'clamp(14px, 1vw, 15px)',
-              fontWeight: 500,
-              gap: '0.5rem',
-              borderRadius: '999px'
-            }}
+            style={{ gap: '0.6rem' }}
           >
-            <Play size={14} fill="#FFFFFF" />
-            <span>Watch Performance</span>
+            <Play size={14} />
+            <span>Watch performance</span>
           </button>
-
-          {/* Contact StarX Button (Goes directly to /contact view) */}
           <button
             type="button"
             id="hero-contact-starx-btn"
             onClick={handleContactStarX}
             className="btn btn-glass hero-action-btn"
-            style={{
-              padding: '14px 18px',
-              fontSize: 'clamp(14px, 1vw, 15px)',
-              fontWeight: 500,
-              gap: '0.5rem',
-              borderRadius: '999px'
-            }}
+            style={{ gap: '0.6rem' }}
           >
-            <span>Contact StarX</span>
+            <span>Book StarX</span>
             <ArrowRight size={14} />
           </button>
         </div>
+      </div>
 
-        {/* 6. Bottom Metadata: CLASSIC • ROCK • WESTERN / TELUGU • HINDI / HYDERABAD */}
-        <div
-          ref={metadataRef}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '0.35rem',
-            fontSize: 'clamp(11px, 1vw, 12px)',
-            fontWeight: 500,
-            color: '#8E8E93',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            ...getInitialStyle()
-          }}
-        >
-          <div style={{ color: '#A1A1A6' }}>{brand.genresDisplay || 'CLASSIC • ROCK • WESTERN'}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-            <span style={{ color: '#B3131B', fontWeight: 600 }}>{brand.languagesDisplay || 'TELUGU • HINDI'}</span>
-            <span>•</span>
-            <span>HYDERABAD</span>
-          </div>
-        </div>
+      <div ref={footerRef} className="rock-hero-footer">
+        <span>
+          <span className="rock-eq" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+          </span>
+          &nbsp;&nbsp;On air
+        </span>
+        <span>{brand.genresDisplay || 'Classic • Rock • Western'}</span>
+        <span>{brand.languagesDisplay || 'Telugu • Hindi'}</span>
+        <span>
+          Scroll
+          <span className="rock-scroll-line" aria-hidden="true" />
+        </span>
       </div>
 
       <style>{`
         @media (max-width: 420px) {
-          .hero-action-btn {
-            width: 100%;
-            max-width: 280px;
-            justify-content: center;
-          }
+          .hero-action-btn { width: 100%; max-width: 300px; }
         }
       `}</style>
     </section>

@@ -152,7 +152,7 @@ export const MediaView = ({ onBackHome, onOpenPhoto }) => {
               style={{
                 backgroundColor: 'rgba(14, 14, 18, 0.72)',
                 border: '1px solid rgba(255, 255, 255, 0.07)',
-                borderRadius: '16px',
+                borderRadius: '4px',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 transition: 'transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease'
@@ -223,7 +223,7 @@ export const MediaView = ({ onBackHome, onOpenPhoto }) => {
             backgroundColor: 'rgba(14, 14, 18, 0.68)',
             backdropFilter: 'blur(18px)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '20px',
+            borderRadius: '4px',
             padding: 'clamp(1.5rem, 3vw, 2.5rem)',
             boxShadow: '0 24px 60px rgba(0, 0, 0, 0.45)'
           }}
@@ -247,7 +247,7 @@ export const MediaView = ({ onBackHome, onOpenPhoto }) => {
                   fontSize: '11px',
                   fontWeight: 600,
                   letterSpacing: '0.08em',
-                  color: '#B3131B',
+                  color: '#E8141C',
                   textTransform: 'uppercase',
                   display: 'block',
                   marginBottom: '0.25rem'
@@ -297,7 +297,7 @@ export const MediaView = ({ onBackHome, onOpenPhoto }) => {
               position: 'relative',
               width: '100%',
               backgroundColor: '#08080A',
-              borderRadius: '14px',
+              borderRadius: '4px',
               overflow: 'hidden',
               cursor: 'pointer',
               border: '1px solid rgba(255, 255, 255, 0.05)',

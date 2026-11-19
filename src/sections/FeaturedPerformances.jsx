@@ -95,7 +95,7 @@ export const FeaturedPerformances = ({ onNavigate }) => {
           style={{
             position: 'relative',
             width: '100%',
-            borderRadius: '18px',
+            borderRadius: '4px',
             overflow: 'hidden',
             backgroundColor: '#0D0D0F',
             border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -189,7 +189,7 @@ export const FeaturedPerformances = ({ onNavigate }) => {
                     fontSize: '11px',
                     fontWeight: 600,
                     letterSpacing: '0.1em',
-                    color: '#B3131B',
+                    color: '#E8141C',
                     textTransform: 'uppercase',
                     display: 'block',
                     marginBottom: '0.2rem'
@@ -226,7 +226,7 @@ export const FeaturedPerformances = ({ onNavigate }) => {
                 }}
               >
                 <span>Watch Performance</span>
-                <ArrowRight size={13} style={{ color: '#B3131B' }} />
+                <ArrowRight size={13} style={{ color: '#E8141C' }} />
               </div>
             </div>
           </div>
@@ -245,17 +245,17 @@ export const FeaturedPerformances = ({ onNavigate }) => {
               fontSize: '13.5px',
               fontWeight: 600,
               textDecoration: 'none',
-              borderBottom: '1px solid rgba(179, 19, 27, 0.8)',
+              borderBottom: '1px solid rgba(232, 20, 28, 0.8)',
               paddingBottom: '2px',
               transition: 'color 0.2s ease, border-color 0.2s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#B3131B';
+              e.currentTarget.style.color = '#E8141C';
               e.currentTarget.style.borderColor = '#FFFFFF';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.color = '#F5F5F7';
-              e.currentTarget.style.borderColor = 'rgba(179, 19, 27, 0.8)';
+              e.currentTarget.style.borderColor = 'rgba(232, 20, 28, 0.8)';
             }}
           >
             <span>View all performances</span>

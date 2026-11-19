@@ -91,7 +91,7 @@ export const BrandLogo = ({
             justifyContent: 'center'
           }}
         >
-          <svg viewBox="0 0 100 100" fill="#B3131B" style={{ width: '55%', height: '55%' }}>
+          <svg viewBox="0 0 100 100" fill="#E8141C" style={{ width: '55%', height: '55%' }}>
             <polygon points="50,5 63,35 95,36 69,57 78,89 50,70 22,89 31,57 5,36 37,35" />
           </svg>
         </div>

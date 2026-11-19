@@ -58,7 +58,7 @@ export const NextEvent = () => {
               fontSize: '0.8rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: '#B3131B',
+              color: '#E8141C',
               textTransform: 'uppercase',
               marginBottom: '0.75rem'
             }}
@@ -68,7 +68,7 @@ export const NextEvent = () => {
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#B3131B'
+                backgroundColor: '#E8141C'
               }}
             />
             UPCOMING SHOWCASE
@@ -141,7 +141,7 @@ export const NextEvent = () => {
                   border: '1px solid rgba(255, 255, 255, 0.06)',
                   boxShadow:
                     '0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-                  borderRadius: '20px',
+                  borderRadius: '4px',
                   padding: '1.85rem',
                   opacity: glassOpacity,
                   y: glassY,
@@ -155,7 +155,7 @@ export const NextEvent = () => {
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     letterSpacing: '0.08em',
-                    color: '#B3131B',
+                    color: '#E8141C',
                     textTransform: 'uppercase',
                     marginBottom: '0.4rem'
                   }}
@@ -204,7 +204,7 @@ export const NextEvent = () => {
                   >
                     {nextEvent.venue && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <MapPin size={15} color="#B3131B" />
+                        <MapPin size={15} color="#E8141C" />
                         <span>
                           {nextEvent.venue}, {nextEvent.location}
                         </span>
@@ -213,7 +213,7 @@ export const NextEvent = () => {
 
                     {nextEvent.date && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <Calendar size={15} color="#B3131B" />
+                        <Calendar size={15} color="#E8141C" />
                         <span>{nextEvent.date}</span>
                       </div>
                     )}
@@ -243,7 +243,7 @@ export const NextEvent = () => {
               padding: '5rem 2rem',
               textAlign: 'center',
               backgroundColor: '#0D0D0F',
-              borderRadius: '26px',
+              borderRadius: '4px',
               border: '1px solid rgba(255, 255, 255, 0.08)'
             }}
           >

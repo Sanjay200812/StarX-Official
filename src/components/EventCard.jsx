@@ -15,7 +15,7 @@ export const EventCard = ({ event, onViewMedia }) => {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: '14px',
+        borderRadius: '4px',
         overflow: 'hidden',
         border: '1px solid rgba(255, 255, 255, 0.08)'
       }}

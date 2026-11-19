@@ -91,7 +91,7 @@ export const AboutView = ({ onBackHome }) => {
             alignItems: 'center',
             backgroundColor: 'rgba(14, 14, 18, 0.68)',
             border: '1px solid rgba(255, 255, 255, 0.07)',
-            borderRadius: '20px',
+            borderRadius: '4px',
             padding: 'clamp(1.75rem, 3.5vw, 3rem)',
             boxShadow: '0 24px 60px rgba(0, 0, 0, 0.45)'
           }}
@@ -105,7 +105,7 @@ export const AboutView = ({ onBackHome }) => {
                   fontSize: '11px',
                   fontWeight: 600,
                   letterSpacing: '0.12em',
-                  color: '#B3131B',
+                  color: '#E8141C',
                   textTransform: 'uppercase',
                   display: 'block',
                   marginBottom: '0.4rem'
@@ -163,7 +163,7 @@ export const AboutView = ({ onBackHome }) => {
               }}
             >
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#B3131B', marginBottom: '0.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#E8141C', marginBottom: '0.25rem' }}>
                   <Music size={13} />
                   <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Genres</span>
                 </div>
@@ -171,7 +171,7 @@ export const AboutView = ({ onBackHome }) => {
               </div>
 
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#B3131B', marginBottom: '0.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#E8141C', marginBottom: '0.25rem' }}>
                   <Globe size={13} />
                   <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Languages</span>
                 </div>
@@ -179,7 +179,7 @@ export const AboutView = ({ onBackHome }) => {
               </div>
 
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#B3131B', marginBottom: '0.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#E8141C', marginBottom: '0.25rem' }}>
                   <MapPin size={13} />
                   <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Base</span>
                 </div>
@@ -194,7 +194,7 @@ export const AboutView = ({ onBackHome }) => {
               position: 'relative',
               width: '100%',
               aspectRatio: '4/3',
-              borderRadius: '16px',
+              borderRadius: '4px',
               overflow: 'hidden',
               boxShadow: '0 20px 50px rgba(0, 0, 0, 0.55)'
             }}

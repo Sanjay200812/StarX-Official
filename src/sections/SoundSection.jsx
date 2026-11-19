@@ -71,7 +71,7 @@ export const SoundSection = () => {
                   style={{
                     width: '64px',
                     height: '64px',
-                    borderRadius: '12px',
+                    borderRadius: '4px',
                     background: isCurrent ? '#FF2A35' : 'rgba(255, 255, 255, 0.05)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     display: 'flex',
@@ -134,7 +134,7 @@ export const SoundSection = () => {
             padding: '2.5rem 1.5rem',
             background: 'radial-gradient(circle at 50% 50%, rgba(229, 9, 20, 0.12) 0%, rgba(10, 10, 10, 0.8) 75%)',
             border: '1px solid rgba(229, 9, 20, 0.25)',
-            borderRadius: '16px',
+            borderRadius: '4px',
             textAlign: 'center'
           }}
         >

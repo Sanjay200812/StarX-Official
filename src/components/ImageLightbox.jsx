@@ -298,7 +298,7 @@ export const ImageLightbox = ({
                 width: 'auto',
                 height: 'auto',
                 objectFit: 'contain',
-                borderRadius: '16px',
+                borderRadius: '4px',
                 boxShadow: '0 30px 80px rgba(0, 0, 0, 0.8)',
                 display: 'block'
               }}
