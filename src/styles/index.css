@@ -33,7 +33,8 @@
   /* Modern Editorial Typography (Headings: Bodoni Moda, Body: Inter) */
   --font-editorial: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
   --font-heading: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-ui: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-scrawl: 'Permanent Marker', 'Comic Sans MS', cursive;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-system: var(--font-body);
 
