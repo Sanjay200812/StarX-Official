@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { resetScroll } from '../lib/smoothScroll';
 
 /**
  * useScrollToTop Hook
@@ -18,19 +19,11 @@ import { useEffect } from 'react';
 export function useScrollToTop(currentView) {
   useEffect(() => {
     // 1. Force top scroll position immediately on view/route change
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'auto'
-    });
+    resetScroll();
 
     // 2. Extra frame guarantee for dynamic layout reflow
     const rafId = requestAnimationFrame(() => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'auto'
-      });
+      resetScroll();
     });
 
     // 3. Clear accidental hash if landing on the default Home route (Requirement 18)

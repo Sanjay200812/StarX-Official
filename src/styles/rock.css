@@ -70,7 +70,6 @@ html {
 
 .stage-universe {
   z-index: 1;
-  animation: stageFadeIn 1.6s ease both;
 }
 
 @keyframes stageFadeIn {
@@ -718,8 +717,10 @@ main section.section-standard > * {
 .rock-scroll-cue {
   position: absolute;
   bottom: clamp(1rem, 3vh, 2rem);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: max-content;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -898,4 +899,213 @@ main section.section-standard > * {
 html,
 body {
   overflow-anchor: none;
+}
+
+/* ---------- Intro: soundcheck + shutter reveal ---------- */
+#starx-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.intro-shutter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50.5%;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(232, 20, 28, 0.12), transparent 60%),
+    #070404;
+  will-change: transform;
+}
+
+.intro-shutter.is-top { top: 0; border-bottom: 1px solid rgba(232, 20, 28, 0.35); }
+.intro-shutter.is-bottom {
+  bottom: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(232, 20, 28, 0.12), transparent 60%),
+    #070404;
+  border-top: 1px solid rgba(232, 20, 28, 0.35);
+}
+
+.intro-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 60, 60, 0.75), rgba(232, 20, 28, 0.25) 35%, transparent 65%);
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 2;
+}
+
+.intro-string {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 90px;
+  transform: translateY(-50%);
+  z-index: 1;
+  filter: drop-shadow(0 0 8px rgba(232, 20, 28, 0.85));
+  overflow: visible;
+}
+
+.intro-center {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.5rem, 1.5vh, 1rem);
+  pointer-events: none;
+}
+
+.intro-logo {
+  width: clamp(72px, 10vw, 120px);
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 0 60px rgba(232, 20, 28, 0.55);
+}
+
+.intro-word {
+  font-family: var(--font-editorial);
+  font-size: clamp(72px, 16vw, 220px);
+  line-height: 0.85;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  display: flex;
+}
+
+.intro-mask {
+  display: inline-block;
+  overflow: hidden;
+  font-family: inherit;
+  padding-top: 0.04em;
+}
+
+.intro-ch {
+  display: inline-block;
+  font-family: inherit;
+}
+
+.intro-ch.is-x {
+  color: var(--red-accent);
+  text-shadow: 0 0 50px rgba(232, 20, 28, 0.8);
+}
+
+.intro-live {
+  font-family: var(--font-ui);
+  font-size: clamp(12px, 1.4vw, 16px);
+  font-weight: 600;
+  letter-spacing: 0.6em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  padding-left: 0.6em;
+}
+
+.intro-meta {
+  position: absolute;
+  left: clamp(1rem, 4vw, 3rem);
+  right: clamp(1rem, 4vw, 3rem);
+  bottom: clamp(1.25rem, 4vh, 2.5rem);
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  pointer-events: none;
+}
+
+.intro-counter {
+  font-family: var(--font-editorial);
+  font-size: clamp(44px, 7vw, 96px);
+  line-height: 0.85;
+  color: #FFFFFF;
+  font-variant-numeric: tabular-nums;
+}
+
+.intro-counter span,
+.intro-counter small {
+  font-family: inherit;
+}
+
+.intro-counter small {
+  font-size: 0.4em;
+  color: var(--red-accent);
+  margin-left: 0.1em;
+}
+
+.intro-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  padding-bottom: 0.4rem;
+  text-align: center;
+}
+
+.intro-eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: clamp(36px, 6vh, 56px);
+}
+
+.intro-eq i {
+  display: block;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(0deg, var(--red-accent), #FFB547);
+  transform-origin: bottom;
+}
+
+.intro-skip {
+  position: absolute;
+  top: clamp(1rem, 3vh, 1.75rem);
+  right: clamp(1rem, 3vw, 2rem);
+  z-index: 4;
+  font-family: var(--font-ui) !important;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(7, 4, 4, 0.4);
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.intro-skip:hover {
+  background: #FFFFFF;
+  color: #070404;
+}
+
+@media (max-width: 640px) {
+  .intro-label { display: none; }
+  .intro-eq i { width: 3px; }
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
 }
