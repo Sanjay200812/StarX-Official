@@ -649,6 +649,13 @@ const buildPicks = (count) => {
 
 /* ------------------------------------------------------------------ */
 
+// Tell the intro the stage has painted, so it never reveals an empty background
+const announceReady = () => {
+  if (window.__starxStageReady) return;
+  window.__starxStageReady = true;
+  window.dispatchEvent(new Event('starx:stage-ready'));
+};
+
 export const StageUniverse = () => {
   const mountRef = useRef(null);
 
@@ -663,6 +670,7 @@ export const StageUniverse = () => {
     try {
       renderer = new THREE.WebGLRenderer({ antialias: !isSmall, alpha: false, powerPreference: 'high-performance' });
     } catch (e) {
+      announceReady();
       return undefined; // no WebGL: the CSS gradient behind stays visible
     }
     const basePixelRatio = Math.min(window.devicePixelRatio || 1, isSmall ? 1.25 : 1.5);
@@ -837,15 +845,26 @@ export const StageUniverse = () => {
         pts.material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
       });
     };
+    // Phones fire resize every time the address bar slides in/out. Re-allocating
+    // the canvas then clears it (a black flash) and stutters, so height-only
+    // changes on touch screens are left to CSS stretching.
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    let lastW = window.innerWidth;
+    let lastH = window.innerHeight;
     const onResize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
+      readScroll();
+      if (coarse && w === lastW && Math.abs(h - lastH) < lastH * 0.3) return;
+      lastW = w;
+      lastH = h;
       renderer.setSize(w, h);
       if (composer) composer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       syncPixelRatio();
-      readScroll();
+      // repaint straight away so the resized (cleared) canvas is never shown
+      if (shown) renderFrame();
     };
     readScroll();
     state.progress = state.target;
@@ -1079,9 +1098,10 @@ export const StageUniverse = () => {
       // Reveal the canvas only once a real frame exists: no black flash
       if (!shown) {
         shown = true;
-        renderer.domElement.style.transition = 'opacity 1.2s ease';
+        renderer.domElement.style.transition = 'opacity 0.7s ease';
         requestAnimationFrame(() => {
           renderer.domElement.style.opacity = '1';
+          announceReady();
         });
       }
     };
@@ -1104,6 +1124,28 @@ export const StageUniverse = () => {
     };
     document.addEventListener('visibilitychange', onVisibility);
 
+    // GPU reset (common on phones when switching apps): fade to the CSS
+    // gradient instead of showing a black canvas, and come back when restored
+    const canvasEl = renderer.domElement;
+    const onContextLost = (e) => {
+      e.preventDefault();
+      running = false;
+      cancelAnimationFrame(raf);
+      canvasEl.style.opacity = '0';
+    };
+    const onContextRestored = () => {
+      canvasEl.style.opacity = '1';
+      if (!reduced && !document.hidden) {
+        running = true;
+        clock.getDelta();
+        loop();
+      } else {
+        renderFrame();
+      }
+    };
+    canvasEl.addEventListener('webglcontextlost', onContextLost);
+    canvasEl.addEventListener('webglcontextrestored', onContextRestored);
+
     let onReducedScroll = null;
     if (reduced) {
       running = false;
@@ -1125,6 +1167,8 @@ export const StageUniverse = () => {
       window.removeEventListener('resize', onResize);
       if (onReducedScroll) window.removeEventListener('scroll', onReducedScroll);
       document.removeEventListener('visibilitychange', onVisibility);
+      canvasEl.removeEventListener('webglcontextlost', onContextLost);
+      canvasEl.removeEventListener('webglcontextrestored', onContextRestored);
       scene.traverse((obj) => {
         if (obj.geometry) obj.geometry.dispose();
         if (obj.material) {

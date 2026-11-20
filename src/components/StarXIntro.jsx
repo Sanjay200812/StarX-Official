@@ -1,39 +1,98 @@
-import React, { useEffect, useLayoutEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import gsap from 'gsap';
 
 /**
- * StarXIntro — "soundcheck" opening sequence (code-animated, no video).
+ * StarXIntro — "lights down, show on".
  *
- *   1. A red guitar string draws across the dark screen and is plucked.
- *   2. A soundcheck counter runs 00 → 100 while equalizer bars warm up.
- *   3. The StarX logo drops in with a red flash, STARX LIVE slams in letter by letter.
- *   4. The screen splits open like a stage shutter: the top and bottom halves
- *      slide away to reveal the already-rendered home page and 3D stage.
+ * A realistic concert opening instead of a graphic animation:
+ *   1. The arena is dark and hazy; the crowd is a silhouette in the
+ *      foreground, phone lights coming on here and there.
+ *   2. "Hyderabad · Tonight" — then the house goes quiet.
+ *   3. The centre follow spot hits (with the little flicker a real lamp has),
+ *      then the side beams, which start to sweep through the haze.
+ *   4. The LED wall powers up line by line: STARX LIVE.
+ *   5. Strobe hits, the crowd's hands go up.
+ *   6. The camera pushes over the crowd and the darkness dissolves into
+ *      the real site: hero + the 3D stage, already rendered underneath.
  *
- * The home page is mounted underneath the whole time, so there's never a
- * black gap. `onStartExit` fires as the shutter starts opening (the hero starts
- * its entrance then); `onFinishExit` fires once the shutter is gone.
- * Skippable at any point; reduced-motion visitors get a short fade.
+ * The exit waits (briefly) for the 3D stage to report its first frame, so the
+ * reveal never lands on an empty dark background. Skippable at any time.
  */
 
-const LETTERS = ['S', 'T', 'A', 'R', 'X'];
+const seeded = (seed) => {
+  let s = seed;
+  return () => {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+};
+
+// Procedural crowd silhouette: two rows of heads/shoulders, some hands up, some phones
+const buildCrowd = () => {
+  const rnd = seeded(7);
+  const rows = [
+    { count: 26, y: 300, scale: 0.72, fill: '#140b0c' },
+    { count: 17, y: 360, scale: 1.05, fill: '#050303' }
+  ];
+  const people = [];
+  const arms = [];
+  const phones = [];
+  rows.forEach((row, ri) => {
+    const step = 1600 / row.count;
+    for (let i = 0; i < row.count; i += 1) {
+      const x = step * i + step * (0.2 + rnd() * 0.6);
+      const s = row.scale * (0.85 + rnd() * 0.3);
+      const y = row.y + rnd() * 18;
+      const headR = 24 * s;
+      const shoulderW = 70 * s;
+      const top = y - headR * 2.2;
+      // head + neck + shoulders as one path
+      people.push({
+        fill: row.fill,
+        d: `M${x - shoulderW} 420 L${x - shoulderW} ${y + 26 * s} Q${x - shoulderW} ${y} ${x - 18 * s} ${y - 4 * s} L${x - 9 * s} ${y - 10 * s} A${headR} ${headR * 1.15} 0 1 1 ${x + 9 * s} ${y - 10 * s} L${x + 18 * s} ${y - 4 * s} Q${x + shoulderW} ${y} ${x + shoulderW} ${y + 26 * s} L${x + shoulderW} 420 Z`
+      });
+      const r = rnd();
+      if (r < (ri ? 0.55 : 0.45)) {
+        // raised arm from one shoulder
+        const side = rnd() < 0.5 ? -1 : 1;
+        const sx = x + side * shoulderW * 0.75;
+        const sy = y + 6 * s;
+        const hx = sx + side * (10 + rnd() * 30) * s;
+        const hy = top - (60 + rnd() * 70) * s;
+        const w = 13 * s;
+        const phone = rnd() < 0.6;
+        arms.push({
+          fill: row.fill,
+          d: `M${sx - w} ${sy + 20 * s} L${hx - w * 0.7} ${hy + 14 * s} Q${hx} ${hy - 12 * s} ${hx + w * 0.7} ${hy + 14 * s} L${sx + w} ${sy + 20 * s} Z`
+        });
+        if (phone) phones.push({ x: hx, y: hy - 6 * s, s, delay: rnd() * 2.2, front: ri === 1 });
+      }
+    }
+  });
+  return { people, arms, phones };
+};
 
 export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplete }) => {
   const rootRef = useRef(null);
-  const topRef = useRef(null);
-  const bottomRef = useRef(null);
-  const centerRef = useRef(null);
-  const stringRef = useRef(null);
-  const logoRef = useRef(null);
-  const wordRef = useRef(null);
-  const liveRef = useRef(null);
-  const counterRef = useRef(null);
-  const metaRef = useRef(null);
-  const eqRef = useRef(null);
-  const flashRef = useRef(null);
+  const sceneRef = useRef(null);
+  const bgRef = useRef(null);
+  const hazeRef = useRef(null);
+  const spotRef = useRef(null);
+  const beamLRef = useRef(null);
+  const beamRRef = useRef(null);
+  const screenRef = useRef(null);
+  const screenWipeRef = useRef(null);
+  const crowdRef = useRef(null);
+  const armsRef = useRef(null);
+  const phonesRef = useRef(null);
+  const captionRef = useRef(null);
+  const strobeRef = useRef(null);
   const skipRef = useRef(null);
   const tlRef = useRef(null);
   const exitingRef = useRef(false);
+  const waitRef = useRef(null);
+
+  const crowd = useMemo(buildCrowd, []);
 
   const finish = useCallback(
     (source) => {
@@ -48,166 +107,183 @@ export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplet
       if (exitingRef.current) return;
       exitingRef.current = true;
       if (tlRef.current) tlRef.current.kill();
+      if (waitRef.current) waitRef.current();
       if (onStartExit) onStartExit(source);
 
       const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduced) {
-        gsap.to(rootRef.current, { opacity: 0, duration: 0.35, onComplete: () => finish(source) });
+      if (reduced || source === 'skip') {
+        gsap.to(rootRef.current, { opacity: 0, duration: reduced ? 0.35 : 0.6, ease: 'power2.inOut', onComplete: () => finish(source) });
         return;
       }
 
+      // Push in over the crowd; the dark arena dissolves into the real site
       gsap
         .timeline({ onComplete: () => finish(source) })
-        .to(skipRef.current, { opacity: 0, duration: 0.2 }, 0)
-        .to(centerRef.current, { scale: 1.12, opacity: 0, duration: 0.45, ease: 'power3.in' }, 0)
-        .to(stringRef.current, { scaleX: 1.6, opacity: 0, duration: 0.4, ease: 'power2.in' }, 0)
-        .to(topRef.current, { yPercent: -100, duration: 1.0, ease: 'expo.inOut' }, 0.2)
-        .to(bottomRef.current, { yPercent: 100, duration: 1.0, ease: 'expo.inOut' }, 0.2);
+        .to(skipRef.current, { opacity: 0, duration: 0.25 }, 0)
+        .to(captionRef.current, { opacity: 0, duration: 0.3 }, 0)
+        .to(sceneRef.current, { scale: 1.18, duration: 1.4, ease: 'power2.inOut' }, 0)
+        .to(crowdRef.current, { yPercent: 55, duration: 1.3, ease: 'power3.in' }, 0.05)
+        .to(screenRef.current, { opacity: 0, scale: 1.1, filter: 'blur(6px)', duration: 0.8, ease: 'power2.in' }, 0.25)
+        .to([spotRef.current, beamLRef.current, beamRRef.current], { opacity: 0, duration: 0.9, ease: 'power2.in' }, 0.35)
+        .to(bgRef.current, { opacity: 0, duration: 1.0, ease: 'power2.inOut' }, 0.35)
+        .to(hazeRef.current, { opacity: 0, duration: 1.0, ease: 'power2.inOut' }, 0.45);
     },
     [finish, onStartExit]
   );
 
-  // Block page scrolling while the intro is up
+  // Exit only once the 3D stage has painted (or after a short grace period)
+  const exitWhenStageReady = useCallback(() => {
+    if (window.__starxStageReady) {
+      runExit('ended');
+      return;
+    }
+    const go = () => runExit('ended');
+    const timer = window.setTimeout(go, 3000);
+    window.addEventListener('starx:stage-ready', go, { once: true });
+    waitRef.current = () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('starx:stage-ready', go);
+    };
+  }, [runExit]);
+
+  // Block page scrolling while the intro is up; Esc / Enter skip
   useEffect(() => {
     const prevent = (e) => e.preventDefault();
-    const preventKeys = (e) => {
+    const onKey = (e) => {
       if ([32, 33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) e.preventDefault();
       if (e.key === 'Escape' || e.key === 'Enter') runExit('skip');
     };
     window.addEventListener('wheel', prevent, { passive: false });
     window.addEventListener('touchmove', prevent, { passive: false });
-    window.addEventListener('keydown', preventKeys, { passive: false });
+    window.addEventListener('keydown', onKey, { passive: false });
     return () => {
       window.removeEventListener('wheel', prevent);
       window.removeEventListener('touchmove', prevent);
-      window.removeEventListener('keydown', preventKeys);
+      window.removeEventListener('keydown', onKey);
+      if (waitRef.current) waitRef.current();
     };
   }, [runExit]);
 
   useLayoutEffect(() => {
     const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const chars = wordRef.current ? wordRef.current.querySelectorAll('.intro-ch') : [];
-    const bars = eqRef.current ? eqRef.current.children : [];
-    const path = stringRef.current ? stringRef.current.querySelector('path') : null;
-    const counter = { v: 0 };
-
     if (reduced) {
       const t = window.setTimeout(() => runExit('reduced'), 900);
       return () => window.clearTimeout(t);
     }
 
     const ctx = gsap.context(() => {
-      gsap.set(chars, { yPercent: 120, opacity: 0 });
-      gsap.set(logoRef.current, { scale: 2.6, opacity: 0, rotate: -12 });
-      gsap.set(liveRef.current, { opacity: 0, letterSpacing: '1.4em' });
-      gsap.set([metaRef.current, skipRef.current], { opacity: 0 });
-      gsap.set(bars, { scaleY: 0.05 });
-      if (path) gsap.set(path, { strokeDasharray: 1000, strokeDashoffset: 1000 });
+      const phones = phonesRef.current ? phonesRef.current.children : [];
+      const lines = screenRef.current ? screenRef.current.querySelectorAll('[data-led]') : [];
 
-      const pluck = { a: 0 };
-      const drawWave = () => {
-        if (!path) return;
-        const amp = pluck.a;
-        let d = 'M0 50';
-        for (let x = 0; x <= 1000; x += 20) {
-          const env = Math.sin((x / 1000) * Math.PI);
-          const y = 50 + Math.sin(x / 38 + performance.now() / 40) * amp * env;
-          d += ` L${x} ${y.toFixed(2)}`;
-        }
-        path.setAttribute('d', d);
-      };
+      gsap.set([spotRef.current, beamLRef.current, beamRRef.current], { opacity: 0 });
+      gsap.set(screenRef.current, { opacity: 0 });
+      gsap.set(screenWipeRef.current, { scaleY: 1 });
+      gsap.set(lines, { opacity: 0 });
+      gsap.set(phones, { opacity: 0, scale: 0.4, transformOrigin: '50% 50%' });
+      gsap.set(armsRef.current, { y: 70 });
+      gsap.set(crowdRef.current, { yPercent: 6 });
+      gsap.set(captionRef.current, { opacity: 0, y: 10 });
+      gsap.set(skipRef.current, { opacity: 0 });
 
-      const tl = gsap.timeline({ onComplete: () => runExit('ended') });
+      // a real lamp striking: hit, dip, catch, settle
+      const strike = (peak = 1) => [
+        { opacity: peak, duration: 0.05 },
+        { opacity: peak * 0.25, duration: 0.06 },
+        { opacity: peak * 0.9, duration: 0.05 },
+        { opacity: peak * 0.55, duration: 0.07 },
+        { opacity: peak, duration: 0.12 }
+      ];
+
+      const tl = gsap.timeline({ onComplete: exitWhenStageReady });
       tlRef.current = tl;
 
-      tl.to(skipRef.current, { opacity: 1, duration: 0.4 }, 0.2)
-        .to(metaRef.current, { opacity: 1, duration: 0.5 }, 0.2)
-        // 1. string draws across, then gets plucked
-        .to(path, { strokeDashoffset: 0, duration: 0.7, ease: 'power3.inOut' }, 0.1)
-        .to(pluck, { a: 22, duration: 0.08, ease: 'power2.out', onUpdate: drawWave }, 0.85)
-        .to(pluck, { a: 0, duration: 1.6, ease: 'elastic.out(1, 0.25)', onUpdate: drawWave }, 0.93)
-        // 2. soundcheck counter + EQ warm-up
-        .to(
-          counter,
-          {
-            v: 100,
-            duration: 2.1,
-            ease: 'power2.inOut',
-            onUpdate: () => {
-              if (counterRef.current) counterRef.current.textContent = String(Math.round(counter.v)).padStart(3, '0');
-            }
-          },
-          0.3
-        )
-        .to(
-          bars,
-          {
-            scaleY: () => 0.3 + Math.random() * 0.7,
-            duration: 0.18,
-            ease: 'power2.out',
-            stagger: { each: 0.02, repeat: 9, yoyo: true }
-          },
-          0.6
-        )
-        // 3. logo drop + flash, wordmark slam
-        .to(logoRef.current, { scale: 1, opacity: 1, rotate: 0, duration: 0.55, ease: 'back.out(2.2)' }, 1.15)
-        .fromTo(flashRef.current, { opacity: 0 }, { opacity: 0.7, duration: 0.06 }, 1.5)
-        .to(flashRef.current, { opacity: 0, duration: 0.6, ease: 'power2.out' }, 1.56)
-        .to(chars, { yPercent: 0, opacity: 1, duration: 0.5, ease: 'expo.out', stagger: 0.06 }, 1.4)
-        .to(liveRef.current, { opacity: 1, letterSpacing: '0.6em', duration: 0.8, ease: 'expo.out' }, 1.8)
-        .to(bars, { scaleY: 0.08, duration: 0.4, ease: 'power2.in', stagger: 0.01 }, 2.6)
-        // 4. hold a beat, then open
-        .to({}, { duration: 0.35 }, 2.75);
+      tl.to(skipRef.current, { opacity: 1, duration: 0.5 }, 0.3)
+        .to(crowdRef.current, { yPercent: 0, duration: 3.4, ease: 'power1.out' }, 0)
+        // 1. phone lights come on across the crowd
+        .to(phones, { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out', stagger: { each: 0.05, from: 'random' } }, 0.2)
+        .to(captionRef.current, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0.35)
+        // 2. centre follow spot strikes
+        .to(spotRef.current, { keyframes: strike(1) }, 1.0)
+        // 3. side beams strike
+        .to(beamLRef.current, { keyframes: strike(0.85) }, 1.45)
+        .to(beamRRef.current, { keyframes: strike(0.85) }, 1.55)
+        // 4. LED wall powers up line by line
+        .to(screenRef.current, { opacity: 1, duration: 0.15 }, 1.7)
+        .to(screenWipeRef.current, { scaleY: 0, duration: 0.55, ease: 'steps(12)' }, 1.72)
+        .to(lines, { keyframes: [{ opacity: 1, duration: 0.04 }, { opacity: 0.3, duration: 0.05 }, { opacity: 1, duration: 0.08 }], stagger: 0.12 }, 1.85)
+        .to(captionRef.current, { opacity: 0.55, duration: 0.4 }, 2.0)
+        // 5. strobe hits, hands go up
+        .fromTo(strobeRef.current, { opacity: 0 }, { keyframes: [{ opacity: 0.55, duration: 0.04 }, { opacity: 0, duration: 0.09 }, { opacity: 0.45, duration: 0.04 }, { opacity: 0, duration: 0.2 }] }, 2.6)
+        .to(armsRef.current, { y: 0, duration: 0.5, ease: 'back.out(1.6)' }, 2.62)
+        .to(phones, { scale: 1.25, duration: 0.3, ease: 'power2.out', stagger: { each: 0.02, from: 'random' } }, 2.65)
+        // hold the moment
+        .to({}, { duration: 0.6 }, 3.0);
     }, rootRef);
 
     return () => ctx.revert();
-  }, [runExit]);
+  }, [runExit, exitWhenStageReady]);
 
   return (
     <div id="starx-intro" ref={rootRef} role="presentation">
-      <div ref={topRef} className="intro-shutter is-top" />
-      <div ref={bottomRef} className="intro-shutter is-bottom" />
-      <div ref={flashRef} className="intro-flash" aria-hidden="true" />
+      <div ref={bgRef} className="ri-bg" />
+      <div ref={sceneRef} className="ri-scene">
+        <div ref={hazeRef} className="ri-haze" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
 
-      <svg ref={stringRef} className="intro-string" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 50 L1000 50" fill="none" stroke="#E8141C" strokeWidth="3" strokeLinecap="round" />
-      </svg>
+        <div ref={beamLRef} className="ri-beam is-left" aria-hidden="true" />
+        <div ref={beamRRef} className="ri-beam is-right" aria-hidden="true" />
+        <div ref={spotRef} className="ri-spot" aria-hidden="true" />
 
-      <div ref={centerRef} className="intro-center">
-        <img ref={logoRef} className="intro-logo" src="/assets/brand/starx-logo.png" alt="" width="120" height="120" />
-        <div ref={wordRef} className="intro-word" aria-label="StarX Live">
-          {LETTERS.map((l, i) => (
-            <span className="intro-mask" key={l + i} aria-hidden="true">
-              <span className={`intro-ch ${l === 'X' ? 'is-x' : ''}`}>{l}</span>
-            </span>
+        <div ref={screenRef} className="ri-screen" aria-label="StarX Live">
+          <img data-led src="/assets/brand/starx-logo.png" alt="" width="96" height="96" className="ri-screen-logo" />
+          <div data-led className="ri-screen-word" aria-hidden="true">
+            STAR<span>X</span>
+          </div>
+          <div data-led className="ri-screen-live" aria-hidden="true">
+            Live · Rock Band
+          </div>
+          <div className="ri-screen-dots" aria-hidden="true" />
+          <div ref={screenWipeRef} className="ri-screen-wipe" aria-hidden="true" />
+        </div>
+
+        <svg ref={crowdRef} className="ri-crowd" viewBox="0 0 1600 420" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+          <defs>
+            <radialGradient id="ri-phone-glow">
+              <stop offset="0" stopColor="#fff6e8" stopOpacity="1" />
+              <stop offset="0.35" stopColor="#ffe2b8" stopOpacity="0.55" />
+              <stop offset="1" stopColor="#ffd39a" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <g ref={armsRef}>
+            {crowd.arms.map((a, i) => (
+              <path key={i} d={a.d} fill={a.fill} />
+            ))}
+          </g>
+          {crowd.people.map((p, i) => (
+            <path key={i} d={p.d} fill={p.fill} />
           ))}
-        </div>
-        <div ref={liveRef} className="intro-live" aria-hidden="true">
-          Live · Rock Band
-        </div>
+          <g ref={phonesRef}>
+            {crowd.phones.map((ph, i) => (
+              <g key={i}>
+                <circle cx={ph.x} cy={ph.y} r={34 * ph.s} fill="url(#ri-phone-glow)" className="ri-phone-glow" style={{ animationDelay: `${ph.delay}s` }} />
+                <rect x={ph.x - 7 * ph.s} y={ph.y - 11 * ph.s} width={14 * ph.s} height={22 * ph.s} rx={2.5 * ph.s} fill="#fffaf2" />
+              </g>
+            ))}
+          </g>
+        </svg>
+
+        <div ref={strobeRef} className="ri-strobe" aria-hidden="true" />
       </div>
 
-      <div ref={metaRef} className="intro-meta" aria-hidden="true">
-        <div className="intro-counter">
-          <span ref={counterRef}>000</span>
-          <small>%</small>
-        </div>
-        <div className="intro-label">Soundcheck — Hyderabad</div>
-        <div ref={eqRef} className="intro-eq">
-          {Array.from({ length: 16 }).map((_, i) => (
-            <i key={i} />
-          ))}
-        </div>
+      <div ref={captionRef} className="ri-caption" aria-hidden="true">
+        <span className="dot" />
+        Hyderabad · Tonight
       </div>
 
-      <button
-        ref={skipRef}
-        type="button"
-        id="intro-skip-button"
-        className="intro-skip"
-        onClick={() => runExit('skip')}
-        aria-label="Skip intro"
-      >
+      <button ref={skipRef} type="button" id="intro-skip-button" className="intro-skip" onClick={() => runExit('skip')} aria-label="Skip intro">
         Skip intro →
       </button>
     </div>
