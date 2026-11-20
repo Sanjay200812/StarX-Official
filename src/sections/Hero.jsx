@@ -16,8 +16,8 @@ gsap.registerPlugin(ScrollTrigger);
  *   scrawled tagline appears and its underline draws → CTAs and meta pop.
  * Return visits render the final state instantly (no timeline).
  *
- * Scroll: the whole title block is scrubbed — it scales down, tilts back and
- * fades while the letters pull apart, so the next section takes the stage.
+ * Scroll: the title block rushes toward the camera and dissolves, as if you
+ * are flying into the 3D stage behind it.
  */
 export const Hero = ({ onNavigate, isReady = false, firstEntry = false, onEntryComplete }) => {
   const { brand } = siteData;
@@ -119,9 +119,11 @@ export const Hero = ({ onNavigate, isReady = false, firstEntry = false, onEntryC
       const tl = gsap.timeline({
         scrollTrigger: { trigger: sectionRef.current, start: 'top top', end: 'bottom top', scrub: 0.5 }
       });
-      tl.to(titleRef.current, { letterSpacing: '0.12em', yPercent: -20, ease: 'none' }, 0)
-        .to(stageRef.current, { scale: 0.86, rotateX: 18, opacity: 0.05, yPercent: 10, ease: 'none' }, 0)
-        .to(beamsRef.current, { yPercent: -25, ease: 'none' }, 0);
+      // Fly forward into the stage: the title rushes past the camera
+      tl.to(titleRef.current, { letterSpacing: '0.2em', ease: 'none' }, 0)
+        .to(stageRef.current, { scale: 1.9, opacity: 0, filter: 'blur(6px)', ease: 'power1.in' }, 0)
+        .to(beamsRef.current, { yPercent: -25, opacity: 0.2, ease: 'none' }, 0)
+        .to(cueRef.current, { opacity: 0, y: 30, ease: 'none' }, 0);
     }, sectionRef);
     return () => ctx.revert();
   }, []);

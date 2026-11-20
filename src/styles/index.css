@@ -122,7 +122,7 @@
 
 html {
   position: relative;
-  scroll-behavior: smooth;
+  scroll-behavior: auto; /* smooth here fights GSAP ScrollTrigger refreshes and causes scroll jumps */
   background-color: var(--bg-main);
   color: var(--text-primary);
   font-family: var(--font-system);

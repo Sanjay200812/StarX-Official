@@ -58,15 +58,24 @@ html {
   100% { transform: translate(0, 0); }
 }
 
-/* Home background video: moody, punchy grade */
-.site-background video {
-  filter: saturate(1.25) contrast(1.15) brightness(0.62);
+/* 3D stage backdrop */
+.stage-universe,
+.stage-universe canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
 
-.site-background-overlay {
-  background:
-    linear-gradient(180deg, rgba(10, 6, 6, 0.35) 0%, rgba(10, 6, 6, 0.2) 40%, rgba(10, 6, 6, 0.9) 100%),
-    radial-gradient(ellipse at 50% 110%, rgba(232, 20, 28, 0.25), transparent 60%) !important;
+.stage-universe {
+  z-index: 1;
+  animation: stageFadeIn 1.6s ease both;
+}
+
+@keyframes stageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* ---------- Typography ---------- */
@@ -840,4 +849,53 @@ main section.section-standard > * {
 .rock-statement-scrawl,
 .rock-hero-tagline {
   font-family: var(--font-scrawl) !important;
+}
+
+/* ---------- Meet StarX: 3D ring (desktop) ---------- */
+.rock-ring-slot {
+  display: contents;
+}
+
+@media (min-width: 1000px) {
+  .rock-ring-stage {
+    perspective: 1500px;
+    perspective-origin: 50% 40%;
+    height: 400px;
+    margin: 1rem auto 3rem;
+    position: relative;
+  }
+
+  .rock-ring {
+    position: absolute !important;
+    left: 50%;
+    top: 0;
+    width: 250px !important;
+    height: 312px;
+    margin: 0 0 0 -125px !important;
+    display: block !important;
+    transform-style: preserve-3d;
+  }
+
+  .rock-ring-slot {
+    display: block;
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+  }
+
+  .rock-ring-slot > .rock-card {
+    max-width: none !important;
+    width: 100% !important;
+    height: 100%;
+  }
+}
+
+/* Chrome's scroll anchoring "corrects" for layout shifts from pinned
+   ScrollTrigger sections and could throw the first scroll to the end of the
+   page. GSAP pins manage position themselves, so anchoring is turned off. */
+html,
+body {
+  overflow-anchor: none;
 }

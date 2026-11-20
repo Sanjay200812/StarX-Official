@@ -4,6 +4,11 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Mobile browsers resize the viewport when the address bar shows/hides during a
+// scroll. Refreshing ScrollTrigger on that resize can throw the page to the
+// wrong position, so ignore those height-only resizes.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' &&
   window.matchMedia &&
@@ -272,7 +277,8 @@ const splitIntoChars = (el) => {
 };
 
 const applyScrollFX = (root) => {
-  if (!root) return;
+  if (!root) return false;
+  const before = ScrollTrigger.getAll().length;
 
   // 1. Headings: letters slam up with a skew, like a riff hitting
   root.querySelectorAll('.editorial-heading:not([data-rock-fx])').forEach((el) => {
@@ -363,6 +369,22 @@ const applyScrollFX = (root) => {
     );
   });
 
+  // 4b. Feature panels tilt up out of the stage floor and flatten as they arrive
+  root.querySelectorAll('.rock-3d-card:not([data-rock-fx])').forEach((el) => {
+    el.setAttribute('data-rock-fx', '1');
+    gsap.fromTo(
+      el,
+      { rotationX: 38, scale: 0.78, yPercent: 12, transformPerspective: 1300, transformOrigin: '50% 100%' },
+      {
+        rotationX: 0,
+        scale: 1,
+        yPercent: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom', end: 'center 55%', scrub: 0.6 }
+      }
+    );
+  });
+
   // 5. Cards: dealt onto the stage in a staggered, tilted batch
   const cards = Array.from(root.querySelectorAll('.rock-card:not([data-rock-fx])'));
   cards.forEach((c) => c.setAttribute('data-rock-fx', '1'));
@@ -399,7 +421,9 @@ const applyScrollFX = (root) => {
     );
   });
 
-  ScrollTrigger.refresh();
+  // Only re-measure when this pass actually created new triggers
+  const added = ScrollTrigger.getAll().length > before;
+  return added;
 };
 
 /**
@@ -414,23 +438,44 @@ export const useRockScrollFX = (viewKey, enabled = true) => {
 
     let raf = 0;
     let timer = 0;
+    let refreshTimer = 0;
     const run = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => applyScrollFX(main));
+      raf = requestAnimationFrame(() => {
+        if (applyScrollFX(main)) {
+          // Batch re-measuring, and never do it while the visitor is mid-scroll
+          window.clearTimeout(refreshTimer);
+          refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 200);
+        }
+      });
     };
 
     // Wait for the route fade-in to settle before measuring
     timer = window.setTimeout(run, 380);
 
-    const observer = new MutationObserver(() => {
+    // Re-run only when real new elements arrive (lazy views), not on our own
+    // heading splits or image placeholder swaps
+    const observer = new MutationObserver((mutations) => {
+      const relevant = mutations.some((m) =>
+        Array.from(m.addedNodes).some(
+          (n) =>
+            n.nodeType === 1 &&
+            !n.classList.contains('rock-word') &&
+            !n.classList.contains('rock-char') &&
+            n.querySelector &&
+            n.querySelector('.editorial-heading, .rock-card, section img, .label-accent')
+        )
+      );
+      if (!relevant) return;
       window.clearTimeout(timer);
-      timer = window.setTimeout(run, 120);
+      timer = window.setTimeout(run, 160);
     });
     observer.observe(main, { childList: true, subtree: true });
 
     return () => {
       observer.disconnect();
       window.clearTimeout(timer);
+      window.clearTimeout(refreshTimer);
       cancelAnimationFrame(raf);
       ScrollTrigger.getAll().forEach((st) => {
         const trg = st.trigger;

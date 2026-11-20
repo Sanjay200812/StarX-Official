@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight } from 'lucide-react';
 import { artists } from '../data/artists';
 import BrandedImage from '../components/BrandedImage';
 import MemberDetailModal from '../components/MemberDetailModal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * BandMembers Section (Home)
@@ -24,6 +28,65 @@ import MemberDetailModal from '../components/MemberDetailModal';
  */
 export const BandMembers = ({ onNavigate, onOpenModal }) => {
   const members = artists;
+  const sectionRef = useRef(null);
+  const ringRef = useRef(null);
+
+  // Desktop: the lineup stands in a 3D ring that spins as you scroll past,
+  // so every musician gets a turn at the front of the stage.
+  useLayoutEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 1000px)', () => {
+      const ring = ringRef.current;
+      if (!ring) return undefined;
+      const slots = Array.from(ring.querySelectorAll('.rock-ring-slot'));
+      const step = 360 / slots.length;
+      const radius = Math.round((270 * slots.length) / (2 * Math.PI)) + 40;
+
+      slots.forEach((slot, i) => {
+        slot.style.transform = `rotateY(${i * step}deg) translateZ(${radius}px)`;
+      });
+      gsap.set(ring, { rotationX: -6 });
+
+      const shade = () => {
+        const current = gsap.getProperty(ring, 'rotationY');
+        slots.forEach((slot, i) => {
+          let a = (((i * step + current) % 360) + 360) % 360;
+          if (a > 180) a = 360 - a; // 0 = facing front, 180 = at the back
+          const front = 1 - a / 180;
+          slot.style.opacity = String(0.25 + front * 0.75);
+          slot.style.filter = `brightness(${(0.45 + front * 0.55).toFixed(3)})`;
+        });
+      };
+      shade();
+
+      const tween = gsap.to(ring, {
+        rotationY: -(360 - step),
+        ease: 'none',
+        onUpdate: shade,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'center center',
+          end: '+=160%',
+          scrub: 0.8,
+          pin: true,
+          anticipatePin: 1
+        }
+      });
+
+      return () => {
+        tween.scrollTrigger && tween.scrollTrigger.kill();
+        tween.kill();
+        gsap.set(ring, { clearProps: 'transform' });
+        slots.forEach((slot) => {
+          slot.style.transform = '';
+          slot.style.opacity = '';
+          slot.style.filter = '';
+        });
+      };
+    });
+    return () => mm.revert();
+  }, []);
   const [localModalMember, setLocalModalMember] = useState(null);
   const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 
@@ -45,6 +108,7 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
 
   return (
     <section
+      ref={sectionRef}
       id="artists-preview"
       className="section-standard"
       style={{
@@ -97,8 +161,11 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
         </p>
       </div>
 
-      {/* Clean Compact Card Grid */}
+      {/* Card grid (mobile/tablet) / 3D spinning ring (desktop) */}
+      <div className="rock-ring-stage">
       <div
+        ref={ringRef}
+        className="rock-ring"
         style={{
           display: 'flex',
           flexWrap: 'wrap',
@@ -113,8 +180,8 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
           const formattedNumber = `0${index + 1}`.slice(-2);
 
           return (
+            <div className="rock-ring-slot" key={member.id}>
             <div
-              key={member.id}
               onClick={() => handleOpenModal(member)}
               className="rock-card"
               role="button"
@@ -249,8 +316,10 @@ export const BandMembers = ({ onNavigate, onOpenModal }) => {
                 </div>
               </div>
             </div>
+            </div>
           );
         })}
+      </div>
       </div>
 
       {/* Link to Full Artists Page */}

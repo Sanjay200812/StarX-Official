@@ -84,6 +84,7 @@ export const FeaturedPerformances = ({ onNavigate }) => {
         {/* ONE Main 16:9 Featured Performance Preview */}
         <div
           onClick={handleWatchPerformance}
+          className="rock-3d-card"
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
@@ -104,12 +105,10 @@ export const FeaturedPerformances = ({ onNavigate }) => {
             transition: 'transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-3px)';
             e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
             e.currentTarget.style.boxShadow = '0 24px 60px rgba(0, 0, 0, 0.65)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
             e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
             e.currentTarget.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.55)';
           }}
