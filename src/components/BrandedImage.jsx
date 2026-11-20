@@ -234,7 +234,7 @@ export const BrandedImage = ({
           alt={alt}
           decoding="async"
           loading={priority ? 'eager' : 'lazy'}
-          fetchPriority={priority ? 'high' : 'auto'}
+          fetchpriority={priority ? 'high' : 'auto'}
           onError={handleImageError}
           style={{
             position: 'absolute',

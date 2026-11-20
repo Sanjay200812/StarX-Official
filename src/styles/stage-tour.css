@@ -1,0 +1,346 @@
+/* ---------- Crew: 3D ring (desktop) ---------- */
+@media (min-width: 1000px) {
+  .rock-ring-stage--crew {
+    height: 500px;
+    perspective: 1400px;
+    perspective-origin: 50% 45%;
+  }
+  .rock-ring.rock-ring--crew {
+    width: 270px !important;
+    height: 470px;
+    margin-left: -135px !important;
+    top: 10px;
+  }
+}
+
+/* ---------- Meet StarX: stage tour ---------- */
+.stage-tour {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 560px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.stage-tour-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(7, 4, 4, 0.82) 0%, rgba(7, 4, 4, 0.5) 34%, rgba(7, 4, 4, 0) 62%),
+    linear-gradient(0deg, rgba(7, 4, 4, 0.6) 0%, rgba(7, 4, 4, 0) 28%);
+}
+
+.stage-tour-head {
+  position: absolute;
+  top: clamp(84px, 11vh, 120px);
+  left: clamp(1.25rem, 6vw, 6rem);
+  right: 1.25rem;
+}
+.stage-tour-title {
+  font-family: 'Anton', sans-serif !important;
+  font-weight: 400;
+  font-size: clamp(30px, 3.6vw, 46px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: #f5f5f7;
+  margin: 0.6rem 0 0.35rem;
+}
+.stage-tour-sub {
+  font-family: var(--font-ui, 'Oswald', sans-serif) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+  color: #a1a1a6;
+  margin: 0;
+}
+
+.stage-tour-panel {
+  position: absolute;
+  left: clamp(1.25rem, 6vw, 6rem);
+  top: 50%;
+  transform: translateY(-38%);
+  width: min(560px, 46vw);
+  perspective: 900px;
+}
+
+.stage-tour-slash {
+  position: absolute;
+  left: -10%;
+  top: -6%;
+  width: 120%;
+  height: 112%;
+  background: linear-gradient(90deg, transparent, #e8141c 30%, #ff3b41 50%, #e8141c 70%, transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.stage-tour-count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: var(--font-ui, 'Oswald', sans-serif);
+  color: #a1a1a6;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+.stage-tour-count b {
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  font-size: 30px;
+  color: #e8141c;
+  letter-spacing: 0.02em;
+}
+.stage-tour-count span {
+  font-size: 14px;
+}
+.stage-tour-count i {
+  font-style: normal;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  margin-left: 0.6rem;
+  padding-left: 0.8rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.stage-tour-instrument {
+  font-family: 'Anton', sans-serif;
+  font-size: clamp(48px, 7.2vw, 112px);
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: #f5f5f7;
+  letter-spacing: 0.01em;
+  margin-bottom: clamp(1rem, 2.4vh, 1.6rem);
+  text-shadow: 0 6px 40px rgba(232, 20, 28, 0.35);
+  white-space: nowrap;
+}
+.stage-tour-instrument .mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.04em;
+}
+.stage-tour-instrument .ch {
+  display: inline-block;
+  font-family: inherit !important;
+}
+
+.stage-tour-body {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.25rem;
+}
+
+.stage-tour-photo {
+  flex: 0 0 auto;
+  width: clamp(130px, 13vw, 190px);
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #111;
+  cursor: pointer;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+  transform-origin: left center;
+}
+.stage-tour-photo:hover,
+.stage-tour-photo:focus-visible {
+  border-color: #e8141c;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 0 4px rgba(232, 20, 28, 0.35);
+  outline: none;
+}
+.stage-tour-photo img {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.stage-tour-photo:hover img {
+  transform: scale(1.06);
+}
+
+.stage-tour-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding-bottom: 0.3rem;
+  min-width: 0;
+}
+.stage-tour-on {
+  font-family: var(--font-scrawl, 'Permanent Marker', cursive) !important;
+  color: #e8141c;
+  font-size: clamp(15px, 1.4vw, 19px);
+  transform: rotate(-2deg);
+}
+.stage-tour-name {
+  font-family: var(--font-ui, 'Oswald', sans-serif) !important;
+  font-weight: 600;
+  font-size: clamp(22px, 2.3vw, 32px);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #f5f5f7;
+  margin: 0;
+  line-height: 1.1;
+}
+.stage-tour-profile {
+  margin-top: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid rgba(232, 20, 28, 0.8);
+  padding: 0 0 2px;
+  color: #f5f5f7;
+  font-family: var(--font-ui, 'Oswald', sans-serif);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.stage-tour-profile:hover {
+  color: #e8141c;
+}
+
+.stage-tour-rail {
+  position: absolute;
+  right: clamp(1rem, 3vw, 2.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.stage-tour-rail button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  background: none;
+  border: 0;
+  padding: 0.3rem 0;
+  cursor: pointer;
+  color: rgba(245, 245, 247, 0.4);
+  font-family: var(--font-ui, 'Oswald', sans-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  transition: color 0.3s ease;
+}
+.stage-tour-rail .t {
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.stage-tour-rail .n {
+  order: 2;
+}
+.stage-tour-rail .n::after {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  width: 18px;
+  height: 2px;
+  margin-left: 0.5rem;
+  background: currentColor;
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease;
+}
+.stage-tour-rail button:hover,
+.stage-tour-rail button.is-active {
+  color: #f5f5f7;
+}
+.stage-tour-rail button:hover .t,
+.stage-tour-rail button.is-active .t {
+  opacity: 1;
+  transform: none;
+}
+.stage-tour-rail button.is-active .n::after {
+  width: 40px;
+  background: #e8141c;
+}
+
+.stage-tour-all {
+  position: absolute;
+  left: clamp(1.25rem, 6vw, 6rem);
+  bottom: clamp(1.5rem, 5vh, 3rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #f5f5f7;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(232, 20, 28, 0.8);
+  padding-bottom: 2px;
+  transition: color 0.2s ease;
+}
+.stage-tour-all:hover {
+  color: #e8141c;
+}
+
+/* Phones & tablets: instrument in the top half, artist panel at the bottom */
+@media (max-width: 899px) {
+  .stage-tour-shade {
+    background: linear-gradient(0deg, rgba(7, 4, 4, 0.92) 0%, rgba(7, 4, 4, 0.7) 38%, rgba(7, 4, 4, 0) 62%);
+  }
+  .stage-tour-head {
+    top: 78px;
+    left: 1.25rem;
+  }
+  .stage-tour-title {
+    font-size: 28px;
+  }
+  .stage-tour-sub {
+    font-size: 10.5px;
+  }
+  .stage-tour-panel {
+    top: auto;
+    bottom: 4.2rem;
+    left: 1.25rem;
+    right: 1.25rem;
+    width: auto;
+    transform: none;
+  }
+  .stage-tour-instrument {
+    font-size: clamp(40px, 12vw, 64px);
+    margin-bottom: 0.9rem;
+  }
+  .stage-tour-photo {
+    width: 104px;
+  }
+  .stage-tour-name {
+    font-size: 21px;
+  }
+  .stage-tour-rail {
+    top: auto;
+    bottom: 1.6rem;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  .stage-tour-rail .t {
+    display: none;
+  }
+  .stage-tour-rail .n {
+    font-size: 0;
+  }
+  .stage-tour-rail .n::after {
+    width: 14px;
+    margin-left: 0;
+  }
+  .stage-tour-rail button.is-active .n::after {
+    width: 30px;
+  }
+  .stage-tour-all {
+    display: none;
+  }
+}

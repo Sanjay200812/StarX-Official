@@ -15,6 +15,12 @@ import {
   RockPageTransition,
   useRockScrollFX
 } from './components/rock/RockFX';
+import {
+  initSmoothScroll,
+  destroySmoothScroll,
+  stopSmoothScroll,
+  startSmoothScroll
+} from './lib/smoothScroll';
 
 // 5 Core Homepage Components (Direct synchronous load for instant Hero render - Spec 39)
 import Hero from './sections/Hero';
@@ -76,6 +82,8 @@ export function App() {
   });
 
   const [introFinished, setIntroFinished] = useState(false);
+  // true from the moment the intro shutter starts opening: the hero animates in underneath
+  const [introRevealing, setIntroRevealing] = useState(false);
   const [showIntroOverlay, setShowIntroOverlay] = useState(true);
   const [heroEntryPlayed, setHeroEntryPlayed] = useState(false);
   const isFinishingIntroRef = useRef(false);
@@ -245,6 +253,7 @@ export function App() {
   }, []);
 
   const handleIntroStartExit = useCallback(() => {
+    setIntroRevealing(true);
     window.scrollTo({
       top: 0,
       left: 0,
@@ -367,12 +376,25 @@ export function App() {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
 
-  const isHomeReady = introFinished && currentView === 'home';
-  const isNavbarReady = introFinished;
+  const isHomeReady = (introRevealing || introFinished) && currentView === 'home';
+  const isNavbarReady = introRevealing || introFinished;
   const isIntroActive = !introFinished;
 
   // Global rock scroll choreography (headings, images, cards) for the active view
   useRockScrollFX(currentView, introFinished);
+
+  // Smooth momentum scrolling (Lenis), synced with GSAP ScrollTrigger
+  useEffect(() => {
+    initSmoothScroll();
+    return () => destroySmoothScroll();
+  }, []);
+
+  // Freeze page scroll while the intro or any overlay is open
+  const isOverlayOpen = showIntroOverlay || Boolean(activeMemberModal) || isMobileMenuOpen || isLightboxOpen;
+  useEffect(() => {
+    if (isOverlayOpen) stopSmoothScroll();
+    else startSmoothScroll();
+  }, [isOverlayOpen]);
 
   return (
     <div
@@ -394,11 +416,13 @@ export function App() {
       */}
       <div
         id="site-content"
-        className={introFinished ? 'home-ready' : 'home-waiting'}
+        className="home-ready"
         style={{
           position: 'relative',
           zIndex: 1,
-          opacity: introFinished ? 1 : 0,
+          // Always painted underneath the intro so the shutter reveals a finished
+          // page instead of fading through black
+          opacity: 1,
           pointerEvents: introFinished ? 'auto' : 'none',
           transition: 'opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1)'
         }}
@@ -406,7 +430,7 @@ export function App() {
         {/* 2. Floating Smoked-Glass Top Navbar */}
         <Navbar
           isReady={isNavbarReady}
-          isIntroActive={isIntroActive}
+          isIntroActive={!isNavbarReady}
           currentView={currentView}
           onNavigate={handleNavigate}
           isMobileMenuOpen={isMobileMenuOpen}

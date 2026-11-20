@@ -1,364 +1,290 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
+import gsap from 'gsap';
 
 /**
- * StarXIntro Component
- * High-reliability cinematic intro video system for StarX Live.
+ * StarXIntro — "lights down, show on".
  *
- * Requirements (Specs 13-26):
- * - Clear states: 'loading' | 'playing' | 'exiting' | 'complete'
- * - Viewport-accurate source: width < 768 -> mobile, width >= 768 -> pc
- * - Branded loading frame: centered StarX logo + subtle pulse + minimal indicator (NO plain black screen)
- * - preload="auto", muted, playsInline, video.load()
- * - Real media events: canplay, playing, ended, error
- * - Play failure / 4.5s load timeout: graceful fallback transition to Home (no 15s wait)
- * - Cancel load timeout as soon as 'playing' fires
- * - Runs on every full document load; SPA route changes do not remount it
+ * A realistic concert opening instead of a graphic animation:
+ *   1. The arena is dark and hazy; the crowd is a silhouette in the
+ *      foreground, phone lights coming on here and there.
+ *   2. "Hyderabad · Tonight" — then the house goes quiet.
+ *   3. The centre follow spot hits (with the little flicker a real lamp has),
+ *      then the side beams, which start to sweep through the haze.
+ *   4. The LED wall powers up line by line: STARX LIVE.
+ *   5. Strobe hits, the crowd's hands go up.
+ *   6. The camera pushes over the crowd and the darkness dissolves into
+ *      the real site: hero + the 3D stage, already rendered underneath.
+ *
+ * The exit waits (briefly) for the 3D stage to report its first frame, so the
+ * reveal never lands on an empty dark background. Skippable at any time.
  */
-export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplete }) => {
-  // 1. Viewport-accurate source selection (Spec 17)
-  const [videoSrc] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 768
-        ? '/assets/videos/starx-intro-mobile.mp4'
-        : '/assets/videos/starx-intro-pc.mp4';
-    }
-    return '/assets/videos/starx-intro-pc.mp4';
-  });
 
-  // 2. Explicit state model (Spec 15)
-  const [introState, setIntroState] = useState('loading'); // 'loading' | 'playing' | 'exiting' | 'complete'
-  const videoRef = useRef(null);
-  const exitCalledRef = useRef(false);
-  const loadTimeoutRef = useRef(null);
-  const exitTimerRef = useRef(null);
+const seeded = (seed) => {
+  let s = seed;
+  return () => {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+};
 
-  // 3. Unified exit sequence (Specs 14, 21, 24, 25)
-  const handleExit = useCallback((source = 'ended') => {
-    if (exitCalledRef.current) return;
-    exitCalledRef.current = true;
-
-    // Clear safety timeout
-    if (loadTimeoutRef.current) {
-      clearTimeout(loadTimeoutRef.current);
-      loadTimeoutRef.current = null;
-    }
-
-    // Pause video
-    if (videoRef.current) {
-      try {
-        videoRef.current.pause();
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    // Notify transition start
-    if (onStartExit) {
-      onStartExit(source);
-    }
-
-    // Transition to exiting state (650ms smooth fade)
-    setIntroState('exiting');
-
-    exitTimerRef.current = setTimeout(() => {
-      setIntroState('complete');
-      if (onFinishExit) {
-        onFinishExit(source);
-      } else if (onFinishIntro) {
-        onFinishIntro(source);
-      } else if (onComplete) {
-        onComplete(source);
-      }
-    }, 650);
-  }, [onStartExit, onFinishExit, onFinishIntro, onComplete]);
-
-  // Prevent scroll during intro (Spec 26)
-  useEffect(() => {
-    const preventScroll = (e) => {
-      e.preventDefault();
-    };
-
-    const preventKeyScroll = (e) => {
-      // Space, PageUp, PageDown, End, Home, Left, Up, Right, Down
-      if ([32, 33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) {
-        e.preventDefault();
-      }
-    };
-
-    window.addEventListener('wheel', preventScroll, { passive: false });
-    window.addEventListener('touchmove', preventScroll, { passive: false });
-    window.addEventListener('keydown', preventKeyScroll, { passive: false });
-
-    return () => {
-      window.removeEventListener('wheel', preventScroll);
-      window.removeEventListener('touchmove', preventScroll);
-      window.removeEventListener('keydown', preventKeyScroll);
-    };
-  }, []);
-
-  // Video initialization & playback handling (Specs 18-23)
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    video.muted = true;
-    video.playsInline = true;
-
-    // Call video.load() as per Spec 18
-    try {
-      video.load();
-    } catch (e) {
-      // ignore
-    }
-
-    // 4.5s load failure safety timeout ONLY (Spec 22: max 4-5s)
-    loadTimeoutRef.current = setTimeout(() => {
-      console.warn('[StarXIntro] Video buffering timed out at 4.5s, exiting gracefully to Home.');
-      handleExit('timeout');
-    }, 4500);
-
-    const onCanPlay = () => {
-      // Always begin the intro from frame zero.
-      try {
-        video.currentTime = 0;
-      } catch (e) {
-        // ignore
-      }
-
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn('[StarXIntro] Autoplay rejected, exiting gracefully to Home:', err);
-          handleExit('play_error');
+// Procedural crowd silhouette: two rows of heads/shoulders, some hands up, some phones
+const buildCrowd = () => {
+  const rnd = seeded(7);
+  const rows = [
+    { count: 26, y: 300, scale: 0.72, fill: '#140b0c' },
+    { count: 17, y: 360, scale: 1.05, fill: '#050303' }
+  ];
+  const people = [];
+  const arms = [];
+  const phones = [];
+  rows.forEach((row, ri) => {
+    const step = 1600 / row.count;
+    for (let i = 0; i < row.count; i += 1) {
+      const x = step * i + step * (0.2 + rnd() * 0.6);
+      const s = row.scale * (0.85 + rnd() * 0.3);
+      const y = row.y + rnd() * 18;
+      const headR = 24 * s;
+      const shoulderW = 70 * s;
+      const top = y - headR * 2.2;
+      // head + neck + shoulders as one path
+      people.push({
+        fill: row.fill,
+        d: `M${x - shoulderW} 420 L${x - shoulderW} ${y + 26 * s} Q${x - shoulderW} ${y} ${x - 18 * s} ${y - 4 * s} L${x - 9 * s} ${y - 10 * s} A${headR} ${headR * 1.15} 0 1 1 ${x + 9 * s} ${y - 10 * s} L${x + 18 * s} ${y - 4 * s} Q${x + shoulderW} ${y} ${x + shoulderW} ${y + 26 * s} L${x + shoulderW} 420 Z`
+      });
+      const r = rnd();
+      if (r < (ri ? 0.55 : 0.45)) {
+        // raised arm from one shoulder
+        const side = rnd() < 0.5 ? -1 : 1;
+        const sx = x + side * shoulderW * 0.75;
+        const sy = y + 6 * s;
+        const hx = sx + side * (10 + rnd() * 30) * s;
+        const hy = top - (60 + rnd() * 70) * s;
+        const w = 13 * s;
+        const phone = rnd() < 0.6;
+        arms.push({
+          fill: row.fill,
+          d: `M${sx - w} ${sy + 20 * s} L${hx - w * 0.7} ${hy + 14 * s} Q${hx} ${hy - 12 * s} ${hx + w * 0.7} ${hy + 14 * s} L${sx + w} ${sy + 20 * s} Z`
         });
+        if (phone) phones.push({ x: hx, y: hy - 6 * s, s, delay: rnd() * 2.2, front: ri === 1 });
       }
-    };
+    }
+  });
+  return { people, arms, phones };
+};
 
-    const onPlaying = () => {
-      // Spec 23: As soon as 'playing' fires, cancel failure timeout!
-      if (loadTimeoutRef.current) {
-        clearTimeout(loadTimeoutRef.current);
-        loadTimeoutRef.current = null;
+export const StarXIntro = ({ onStartExit, onFinishExit, onFinishIntro, onComplete }) => {
+  const rootRef = useRef(null);
+  const sceneRef = useRef(null);
+  const bgRef = useRef(null);
+  const hazeRef = useRef(null);
+  const spotRef = useRef(null);
+  const beamLRef = useRef(null);
+  const beamRRef = useRef(null);
+  const screenRef = useRef(null);
+  const screenWipeRef = useRef(null);
+  const crowdRef = useRef(null);
+  const armsRef = useRef(null);
+  const phonesRef = useRef(null);
+  const captionRef = useRef(null);
+  const strobeRef = useRef(null);
+  const skipRef = useRef(null);
+  const tlRef = useRef(null);
+  const exitingRef = useRef(false);
+  const waitRef = useRef(null);
+
+  const crowd = useMemo(buildCrowd, []);
+
+  const finish = useCallback(
+    (source) => {
+      const cb = onFinishExit || onFinishIntro || onComplete;
+      if (cb) cb(source);
+    },
+    [onFinishExit, onFinishIntro, onComplete]
+  );
+
+  const runExit = useCallback(
+    (source = 'ended') => {
+      if (exitingRef.current) return;
+      exitingRef.current = true;
+      if (tlRef.current) tlRef.current.kill();
+      if (waitRef.current) waitRef.current();
+      if (onStartExit) onStartExit(source);
+
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced || source === 'skip') {
+        gsap.to(rootRef.current, { opacity: 0, duration: reduced ? 0.35 : 0.6, ease: 'power2.inOut', onComplete: () => finish(source) });
+        return;
       }
-      setIntroState('playing');
+
+      // Push in over the crowd; the dark arena dissolves into the real site
+      gsap
+        .timeline({ onComplete: () => finish(source) })
+        .to(skipRef.current, { opacity: 0, duration: 0.25 }, 0)
+        .to(captionRef.current, { opacity: 0, duration: 0.3 }, 0)
+        .to(sceneRef.current, { scale: 1.18, duration: 1.4, ease: 'power2.inOut' }, 0)
+        .to(crowdRef.current, { yPercent: 55, duration: 1.3, ease: 'power3.in' }, 0.05)
+        .to(screenRef.current, { opacity: 0, scale: 1.1, filter: 'blur(6px)', duration: 0.8, ease: 'power2.in' }, 0.25)
+        .to([spotRef.current, beamLRef.current, beamRRef.current], { opacity: 0, duration: 0.9, ease: 'power2.in' }, 0.35)
+        .to(bgRef.current, { opacity: 0, duration: 1.0, ease: 'power2.inOut' }, 0.35)
+        .to(hazeRef.current, { opacity: 0, duration: 1.0, ease: 'power2.inOut' }, 0.45);
+    },
+    [finish, onStartExit]
+  );
+
+  // Exit only once the 3D stage has painted (or after a short grace period)
+  const exitWhenStageReady = useCallback(() => {
+    if (window.__starxStageReady) {
+      runExit('ended');
+      return;
+    }
+    const go = () => runExit('ended');
+    const timer = window.setTimeout(go, 3000);
+    window.addEventListener('starx:stage-ready', go, { once: true });
+    waitRef.current = () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('starx:stage-ready', go);
     };
+  }, [runExit]);
 
-    const onError = (e) => {
-      console.warn('[StarXIntro] Video error event fired:', e);
-      handleExit('error');
+  // Block page scrolling while the intro is up; Esc / Enter skip
+  useEffect(() => {
+    const prevent = (e) => e.preventDefault();
+    const onKey = (e) => {
+      if ([32, 33, 34, 35, 36, 37, 38, 39, 40].includes(e.keyCode)) e.preventDefault();
+      if (e.key === 'Escape' || e.key === 'Enter') runExit('skip');
     };
-
-    video.addEventListener('canplay', onCanPlay, { once: true });
-    video.addEventListener('playing', onPlaying, { once: true });
-    video.addEventListener('error', onError, { once: true });
-
+    window.addEventListener('wheel', prevent, { passive: false });
+    window.addEventListener('touchmove', prevent, { passive: false });
+    window.addEventListener('keydown', onKey, { passive: false });
     return () => {
-      if (loadTimeoutRef.current) clearTimeout(loadTimeoutRef.current);
-      if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
-      video.removeEventListener('canplay', onCanPlay);
-      video.removeEventListener('playing', onPlaying);
-      video.removeEventListener('error', onError);
+      window.removeEventListener('wheel', prevent);
+      window.removeEventListener('touchmove', prevent);
+      window.removeEventListener('keydown', onKey);
+      if (waitRef.current) waitRef.current();
     };
-  }, [videoSrc, handleExit]);
+  }, [runExit]);
 
-  const isExiting = introState === 'exiting' || introState === 'complete';
-  const isLoading = introState === 'loading';
+  useLayoutEffect(() => {
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      const t = window.setTimeout(() => runExit('reduced'), 900);
+      return () => window.clearTimeout(t);
+    }
+
+    const ctx = gsap.context(() => {
+      const phones = phonesRef.current ? phonesRef.current.children : [];
+      const lines = screenRef.current ? screenRef.current.querySelectorAll('[data-led]') : [];
+
+      gsap.set([spotRef.current, beamLRef.current, beamRRef.current], { opacity: 0 });
+      gsap.set(screenRef.current, { opacity: 0 });
+      gsap.set(screenWipeRef.current, { scaleY: 1 });
+      gsap.set(lines, { opacity: 0 });
+      gsap.set(phones, { opacity: 0, scale: 0.4, transformOrigin: '50% 50%' });
+      gsap.set(armsRef.current, { y: 70 });
+      gsap.set(crowdRef.current, { yPercent: 6 });
+      gsap.set(captionRef.current, { opacity: 0, y: 10 });
+      gsap.set(skipRef.current, { opacity: 0 });
+
+      // a real lamp striking: hit, dip, catch, settle
+      const strike = (peak = 1) => [
+        { opacity: peak, duration: 0.05 },
+        { opacity: peak * 0.25, duration: 0.06 },
+        { opacity: peak * 0.9, duration: 0.05 },
+        { opacity: peak * 0.55, duration: 0.07 },
+        { opacity: peak, duration: 0.12 }
+      ];
+
+      const tl = gsap.timeline({ onComplete: exitWhenStageReady });
+      tlRef.current = tl;
+
+      tl.to(skipRef.current, { opacity: 1, duration: 0.5 }, 0.3)
+        .to(crowdRef.current, { yPercent: 0, duration: 3.4, ease: 'power1.out' }, 0)
+        // 1. phone lights come on across the crowd
+        .to(phones, { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out', stagger: { each: 0.05, from: 'random' } }, 0.2)
+        .to(captionRef.current, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 0.35)
+        // 2. centre follow spot strikes
+        .to(spotRef.current, { keyframes: strike(1) }, 1.0)
+        // 3. side beams strike
+        .to(beamLRef.current, { keyframes: strike(0.85) }, 1.45)
+        .to(beamRRef.current, { keyframes: strike(0.85) }, 1.55)
+        // 4. LED wall powers up line by line
+        .to(screenRef.current, { opacity: 1, duration: 0.15 }, 1.7)
+        .to(screenWipeRef.current, { scaleY: 0, duration: 0.55, ease: 'steps(12)' }, 1.72)
+        .to(lines, { keyframes: [{ opacity: 1, duration: 0.04 }, { opacity: 0.3, duration: 0.05 }, { opacity: 1, duration: 0.08 }], stagger: 0.12 }, 1.85)
+        .to(captionRef.current, { opacity: 0.55, duration: 0.4 }, 2.0)
+        // 5. strobe hits, hands go up
+        .fromTo(strobeRef.current, { opacity: 0 }, { keyframes: [{ opacity: 0.55, duration: 0.04 }, { opacity: 0, duration: 0.09 }, { opacity: 0.45, duration: 0.04 }, { opacity: 0, duration: 0.2 }] }, 2.6)
+        .to(armsRef.current, { y: 0, duration: 0.5, ease: 'back.out(1.6)' }, 2.62)
+        .to(phones, { scale: 1.25, duration: 0.3, ease: 'power2.out', stagger: { each: 0.02, from: 'random' } }, 2.65)
+        // hold the moment
+        .to({}, { duration: 0.6 }, 3.0);
+    }, rootRef);
+
+    return () => ctx.revert();
+  }, [runExit, exitWhenStageReady]);
 
   return (
-    <div
-      id="starx-intro-overlay"
-      className={isExiting ? 'intro-fading' : ''}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        width: '100vw',
-        height: '100dvh',
-        backgroundColor: '#000000',
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        touchAction: 'none',
-        opacity: isExiting ? 0 : 1,
-        visibility: 'visible',
-        transition: 'opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
-        pointerEvents: isExiting ? 'none' : 'auto'
-      }}
-    >
-      <style>{`
-        .intro-skip-btn {
-          position: absolute;
-          top: 24px;
-          right: 28px;
-          z-index: 1010;
-          font-family: 'Inter', -apple-system, sans-serif;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.08em;
-          color: #F5F5F7;
-          background: rgba(14, 14, 18, 0.65);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 999px;
-          padding: 8px 18px;
-          cursor: pointer;
-          transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          user-select: none;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
-        }
-
-        .intro-skip-btn:hover {
-          background: rgba(255, 255, 255, 0.18);
-          border-color: rgba(255, 255, 255, 0.45);
-          transform: scale(1.03);
-        }
-
-        @media (max-width: 767px) {
-          .intro-skip-btn {
-            top: max(16px, env(safe-area-inset-top));
-            right: max(16px, env(safe-area-inset-right));
-            font-size: 11.5px;
-            padding: 7px 15px;
-          }
-        }
-
-        @keyframes starxPulse {
-          0%, 100% {
-            opacity: 0.85;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.025);
-          }
-        }
-
-        @keyframes starxSpin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        .starx-loader-ring {
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
-          border: 2px solid rgba(255, 255, 255, 0.08);
-          border-top-color: #E8141C;
-          animation: starxSpin 0.9s linear infinite;
-        }
-      `}</style>
-
-      {/* Intro Video Element (Specs 18-20) */}
-      <video
-        id="starx-intro-video"
-        ref={videoRef}
-        key={videoSrc}
-        src={videoSrc}
-        preload="auto"
-        autoPlay
-        muted
-        playsInline
-        onEnded={() => handleExit('ended')}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center',
-          backgroundColor: '#000000',
-          display: 'block',
-          opacity: isLoading ? 0 : 1,
-          transition: 'opacity 0.45s ease',
-          visibility: 'visible'
-        }}
-      />
-
-      {/* Branded Loading Frame (Spec 16: Zero plain black screen) */}
-      <div
-        id="starx-intro-loading-frame"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundColor: '#000000',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1005,
-          opacity: isLoading ? 1 : 0,
-          pointerEvents: isLoading ? 'auto' : 'none',
-          transition: 'opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1)'
-        }}
-      >
-        {/* Centered Circular StarX Logo with Subtle Glow & Pulse */}
-        <div
-          style={{
-            position: 'relative',
-            width: '84px',
-            height: '84px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            backgroundColor: '#050505',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 0 40px rgba(232, 20, 28, 0.28), 0 10px 30px rgba(0, 0, 0, 0.8)',
-            marginBottom: '1.25rem',
-            animation: 'starxPulse 2.2s ease-in-out infinite',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <img
-            src="/assets/brand/starx-logo.png"
-            alt="StarX Live"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block'
-            }}
-          />
+    <div id="starx-intro" ref={rootRef} role="presentation">
+      <div ref={bgRef} className="ri-bg" />
+      <div ref={sceneRef} className="ri-scene">
+        <div ref={hazeRef} className="ri-haze" aria-hidden="true">
+          <i />
+          <i />
+          <i />
         </div>
 
-        {/* Brand Name & Loading Indicator */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '0.65rem'
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "'Bodoni Moda', serif",
-              fontSize: '15px',
-              fontWeight: 650,
-              letterSpacing: '0.14em',
-              color: '#F5F5F7',
-              textTransform: 'uppercase'
-            }}
-          >
-            STAR<span style={{ color: '#E8141C' }}>X</span> LIVE
-          </span>
+        <div ref={beamLRef} className="ri-beam is-left" aria-hidden="true" />
+        <div ref={beamRRef} className="ri-beam is-right" aria-hidden="true" />
+        <div ref={spotRef} className="ri-spot" aria-hidden="true" />
 
-          <div className="starx-loader-ring" aria-label="Loading..." />
+        <div ref={screenRef} className="ri-screen" aria-label="StarX Live">
+          <img data-led src="/assets/brand/starx-logo.png" alt="" width="96" height="96" className="ri-screen-logo" />
+          <div data-led className="ri-screen-word" aria-hidden="true">
+            STAR<span>X</span>
+          </div>
+          <div data-led className="ri-screen-live" aria-hidden="true">
+            Live · Rock Band
+          </div>
+          <div className="ri-screen-dots" aria-hidden="true" />
+          <div ref={screenWipeRef} className="ri-screen-wipe" aria-hidden="true" />
         </div>
+
+        <svg ref={crowdRef} className="ri-crowd" viewBox="0 0 1600 420" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+          <defs>
+            <radialGradient id="ri-phone-glow">
+              <stop offset="0" stopColor="#fff6e8" stopOpacity="1" />
+              <stop offset="0.35" stopColor="#ffe2b8" stopOpacity="0.55" />
+              <stop offset="1" stopColor="#ffd39a" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <g ref={armsRef}>
+            {crowd.arms.map((a, i) => (
+              <path key={i} d={a.d} fill={a.fill} />
+            ))}
+          </g>
+          {crowd.people.map((p, i) => (
+            <path key={i} d={p.d} fill={p.fill} />
+          ))}
+          <g ref={phonesRef}>
+            {crowd.phones.map((ph, i) => (
+              <g key={i}>
+                <circle cx={ph.x} cy={ph.y} r={34 * ph.s} fill="url(#ri-phone-glow)" className="ri-phone-glow" style={{ animationDelay: `${ph.delay}s` }} />
+                <rect x={ph.x - 7 * ph.s} y={ph.y - 11 * ph.s} width={14 * ph.s} height={22 * ph.s} rx={2.5 * ph.s} fill="#fffaf2" />
+              </g>
+            ))}
+          </g>
+        </svg>
+
+        <div ref={strobeRef} className="ri-strobe" aria-hidden="true" />
       </div>
 
-      {/* Clean SKIP Button (Spec 25: Always visible on top) */}
-      <button
-        type="button"
-        id="intro-skip-button"
-        onClick={() => handleExit('skip')}
-        className="intro-skip-btn"
-        aria-label="Skip Intro Video"
-      >
-        SKIP
+      <div ref={captionRef} className="ri-caption" aria-hidden="true">
+        <span className="dot" />
+        Hyderabad · Tonight
+      </div>
+
+      <button ref={skipRef} type="button" id="intro-skip-button" className="intro-skip" onClick={() => runExit('skip')} aria-label="Skip intro">
+        Skip intro →
       </button>
     </div>
   );

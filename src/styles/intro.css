@@ -1,0 +1,257 @@
+/* ====================================================================
+   Intro: "lights down, show on" — realistic concert opening
+   ==================================================================== */
+
+#starx-intro {
+  background: transparent;
+}
+
+.ri-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 100%, rgba(120, 10, 14, 0.28), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 38%, rgba(60, 8, 10, 0.25), transparent 70%),
+    #070404;
+}
+
+.ri-scene {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 62%;
+  will-change: transform;
+}
+
+/* Stage haze drifting through the light */
+.ri-haze {
+  position: absolute;
+  inset: -10%;
+  pointer-events: none;
+  opacity: 0.9;
+}
+.ri-haze i {
+  position: absolute;
+  width: 70vmax;
+  height: 40vmax;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(150, 120, 120, 0.09), transparent);
+  filter: blur(30px);
+  animation: riHaze 16s ease-in-out infinite alternate;
+}
+.ri-haze i:nth-child(1) { left: -10%; top: 20%; }
+.ri-haze i:nth-child(2) { right: -15%; top: 35%; animation-duration: 21s; animation-delay: -6s; }
+.ri-haze i:nth-child(3) { left: 20%; top: 55%; animation-duration: 18s; animation-delay: -11s; }
+
+@keyframes riHaze {
+  from { transform: translate3d(-4%, 0, 0) scale(1); }
+  to { transform: translate3d(6%, -4%, 0) scale(1.15); }
+}
+
+/* Centre follow spot: a soft cone through the haze with a pool of light */
+.ri-spot {
+  position: absolute;
+  left: 50%;
+  top: -12%;
+  width: min(80vw, 760px);
+  height: 92%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(16px);
+}
+.ri-spot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 244, 228, 0.55) 0%, rgba(255, 232, 205, 0.16) 55%, rgba(255, 225, 190, 0.05) 100%);
+  clip-path: polygon(46% 0, 54% 0, 92% 100%, 8% 100%);
+}
+.ri-spot::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -6%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 236, 214, 0.35), transparent);
+  filter: blur(10px);
+}
+
+/* Side beams: coloured, sweeping slowly like moving heads */
+.ri-beam {
+  position: absolute;
+  top: -8%;
+  width: min(36vw, 420px);
+  height: 115%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform-origin: 50% 0;
+  filter: blur(14px);
+}
+.ri-beam::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(47% 0, 53% 0, 100% 100%, 0 100%);
+}
+.ri-beam.is-left {
+  left: 6%;
+  animation: riSweepL 6s ease-in-out infinite alternate;
+}
+.ri-beam.is-left::before {
+  background: linear-gradient(180deg, rgba(255, 50, 56, 0.6), rgba(232, 20, 28, 0.12) 65%, transparent);
+}
+.ri-beam.is-right {
+  right: 6%;
+  animation: riSweepR 7s ease-in-out infinite alternate;
+}
+.ri-beam.is-right::before {
+  background: linear-gradient(180deg, rgba(255, 181, 71, 0.5), rgba(255, 140, 40, 0.1) 65%, transparent);
+}
+@keyframes riSweepL {
+  from { transform: rotate(-24deg); }
+  to { transform: rotate(8deg); }
+}
+@keyframes riSweepR {
+  from { transform: rotate(22deg); }
+  to { transform: rotate(-10deg); }
+}
+
+/* LED wall */
+.ri-screen {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: min(620px, 84vw);
+  aspect-ratio: 16 / 7.4;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.2rem, 1vh, 0.6rem);
+  background: radial-gradient(ellipse at 50% 50%, #1a0709, #0b0405 75%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  box-shadow: 0 0 80px rgba(232, 20, 28, 0.28), 0 30px 80px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+.ri-screen-logo {
+  width: clamp(44px, 7vw, 72px);
+  height: auto;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 18px rgba(232, 20, 28, 0.7));
+}
+.ri-screen-word {
+  font-family: 'Anton', sans-serif !important;
+  font-size: clamp(64px, 13vw, 150px);
+  line-height: 0.86;
+  letter-spacing: 0.02em;
+  color: #fff4ee;
+  text-shadow: 0 0 22px rgba(255, 210, 200, 0.45), 0 0 60px rgba(232, 20, 28, 0.35);
+}
+.ri-screen-word span {
+  font-family: inherit !important;
+  color: #ff2a30;
+  text-shadow: 0 0 26px rgba(255, 42, 48, 0.9);
+}
+.ri-screen-live {
+  font-family: var(--font-ui, 'Oswald', sans-serif) !important;
+  font-size: clamp(11px, 1.4vw, 15px);
+  font-weight: 600;
+  letter-spacing: 0.55em;
+  padding-left: 0.55em;
+  text-transform: uppercase;
+  color: rgba(255, 236, 228, 0.85);
+}
+/* the pixel grid of a real LED panel */
+.ri-screen-dots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, transparent 0 1px, rgba(0, 0, 0, 0.5) 1.6px);
+  background-size: 4px 4px;
+}
+.ri-screen-wipe {
+  position: absolute;
+  inset: 0;
+  background: #0b0405;
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+
+/* Crowd silhouette in the foreground, rim-lit by the stage */
+.ri-crowd {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: clamp(220px, 40vh, 420px);
+  filter: drop-shadow(0 -2px 5px rgba(232, 20, 28, 0.35));
+  will-change: transform;
+}
+.ri-phone-glow {
+  animation: riTwinkle 2.4s ease-in-out infinite;
+}
+@keyframes riTwinkle {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 0.45; }
+}
+
+.ri-strobe {
+  position: absolute;
+  inset: 0;
+  background: #fffaf2;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ri-caption {
+  position: absolute;
+  top: clamp(1.4rem, 4vh, 2rem);
+  left: clamp(1rem, 4vw, 2.5rem);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-ui, 'Oswald', sans-serif) !important;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  z-index: 4;
+}
+.ri-caption .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e8141c;
+  box-shadow: 0 0 10px #e8141c;
+  animation: riPulse 1.2s ease-in-out infinite;
+}
+@keyframes riPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@media (max-width: 640px) {
+  .ri-screen {
+    top: 36%;
+  }
+  .ri-beam {
+    width: 48vw;
+  }
+  .ri-caption {
+    font-size: 10.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ri-haze i,
+  .ri-beam,
+  .ri-phone-glow,
+  .ri-caption .dot {
+    animation: none;
+  }
+}
