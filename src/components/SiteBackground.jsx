@@ -41,7 +41,7 @@ export const SiteBackground = ({ currentView = 'home' }) => {
           zIndex: 3,
           pointerEvents: 'none',
           background: isHome
-            ? 'radial-gradient(ellipse at center, rgba(7,4,4,0) 35%, rgba(7,4,4,0.55) 100%)'
+            ? 'radial-gradient(ellipse at center, rgba(7,4,4,0.28) 30%, rgba(7,4,4,0.62) 100%)'
             : 'linear-gradient(180deg, rgba(7,4,4,0.55), rgba(7,4,4,0.7))',
           transition: 'background 0.6s ease'
         }}
