@@ -53,7 +53,7 @@ export const artists = [
   },
   {
     id: 6,
-    name: "K. Sudhakar",
+    name: "G. Sudhakar",
     role: "Singer",
     image: "/assets/artists/k-sudhakar.jpg",
     bio: "Profile details will be updated soon.",

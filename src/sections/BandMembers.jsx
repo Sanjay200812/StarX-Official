@@ -1,365 +1,258 @@
-import React, { useState, useLayoutEffect, useRef } from 'react';
+import React, { useState, useLayoutEffect, useEffect, useRef, useCallback } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { artists } from '../data/artists';
 import BrandedImage from '../components/BrandedImage';
 import MemberDetailModal from '../components/MemberDetailModal';
+import { stageFocus } from '../lib/stageFocus';
+import { scrollToY } from '../lib/smoothScroll';
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * BandMembers Section (Home)
- * "MEET STARX"
+ * BandMembers (Home) — "MEET STARX" stage tour.
  *
- * Requirements:
- * - 7 confirmed artists:
- *     1. B. Prasad (Rhythm Pad)
- *     2. B. Joseph (Drum Kit)
- *     3. G. Perumalla Rao (Piano 1)
- *     4. N. Thirapatiyya (Lead Guitar)
- *     5. E. Chandra Mohan (Bass Guitar)
- *     6. K. Sudhakar (Singer)
- *     7. G. Vijay (Singer)
- * - Compact card width: 230px to 270px, image ratio 4:5
- * - Name: 17px to 20px, Role: 11px to 13px
- * - Single click opens artist modal directly
- * - Link "View artist profiles →" navigates to /artists
+ * The section pins to the screen and each scroll step flies the 3D stage
+ * camera to one instrument, with the artist who plays it:
+ *   01 Rhythm Pad — B. Prasad      02 Drum Kit — B. Joseph
+ *   03 Piano — G. Perumalla Rao    04 Lead Guitar — N. Thirapatiyya
+ *   05 Bass Guitar — E. Chandra Mohan
+ *   06 Vocals — G. Sudhakar        07 Vocals — G. Vijay
+ * The camera itself lives in StageUniverse; this section only reports where
+ * the tour is through `stageFocus`. Clicking the photo opens the profile.
  */
+
+// Order matches the camera shots in StageUniverse
+const TOUR = [
+  { id: 1, instrument: 'Rhythm Pad', note: 'Pads & percussion' },
+  { id: 2, instrument: 'Drum Kit', note: 'Drums' },
+  { id: 3, instrument: 'Piano', note: 'Keys' },
+  { id: 4, instrument: 'Lead Guitar', note: 'Lead guitar' },
+  { id: 5, instrument: 'Bass Guitar', note: 'Bass' },
+  { id: 6, instrument: 'Vocals', note: 'Lead vocals' },
+  { id: 7, instrument: 'Vocals', note: 'Lead vocals' }
+].map((stop) => ({ ...stop, artist: artists.find((a) => a.id === stop.id) || artists[stop.id - 1] }));
+
+const LAST = TOUR.length - 1;
+// how much scroll each instrument gets, in viewport heights
+const VH_PER_STOP = 0.9;
+
+// Hold on each instrument for a while, then travel to the next
+const holdEase = (x) => {
+  const i = Math.floor(x);
+  const f = x - i;
+  const t = Math.min(1, Math.max(0, (f - 0.28) / 0.44));
+  return i + t * t * (3 - 2 * t);
+};
+
 export const BandMembers = ({ onNavigate, onOpenModal }) => {
-  const members = artists;
   const sectionRef = useRef(null);
-  const ringRef = useRef(null);
-
-  // Desktop: the lineup stands in a 3D ring that spins as you scroll past,
-  // so every musician gets a turn at the front of the stage.
-  useLayoutEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-    const mm = gsap.matchMedia();
-    mm.add('(min-width: 1000px)', () => {
-      const ring = ringRef.current;
-      if (!ring) return undefined;
-      const slots = Array.from(ring.querySelectorAll('.rock-ring-slot'));
-      const step = 360 / slots.length;
-      const radius = Math.round((270 * slots.length) / (2 * Math.PI)) + 40;
-
-      slots.forEach((slot, i) => {
-        slot.style.transform = `rotateY(${i * step}deg) translateZ(${radius}px)`;
-      });
-      gsap.set(ring, { rotationX: -6 });
-
-      const shade = () => {
-        const current = gsap.getProperty(ring, 'rotationY');
-        slots.forEach((slot, i) => {
-          let a = (((i * step + current) % 360) + 360) % 360;
-          if (a > 180) a = 360 - a; // 0 = facing front, 180 = at the back
-          const front = 1 - a / 180;
-          slot.style.opacity = String(0.25 + front * 0.75);
-          slot.style.filter = `brightness(${(0.45 + front * 0.55).toFixed(3)})`;
-        });
-      };
-      shade();
-
-      const tween = gsap.to(ring, {
-        rotationY: -(360 - step),
-        ease: 'none',
-        onUpdate: shade,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'center center',
-          end: '+=160%',
-          scrub: 0.8,
-          pin: true,
-          anticipatePin: 1
-        }
-      });
-
-      return () => {
-        tween.scrollTrigger && tween.scrollTrigger.kill();
-        tween.kill();
-        gsap.set(ring, { clearProps: 'transform' });
-        slots.forEach((slot) => {
-          slot.style.transform = '';
-          slot.style.opacity = '';
-          slot.style.filter = '';
-        });
-      };
-    });
-    return () => mm.revert();
-  }, []);
+  const panelRef = useRef(null);
+  const slashRef = useRef(null);
+  const triggerRef = useRef(null);
+  const activeRef = useRef(0);
+  const [active, setActive] = useState(0);
   const [localModalMember, setLocalModalMember] = useState(null);
   const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 
-  const handleOpenModal = (member) => {
-    if (onOpenModal) {
-      onOpenModal(member);
-    } else {
-      setLocalModalMember(member);
-      setIsLocalModalOpen(true);
-    }
+  // Pin the section and report the tour position to the 3D stage
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return undefined;
+
+    const updateWeight = () => {
+      const top = section.getBoundingClientRect().top;
+      const vh = window.innerHeight || 1;
+      stageFocus.weight = Math.max(0, Math.min(1, 1 - Math.abs(top) / vh));
+    };
+
+    const ctx = gsap.context(() => {
+      triggerRef.current = ScrollTrigger.create({
+        trigger: section,
+        start: 'top top',
+        end: () => `+=${Math.round(window.innerHeight * VH_PER_STOP * (TOUR.length - 0.4))}`,
+        pin: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const x = self.progress * LAST;
+          stageFocus.pos = holdEase(x);
+          const idx = Math.min(LAST, Math.max(0, Math.round(x)));
+          if (idx !== activeRef.current) {
+            activeRef.current = idx;
+            setActive(idx);
+          }
+          updateWeight();
+        }
+      });
+    }, section);
+
+    window.addEventListener('scroll', updateWeight, { passive: true });
+    window.addEventListener('resize', updateWeight);
+    updateWeight();
+
+    return () => {
+      window.removeEventListener('scroll', updateWeight);
+      window.removeEventListener('resize', updateWeight);
+      ctx.revert();
+      triggerRef.current = null;
+      stageFocus.weight = 0;
+      stageFocus.pos = 0;
+    };
+  }, []);
+
+  // Artist change: a red slash sweeps the panel, the new name slams in
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return undefined;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const chars = panel.querySelectorAll('.stage-tour-instrument .ch');
+    const lines = panel.querySelectorAll('[data-tour-line]');
+    const photo = panel.querySelector('.stage-tour-photo');
+
+    const tl = gsap.timeline();
+    tl.fromTo(
+      slashRef.current,
+      { xPercent: -120, skewX: -18, autoAlpha: 1 },
+      { xPercent: 120, duration: 0.55, ease: 'power3.inOut' },
+      0
+    )
+      .set(slashRef.current, { autoAlpha: 0 })
+      .fromTo(
+        chars,
+        { yPercent: 115, rotate: 6, opacity: 0 },
+        { yPercent: 0, rotate: 0, opacity: 1, duration: 0.5, ease: 'expo.out', stagger: 0.025 },
+        0.12
+      )
+      .fromTo(lines, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'power3.out', stagger: 0.06 }, 0.2)
+      .fromTo(
+        photo,
+        { rotateY: -55, x: 40, opacity: 0, clipPath: 'inset(0 0 0 100%)' },
+        { rotateY: 0, x: 0, opacity: 1, clipPath: 'inset(0 0 0 0%)', duration: 0.7, ease: 'expo.out' },
+        0.1
+      );
+    return () => tl.kill();
+  }, [active]);
+
+  const handleOpenModal = useCallback(
+    (member) => {
+      if (onOpenModal) onOpenModal(member);
+      else {
+        setLocalModalMember(member);
+        setIsLocalModalOpen(true);
+      }
+    },
+    [onOpenModal]
+  );
+
+  const jumpTo = (i) => {
+    const st = triggerRef.current;
+    if (!st) return;
+    scrollToY(st.start + ((st.end - st.start) * i) / LAST + 1);
   };
 
   const handleViewAllArtists = (e) => {
     e.preventDefault();
-    if (onNavigate) {
-      onNavigate('artists', 'view');
-    }
+    if (onNavigate) onNavigate('artists', 'view');
   };
 
+  const stop = TOUR[active];
+  const member = stop.artist;
+  const num = (n) => `0${n}`.slice(-2);
+
   return (
-    <section
-      ref={sectionRef}
-      id="artists-preview"
-      className="section-standard"
-      style={{
-        position: 'relative',
-        backgroundColor: 'transparent',
-        padding: 'clamp(3.5rem, 5.5vw, 5rem) 1.5rem',
-        overflow: 'hidden'
-      }}
-    >
-      {/* Section Header */}
-      <div
-        className="container"
-        style={{
-          textAlign: 'center',
-          marginBottom: '2.5rem'
-        }}
-      >
-        <div className="label-accent" style={{ marginBottom: '0.65rem', fontSize: '12px' }}>
+    <section ref={sectionRef} id="artists-preview" className="stage-tour" aria-label="Meet StarX: the band, one instrument at a time">
+      <div className="stage-tour-shade" aria-hidden="true" />
+
+      <header className="stage-tour-head">
+        <div className="label-accent" data-rock-fx="1" style={{ fontSize: '12px' }}>
           <span className="label-accent-dot" />
           STARX MUSICIANS
         </div>
-
-        <h2
-          className="editorial-heading"
-          style={{
-            fontSize: 'clamp(28px, 3.4vw, 38px)',
-            fontWeight: 600,
-            letterSpacing: '-0.015em',
-            color: '#F5F5F7',
-            margin: '0 0 0.5rem 0',
-            lineHeight: 1.12
-          }}
-        >
+        <h2 className="stage-tour-title" data-rock-fx="1">
           MEET STARX
         </h2>
-
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: 'clamp(13.5px, 1.05vw, 15px)',
-            fontWeight: 400,
-            color: '#A1A1A6',
-            maxWidth: '480px',
-            margin: '0 auto',
-            lineHeight: 1.6,
-            letterSpacing: '-0.01em'
-          }}
-        >
-          Real musicians. Real energy. The core lineup behind the live sound.
+        <p className="stage-tour-sub" data-rock-fx="1">
+          Scroll across the stage — one instrument, one artist.
         </p>
+      </header>
+
+      <div ref={panelRef} className="stage-tour-panel" key={active}>
+        <div ref={slashRef} className="stage-tour-slash" aria-hidden="true" />
+
+        <div className="stage-tour-count" data-tour-line>
+          <b>{num(active + 1)}</b>
+          <span>/ {num(TOUR.length)}</span>
+          <i>{stop.note}</i>
+        </div>
+
+        <div className="stage-tour-instrument" aria-hidden="true">
+          {stop.instrument.split('').map((c, i) => (
+            <span className="mask" key={i}>
+              <span className="ch">{c === ' ' ? ' ' : c}</span>
+            </span>
+          ))}
+        </div>
+
+        <div className="stage-tour-body">
+          <button
+            type="button"
+            className="stage-tour-photo"
+            onClick={() => handleOpenModal(member)}
+            aria-label={`View profile for ${member.name} - ${stop.instrument}`}
+          >
+            <BrandedImage
+              src={member.image}
+              alt={`${member.name} - ${member.role}`}
+              aspectRatio="4/5"
+              fallbackTitle={member.name}
+              fallbackSubtitle={member.role}
+              variant="member"
+              objectFit="cover"
+              priority
+              style={{ width: '100%', height: '100%' }}
+            />
+          </button>
+
+          <div className="stage-tour-info">
+            <span className="stage-tour-on" data-tour-line>
+              On {stop.instrument.toLowerCase() === 'vocals' ? 'the mic' : stop.instrument}
+            </span>
+            <h3 className="stage-tour-name" data-tour-line>
+              {member.name}
+            </h3>
+            <button type="button" className="stage-tour-profile" data-tour-line onClick={() => handleOpenModal(member)}>
+              View profile <ArrowUpRight size={14} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Card grid (mobile/tablet) / 3D spinning ring (desktop) */}
-      <div className="rock-ring-stage">
-      <div
-        ref={ringRef}
-        className="rock-ring"
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: '1.25rem',
-          maxWidth: '1180px',
-          margin: '0 auto 2rem auto',
-          width: '100%'
-        }}
-      >
-        {members.map((member, index) => {
-          const formattedNumber = `0${index + 1}`.slice(-2);
+      <nav className="stage-tour-rail" aria-label="Jump to an artist">
+        {TOUR.map((s, i) => (
+          <button
+            type="button"
+            key={s.id}
+            className={i === active ? 'is-active' : ''}
+            onClick={() => jumpTo(i)}
+            aria-label={`${s.instrument}: ${s.artist.name}`}
+            aria-current={i === active ? 'step' : undefined}
+          >
+            <span className="n">{num(i + 1)}</span>
+            <span className="t">{s.instrument}</span>
+          </button>
+        ))}
+      </nav>
 
-          return (
-            <div className="rock-ring-slot" key={member.id}>
-            <div
-              onClick={() => handleOpenModal(member)}
-              className="rock-card"
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleOpenModal(member);
-                }
-              }}
-              aria-label={`View profile for ${member.name} - ${member.role}`}
-              style={{
-                flex: '1 1 220px',
-                maxWidth: '260px',
-                minWidth: 0,
-                width: '100%',
-                aspectRatio: '4 / 5',
-                position: 'relative',
-                borderRadius: '4px',
-                overflow: 'hidden',
-                backgroundColor: 'rgba(14, 14, 17, 0.75)',
-                border: '1px solid rgba(255, 255, 255, 0.07)',
-                boxShadow: '0 14px 32px rgba(0, 0, 0, 0.4)',
-                cursor: 'pointer',
-                transition:
-                  'border-color 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease',
-                userSelect: 'none'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.18)';
-                e.currentTarget.style.transform = 'translateY(-3px)';
-                e.currentTarget.style.boxShadow = '0 18px 40px rgba(0, 0, 0, 0.55)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.07)';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 14px 32px rgba(0, 0, 0, 0.4)';
-              }}
-            >
-              {/* Photo Area (4:5 ratio) */}
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  width: '100%',
-                  height: '100%',
-                  overflow: 'hidden'
-                }}
-              >
-                <BrandedImage
-                  src={member.image}
-                  alt={`${member.name} - ${member.role}`}
-                  aspectRatio="4/5"
-                  fallbackTitle={member.name}
-                  fallbackSubtitle={member.role}
-                  variant="member"
-                  objectFit="cover"
-                  priority={index < 3}
-                  style={{
-                    width: '100%',
-                    height: '100%'
-                  }}
-                />
+      <a href="/artists" onClick={handleViewAllArtists} className="stage-tour-all">
+        <span>View all artist profiles</span>
+        <ArrowRight size={14} />
+      </a>
 
-                {/* Bottom Vignette Gradient */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background:
-                      'linear-gradient(180deg, transparent 40%, rgba(5, 5, 8, 0.65) 68%, rgba(5, 5, 8, 0.94) 100%)',
-                    pointerEvents: 'none'
-                  }}
-                />
-              </div>
-
-              {/* Bottom Card Content */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: '1rem',
-                  zIndex: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end'
-                }}
-              >
-                <span
-                  className="rock-card-num"
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: '10.5px',
-                    fontWeight: 600,
-                    letterSpacing: '0.12em',
-                    color: '#E8141C',
-                    marginBottom: '0.2rem',
-                    textTransform: 'uppercase'
-                  }}
-                >
-                  {formattedNumber}
-                </span>
-
-                <div
-                  className="rock-card-name"
-                  style={{
-                    fontSize: 'clamp(17px, 3.5vw, 19px)',
-                    fontWeight: 600,
-                    letterSpacing: '-0.015em',
-                    color: '#F5F5F7',
-                    lineHeight: 1.2,
-                    marginBottom: '0.2rem'
-                  }}
-                >
-                  {member.name}
-                </div>
-
-                <div
-                  className="rock-card-role"
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: '12px',
-                    fontWeight: 400,
-                    letterSpacing: '0.01em',
-                    color: '#A1A1A6',
-                    lineHeight: 1.35
-                  }}
-                >
-                  {member.role}
-                </div>
-              </div>
-            </div>
-            </div>
-          );
-        })}
-      </div>
-      </div>
-
-      {/* Link to Full Artists Page */}
-      <div style={{ textAlign: 'center' }}>
-        <a
-          href="/artists"
-          onClick={handleViewAllArtists}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            color: '#F5F5F7',
-            fontSize: '13.5px',
-            fontWeight: 600,
-            textDecoration: 'none',
-            borderBottom: '1px solid rgba(232, 20, 28, 0.8)',
-            paddingBottom: '2px',
-            transition: 'color 0.2s ease, border-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#E8141C';
-            e.currentTarget.style.borderColor = '#FFFFFF';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#F5F5F7';
-            e.currentTarget.style.borderColor = 'rgba(232, 20, 28, 0.8)';
-          }}
-        >
-          <span>View artist profiles</span>
-          <ArrowRight size={14} />
-        </a>
-      </div>
-
-      {/* Fallback local modal if onOpenModal is not provided */}
       {!onOpenModal && (
-        <MemberDetailModal
-          isOpen={isLocalModalOpen}
-          onClose={() => setIsLocalModalOpen(false)}
-          member={localModalMember}
-        />
+        <MemberDetailModal isOpen={isLocalModalOpen} onClose={() => setIsLocalModalOpen(false)} member={localModalMember} />
       )}
     </section>
   );

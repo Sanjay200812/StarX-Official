@@ -5,6 +5,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { stageFocus } from '../../lib/stageFocus';
 
 /**
  * StageUniverse — the StarX concert stage, in 3D, behind the whole site.
@@ -17,6 +18,9 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
  *
  * As the page scrolls the camera orbits the stage (closer in the middle of the
  * page, rising and dipping), so the band is always in view from a new angle.
+ * Inside the "Meet StarX" tour the camera instead flies from instrument to
+ * instrument (pad → drums → piano → lead → bass → both vocal mics), driven by
+ * the shared `stageFocus` channel, with a follow spot lighting each one.
  * The whole rig plays along to a 112 BPM beat: kick pumps the bass drum and
  * speakers, cymbals shake, the pad steps through its lights, keys get pressed.
  *
@@ -713,7 +717,8 @@ export const StageUniverse = () => {
 
     const keys = buildKeyboard(m);
     keys.group.position.set(-6, -1, -1.2);
-    keys.group.rotation.y = 0.45;
+    // turned round so the player stands behind it, facing the audience
+    keys.group.rotation.y = Math.PI + 0.45;
     scene.add(keys.group);
 
     const pad = buildPad(m);
@@ -732,6 +737,8 @@ export const StageUniverse = () => {
     micL.group.position.set(-1.6, -1, 3.8);
     const micR = buildMic(m);
     micR.group.position.set(1.6, -1, 3.8);
+    micL.group.scale.setScalar(1.2);
+    micR.group.scale.setScalar(1.2);
     scene.add(micL.group, micR.group);
 
     const ampL = buildAmp(m);
@@ -746,6 +753,34 @@ export const StageUniverse = () => {
     vinyl.spinner.position.set(0, 5.2, -8.5);
     vinyl.spinner.scale.setScalar(0.95);
     scene.add(vinyl.spinner);
+
+    // Tour camera shots, one per instrument (order = TOUR_ORDER).
+    // `obj` shots are in that instrument's local space; the rest are world space.
+    scene.updateMatrixWorld(true);
+    const shotDefs = [
+      { obj: pad.group, target: [0, 1.2, 0], cam: [2.9, 3.2, 3.6] },
+      { obj: drums.group, target: [0, 1.3, 0.1], cam: [0, 4.2, 5.2] },
+      { obj: keys.group, target: [0, 1.4, 0], cam: [-2.6, 4.3, 5.4] },
+      { target: [-3.6, 2.5, 2.4], cam: [-2.4, 3.1, 8.2] },
+      { target: [3.6, 2.7, 2.4], cam: [2.4, 3.3, 8.6] },
+      { target: [-1.6, 0.7, 3.8], cam: [-0.9, 1.3, 6.9] },
+      { target: [1.6, 0.7, 3.8], cam: [0.9, 1.3, 6.9] }
+    ];
+    const shots = shotDefs.map((d) => {
+      const target = new THREE.Vector3(...d.target);
+      const cam = new THREE.Vector3(...d.cam);
+      if (d.obj) {
+        d.obj.localToWorld(target);
+        d.obj.localToWorld(cam);
+      }
+      return { target, cam };
+    });
+    const lastShot = shots.length - 1;
+
+    // Follow spot that lands on whichever instrument the tour is on
+    const followSpot = new THREE.SpotLight('#fff1e0', 0, 30, 0.32, 0.6, 1.2);
+    followSpot.position.set(0, 12, 6);
+    scene.add(followSpot, followSpot.target);
 
     // Sound ripples across the stage floor
     const ripples = Array.from({ length: 4 }).map((_, i) => {
@@ -840,6 +875,11 @@ export const StageUniverse = () => {
     };
 
     const dummy = new THREE.Object3D();
+    const focus = { weight: stageFocus.weight, pos: stageFocus.pos };
+    const tourCam = new THREE.Vector3();
+    const tourTarget = new THREE.Vector3();
+    const tmpVec = new THREE.Vector3();
+    const tmpVec2 = new THREE.Vector3();
     const clock = new THREE.Clock();
     let raf = 0;
     let running = true;
@@ -871,6 +911,58 @@ export const StageUniverse = () => {
       const height = 3.4 + Math.sin(p * Math.PI * 2 + 0.4) * 1.8 - state.my * 0.6;
       camera.position.set(Math.sin(angle) * radius, height, Math.cos(angle) * radius);
       lookTarget.set(Math.sin(angle) * -1.2, 1.4 + Math.sin(p * Math.PI) * 0.6, 0);
+
+      // Stage tour: fly between instrument shots and blend over the orbit
+      if (reduced) {
+        focus.weight = stageFocus.weight;
+        focus.pos = stageFocus.pos;
+      } else {
+        focus.weight += (stageFocus.weight - focus.weight) * Math.min(1, dt * 3.2);
+        focus.pos += (stageFocus.pos - focus.pos) * Math.min(1, dt * 3.6);
+      }
+      const fw = focus.weight * focus.weight * (3 - 2 * focus.weight);
+      if (fw > 0.001) {
+        const fp = Math.min(lastShot, Math.max(0, focus.pos));
+        const i0 = Math.floor(fp);
+        const i1 = Math.min(lastShot, i0 + 1);
+        const f = fp - i0;
+        const fe = f * f * (3 - 2 * f);
+        const a = shots[i0];
+        const b = shots[i1];
+        tourCam.lerpVectors(a.cam, b.cam, fe);
+        tourTarget.lerpVectors(a.target, b.target, fe);
+        // swoop up and out between shots instead of cutting through the kit
+        const arc = Math.sin(f * Math.PI);
+        tmpVec.set(tourCam.x, 0, tourCam.z).normalize().multiplyScalar(arc * 2.6);
+        tourCam.add(tmpVec);
+        tourCam.y += arc * 1.4;
+        // phones: pull back a little (narrow view); a touch of pointer parallax
+        if (isSmall) tourCam.sub(tourTarget).multiplyScalar(1.3).add(tourTarget);
+        tourCam.x += state.mx * 0.35;
+        tourCam.y -= state.my * 0.2;
+        // keep the instrument clear of the text: right of centre on desktop, high on phones
+        tmpVec.subVectors(tourTarget, tourCam);
+        const dist = tmpVec.length();
+        tmpVec.normalize();
+        if (isSmall) {
+          tmpVec2.set(0, 1, 0);
+          tourCam.addScaledVector(tmpVec2, -dist * 0.2);
+          tourTarget.addScaledVector(tmpVec2, -dist * 0.2);
+        } else {
+          tmpVec2.crossVectors(tmpVec, camera.up).normalize();
+          tourCam.addScaledVector(tmpVec2, -dist * 0.24);
+          tourTarget.addScaledVector(tmpVec2, -dist * 0.24);
+        }
+        camera.position.lerp(tourCam, fw);
+        lookTarget.lerp(tourTarget, fw);
+
+        const spotOn = shots[Math.round(fp)].target;
+        followSpot.target.position.lerp(spotOn, Math.min(1, dt * 4));
+        followSpot.position.set(followSpot.target.position.x * 0.6, 11, followSpot.target.position.z + 5);
+        followSpot.intensity = fw * 75;
+      } else {
+        followSpot.intensity = 0;
+      }
       camera.lookAt(lookTarget);
 
       // Lights pulse with the kick
@@ -928,10 +1020,12 @@ export const StageUniverse = () => {
         });
       });
 
-      // Guitars float and turn, mics sway
-      lead.rotation.set(0.05, Math.sin(t * 0.5) * 0.6 + 0.3, 0.22 + Math.sin(t * 0.9) * 0.04);
+      // Guitars float and turn (and face the camera when the tour is on them), mics sway
+      const onLead = fw * Math.max(0, 1 - Math.abs(focus.pos - 3));
+      const onBass = fw * Math.max(0, 1 - Math.abs(focus.pos - 4));
+      lead.rotation.set(0.05, (Math.sin(t * 0.5) * 0.6 + 0.3) * (1 - onLead) + Math.sin(t * 0.6) * 0.12 * onLead, 0.22 + Math.sin(t * 0.9) * 0.04);
       lead.position.y = 1.6 + Math.sin(t * 0.8) * 0.18;
-      bass.rotation.set(0.05, Math.sin(t * 0.45 + 2) * 0.6 - 0.3, -0.22 + Math.sin(t * 0.8 + 1) * 0.04);
+      bass.rotation.set(0.05, (Math.sin(t * 0.45 + 2) * 0.6 - 0.3) * (1 - onBass) + Math.sin(t * 0.55) * 0.12 * onBass, -0.22 + Math.sin(t * 0.8 + 1) * 0.04);
       bass.position.y = 1.5 + Math.sin(t * 0.75 + 1.3) * 0.18;
       micL.head.rotation.z = Math.sin(t * 0.9) * 0.06;
       micR.head.rotation.z = Math.sin(t * 0.9 + 1) * 0.06;

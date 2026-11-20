@@ -342,7 +342,7 @@ const applyScrollFX = (root) => {
   // 4. Big media frames: shutter wipe + parallax drift
   root.querySelectorAll('section img:not([data-rock-fx])').forEach((img) => {
     img.setAttribute('data-rock-fx', '1');
-    if (img.closest('#home') || img.closest('.rock-card') || img.closest('.logo-wrapper')) return;
+    if (img.closest('#home') || img.closest('.rock-card') || img.closest('.logo-wrapper') || img.closest('.stage-tour')) return;
     if (img.closest('[role="dialog"]')) return;
     const frame = img.parentElement;
     if (!frame || frame.getBoundingClientRect().width < 260) return;
@@ -463,6 +463,7 @@ export const useRockScrollFX = (viewKey, enabled = true) => {
             !n.classList.contains('rock-word') &&
             !n.classList.contains('rock-char') &&
             n.querySelector &&
+            !(n.closest && n.closest('.stage-tour')) &&
             n.querySelector('.editorial-heading, .rock-card, section img, .label-accent')
         )
       );

@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, Instagram } from 'lucide-react';
 import { crew } from '../data/crew';
 import BrandedImage from '../components/BrandedImage';
 import MemberDetailModal from '../components/MemberDetailModal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * CrewPreview Section (Home)
@@ -10,8 +14,72 @@ import MemberDetailModal from '../components/MemberDetailModal';
  * Compact crew preview sourced from the central roster.
  * Single click opens member detail modal.
  * Link "View full crew →" navigates to /crew.
+ *
+ * Desktop: the crew stand in a 3D ring that spins as you scroll past (pinned),
+ * so each person gets a turn at the front. Phones/tablets keep the card grid.
  */
 export const CrewPreview = ({ onNavigate, onOpenModal }) => {
+  const sectionRef = useRef(null);
+  const ringRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const mm = gsap.matchMedia();
+    mm.add('(min-width: 1000px)', () => {
+      const ring = ringRef.current;
+      if (!ring) return undefined;
+      const slots = Array.from(ring.querySelectorAll('.rock-ring-slot'));
+      if (slots.length < 2) return undefined;
+      const step = 360 / slots.length;
+      const radius = Math.max(340, Math.round((300 * slots.length) / (2 * Math.PI)) + 60);
+
+      slots.forEach((slot, i) => {
+        slot.style.transform = `rotateY(${i * step}deg) translateZ(${radius}px)`;
+      });
+      gsap.set(ring, { rotationX: -6, z: -radius });
+
+      const shade = () => {
+        const current = gsap.getProperty(ring, 'rotationY');
+        slots.forEach((slot, i) => {
+          let a = (((i * step + current) % 360) + 360) % 360;
+          if (a > 180) a = 360 - a; // 0 = facing front, 180 = at the back
+          const front = 1 - a / 180;
+          slot.style.opacity = String(0.2 + front * 0.8);
+          slot.style.filter = `brightness(${(0.4 + front * 0.6).toFixed(3)})`;
+          slot.style.pointerEvents = front > 0.8 ? 'auto' : 'none';
+        });
+      };
+      shade();
+
+      const tween = gsap.to(ring, {
+        rotationY: -(360 - step),
+        ease: 'none',
+        onUpdate: shade,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: () => (sectionRef.current.offsetHeight > window.innerHeight - 70 ? 'top top' : 'center center'),
+          end: `+=${slots.length * 55}%`,
+          scrub: 0.8,
+          pin: true,
+          anticipatePin: 1
+        }
+      });
+
+      return () => {
+        if (tween.scrollTrigger) tween.scrollTrigger.kill();
+        tween.kill();
+        gsap.set(ring, { clearProps: 'transform' });
+        slots.forEach((slot) => {
+          slot.style.transform = '';
+          slot.style.opacity = '';
+          slot.style.filter = '';
+          slot.style.pointerEvents = '';
+        });
+      };
+    });
+    return () => mm.revert();
+  }, []);
+
   const [localModalMember, setLocalModalMember] = useState(null);
   const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 
@@ -33,6 +101,7 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
 
   return (
     <section
+      ref={sectionRef}
       id="crew-preview"
       className="section-standard"
       style={{
@@ -77,8 +146,11 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
           </p>
         </div>
 
-        {/* 3-Card Grid */}
+        {/* Card grid (phones/tablets) / 3D spinning ring (desktop) */}
+        <div className="rock-ring-stage rock-ring-stage--crew">
         <div
+          ref={ringRef}
+          className="rock-ring rock-ring--crew"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
@@ -88,8 +160,8 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
           }}
         >
           {crew.map((person) => (
+            <div className="rock-ring-slot" key={person.id}>
             <div
-              key={person.id}
               onClick={() => handleOpenModal(person)}
               className="rock-card rock-card--panel"
               role="button"
@@ -219,7 +291,9 @@ export const CrewPreview = ({ onNavigate, onOpenModal }) => {
                 )}
               </div>
             </div>
+            </div>
           ))}
+        </div>
         </div>
 
         {/* View Full Crew Navigation Link */}

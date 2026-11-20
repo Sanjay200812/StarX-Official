@@ -52,3 +52,9 @@ export const resetScroll = () => {
   if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
   else window.scrollTo(0, 0);
 };
+
+/** Smoothly scroll to a page Y position (used by the stage tour's jump links). */
+export const scrollToY = (y) => {
+  if (lenis) lenis.scrollTo(y, { duration: 1.4 });
+  else window.scrollTo({ top: y, behavior: 'smooth' });
+};
